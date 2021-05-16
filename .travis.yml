@@ -13,6 +13,7 @@ env:
     - ANDROID_API=28
 
 install:
+  - git clone https://github.com/flutter/flutter.git -b stable
   - git clone $FLUTTER_GITHUB -b main --depth 1
   - $FLUTTER doctor
   - $FLUTTER pub get
