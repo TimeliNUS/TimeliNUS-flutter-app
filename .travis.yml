@@ -24,11 +24,11 @@ jobs:
       script:
         - $DARTFMT -n $PACKAGES --set-exit-if-changed
 
-    - stage: Packages' Flutter Test
-      script:
-        - $FLUTTER test --coverage $PACKAGES
-      # after_success:
-      #   - bash <(curl -s $CODECOV)
+    # - stage: Packages' Flutter Test
+    #   script:
+    #     - $FLUTTER test --coverage $PACKAGES
+    #   # after_success:
+    #   #   - bash <(curl -s $CODECOV)
 
     - stage: App's Flutter Test
       script:
