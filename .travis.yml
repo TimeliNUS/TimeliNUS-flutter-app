@@ -35,8 +35,8 @@ jobs:
       script:
         - cd $APP
         - $FLUTTER_UP test --coverage
-      # after_success:
-      #   - bash <(curl -s $CODECOV)
+      after_success:
+        - bash <(curl -s $CODECOV)
 
     - stage: iOS Integration Tests
       os: osx
