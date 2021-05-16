@@ -8,8 +8,9 @@ env:
     - FLUTTER_UP=../flutter/bin/flutter
     - FLUTTER_GITHUB=https://github.com/TimelinNUS/TimeliNUS-flutter-app
     - CODECOV=https://codecov.io/bash
+    - CODECOV_TOKEN=d1891b0b-22bf-44da-880b-40bae98fe02b
     - PACKAGES=packages
-    - APP=app
+    - APP=lib
     - ANDROID_API=28
 
 install:
