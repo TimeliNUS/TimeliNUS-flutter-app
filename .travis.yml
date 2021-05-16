@@ -13,7 +13,7 @@ env:
     - ANDROID_API=28
 
 install:
-  - git clone $FLUTTER_GITHUB -b stable --depth 1
+  - git clone $FLUTTER_GITHUB -b main --depth 1
   - $FLUTTER doctor
   - $FLUTTER pub get
 
@@ -26,15 +26,15 @@ jobs:
     - stage: Packages' Flutter Test
       script:
         - $FLUTTER test --coverage $PACKAGES
-      after_success:
-        - bash <(curl -s $CODECOV)
+      # after_success:
+      #   - bash <(curl -s $CODECOV)
 
     - stage: App's Flutter Test
       script:
         - cd $APP
         - $FLUTTER_UP test --coverage
-      after_success:
-        - bash <(curl -s $CODECOV)
+      # after_success:
+      #   - bash <(curl -s $CODECOV)
 
     - stage: iOS Integration Tests
       os: osx
