@@ -1,9 +1,11 @@
 import 'package:TimeliNUS/screens/loginScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:TimeliNUS/screens/myHomeScreen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  // await FirebaseAuth.instance.useEmulator('http://localhost:9099');
   runApp(MyApp());
 }
 

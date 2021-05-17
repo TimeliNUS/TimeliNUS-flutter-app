@@ -5,7 +5,7 @@ import 'package:TimeliNUS/screens/myHomeScreen.dart';
 void main() {
   testWidgets('home page is created', (WidgetTester tester) async {
     final testWidget = MaterialApp(
-      home: MyHomeScreen(title: 'Flutter Demo Home Page'),
+      home: MyHomeScreen('Flutter Demo Home Page'),
     );
 
     await tester.pumpWidget(testWidget);
