@@ -1,3 +1,4 @@
+import 'package:TimeliNUS/screens/loginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:TimeliNUS/screens/myHomeScreen.dart';
 
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: LoginScreen(),
     );
   }
 }
