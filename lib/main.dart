@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:TimeliNUS/screens/myHomePage.dart';
+import 'package:TimeliNUS/screens/myHomeScreen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
