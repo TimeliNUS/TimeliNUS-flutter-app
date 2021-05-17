@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,8 +22,25 @@ void main() {
     await tester.pumpWidget(testWidget);
     expect(
         find.byWidgetPredicate(
-          (Widget widget) =>
-              widget is TextField && widget.key == Key('Username'),
+          (Widget widget) => widget is TextField && widget.key == Key('Email'),
+        ),
+        findsOneWidget);
+  });
+
+  testWidgets('user name input is bounded to a variable',
+      (WidgetTester tester) async {
+    final testWidget = MaterialApp(
+      home: LoginScreen(),
+    );
+    await tester.pumpWidget(testWidget);
+    await tester.enterText(
+        find.byWidgetPredicate(
+          (Widget widget) => widget is TextField && widget.key == Key('Email'),
+        ),
+        'hi');
+    expect(
+        find.byWidgetPredicate(
+          (Widget widget) => widget is TextField && widget.key == Key('Email'),
         ),
         findsOneWidget);
   });

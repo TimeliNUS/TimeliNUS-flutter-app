@@ -29,6 +29,7 @@ dependencies:
   equatable: ^1.1.1
   cupertino_icons: ^1.0.2
   bloc: ^7.0.0
+  flutter_platform_widgets: ^1.7.1
 
 dev_dependencies:
   flutter_test:
