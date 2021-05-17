@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:TimeliNUS/screens/myHomePage.dart';
+import 'package:TimeliNUS/screens/myHomeScreen.dart';
 import 'package:TimeliNUS/main.dart';
 
 void main() {
