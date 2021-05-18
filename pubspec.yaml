@@ -32,6 +32,7 @@ dependencies:
   flutter_platform_widgets: ^1.7.1
   google_sign_in: "^4.5.1"
   provider: "^5.0.0"
+  device_info: "^2.0.0"
 
 dev_dependencies:
   flutter_test:

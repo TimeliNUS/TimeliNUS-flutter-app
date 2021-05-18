@@ -3,19 +3,22 @@ import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {
-  FirebaseAuth auth = FirebaseAuth.instance;
-  static void signUp(String email, String password) async {
+  static FirebaseAuth auth = FirebaseAuth.instance;
+
+  static Future<User> signUp(String email, String password) async {
+    User user;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+      user = userCredential.user;
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
       print(e.message);
     }
+    return user;
   }
 
   static Future<User> signInWithGoogle({BuildContext context}) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
     User user;
 
     final GoogleSignIn googleSignIn = GoogleSignIn();

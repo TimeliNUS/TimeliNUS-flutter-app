@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:TimeliNUS/utils/services/firebase.dart';
 
-final FirebaseAuth _auth = FirebaseAuth.instance;
-
 class LoginScreen extends StatefulWidget {
   LoginScreen();
 
