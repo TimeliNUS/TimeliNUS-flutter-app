@@ -1,15 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {
   static FirebaseAuth auth = FirebaseAuth.instance;
+  static FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   static Future<User> signUp(String email, String password) async {
+    // FirebaseAuth.instance.useEmulator('http://localhost:9099');
     User user;
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+          email: email, password: password);
       user = userCredential.user;
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
@@ -51,5 +55,17 @@ class FirebaseService {
     }
 
     return user;
+  }
+
+  static Future<String> add() async {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    return users
+        .add({
+          'full_name': 'fullName', // John Doe
+          'company': 'company', // Stokes and Sons
+          'age': 'age' // 42
+        })
+        .then((value) => ("User Added"))
+        .catchError((error) => ("Failed to add user: $error"));
   }
 }

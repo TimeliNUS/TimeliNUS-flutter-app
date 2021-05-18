@@ -23,22 +23,31 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_core: "0.7.0"
+  firebase_core: "^1.1.1"
   flutter_bloc: ^7.0.0
-  firebase_auth: "^0.20.1"
-  equatable: ^1.1.1
+  firebase_auth: "^1.1.4"
+  cloud_firestore: "^2.1.0"
+  equatable: ^2.0.0
   cupertino_icons: ^1.0.2
   bloc: ^7.0.0
   flutter_platform_widgets: ^1.7.1
-  google_sign_in: "^4.5.1"
+  google_sign_in: "^5.0.2"
   provider: "^5.0.0"
   device_info: "^2.0.0"
+  carousel_slider: "^3.0.0"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mockito: ^4.0.0
+  # integration_test:
+  #   sdk: flutter
+  # flutter_driver:
+  #   sdk: flutter
+  mockito: ^5.0.0
   bloc_test: ^8.0.0
+  http: "^0.13.0" 
+  firebase_auth_mocks: "^0.6.0" 
+  google_sign_in_mocks: "^0.2.1"
 
 # The following section is specific to Flutter.
 flutter:
