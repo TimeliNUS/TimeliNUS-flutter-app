@@ -22,8 +22,9 @@ class RegisterGroupState extends State<RegisterGroup> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Padding(
-      padding: EdgeInsets.only(top: 20, left: 45, right: 45),
+      padding: EdgeInsets.only(top: screenHeight * 0.01, left: 45, right: 45),
       child: Column(
         children: [
           Text("Sign up now to start using TimeliNUS",
@@ -31,13 +32,13 @@ class RegisterGroupState extends State<RegisterGroup> {
           Padding(padding: EdgeInsets.symmetric(vertical: 10)),
           Image(
             image: AssetImage("assets/images/loginScreen/register.png"),
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height * 0.175,
           ),
           Padding(padding: EdgeInsets.symmetric(vertical: 10)),
           getEmailInput(_emailController),
-          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+          Padding(padding: EdgeInsets.symmetric(vertical: 5)),
           getPasswordInput(_passwordController),
-          Padding(padding: EdgeInsets.only(top: 20)),
+          Padding(padding: EdgeInsets.only(top: screenHeight * 0.01)),
           Row(
             children: [
               Text(
@@ -56,7 +57,10 @@ class RegisterGroupState extends State<RegisterGroup> {
                   onChanged: (isSetToRemembered) =>
                       setState(() => isRemembered = isSetToRemembered)),
             ),
-            Padding(padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30)),
+            Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: MediaQuery.of(context).size.height * 0.025)),
             InkWell(
                 onTap: () => setState(() => isRemembered = !isRemembered),
                 child: Text("Remember me", style: ThemeTextStyle.defaultText))

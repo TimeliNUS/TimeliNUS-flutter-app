@@ -36,8 +36,8 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var height = screenSize.height;
+    final screenSize = MediaQuery.of(context).size;
+    final screenHeight = screenSize.height;
 
     return Scaffold(
         // appBar: AppBar(
@@ -59,7 +59,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(top: height * 0.1),
+                    padding: EdgeInsets.only(top: screenHeight * 0.075),
                     child: Text(
                       action == AuthenticationAction.login
                           ? 'Login'
@@ -91,13 +91,13 @@ class _LandingScreenState extends State<LandingScreen> {
                     Expanded(
                       flex: 1,
                       child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 40),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 40),
                           child: Row(
                             children: <Widget>[
                               Expanded(child: Divider()),
                               Padding(
-                                  padding: EdgeInsets.all(15),
+                                  padding: EdgeInsets.all(screenHeight * 0.01),
                                   child: Text("OR",
                                       style: TextStyle(color: Colors.black12))),
                               Expanded(child: Divider()),
@@ -123,8 +123,6 @@ class _LandingScreenState extends State<LandingScreen> {
                             child: new ConstrainedBox(
                               constraints: BoxConstraints(
                                   maxHeight: 45, minHeight: 45, maxWidth: 40),
-                              // height: 40.0,
-                              // width: 80.0,
                               child: OutlinedButton(
                                   style: ButtonStyle(
                                     shape: MaterialStateProperty.all(

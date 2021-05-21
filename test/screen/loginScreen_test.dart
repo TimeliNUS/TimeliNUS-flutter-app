@@ -1,10 +1,8 @@
+import 'package:TimeliNUS/widgets/registerGroup.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:TimeliNUS/screens/landingScreen.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   // testWidgets('login page is created', (WidgetTester tester) async {
@@ -52,5 +50,17 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byWidgetPredicate((Widget widget) => widget is CarouselSlider),
         findsOneWidget);
+  });
+
+  testWidgets('show signin group', (WidgetTester tester) async {
+    // expect(true, true);
+    final testWidget = MaterialApp(
+      home: LandingScreen(),
+    );
+    await tester.pumpWidget(testWidget);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("Continue with Email"));
+    await tester.pumpAndSettle();
+    expect(find.byType(RegisterGroup), findsOneWidget);
   });
 }

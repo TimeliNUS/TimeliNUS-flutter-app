@@ -35,7 +35,7 @@ class LoginGroupState extends State<LoginGroup> {
           ),
           Padding(padding: EdgeInsets.symmetric(vertical: 10)),
           getEmailInput(_emailController),
-          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+          Padding(padding: EdgeInsets.symmetric(vertical: 5)),
           getPasswordInput(_passwordController),
           Row(mainAxisSize: MainAxisSize.max, children: [
             SizedBox(
