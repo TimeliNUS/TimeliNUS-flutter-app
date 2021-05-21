@@ -2,6 +2,7 @@ import 'package:TimeliNUS/widgets/carousel.dart';
 import 'package:TimeliNUS/widgets/googleSignInButton.dart';
 import 'package:TimeliNUS/widgets/landingActionGroup.dart';
 import 'package:TimeliNUS/widgets/loginGroup.dart';
+import 'package:TimeliNUS/widgets/registerGroup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -69,13 +70,20 @@ class _LandingScreenState extends State<LandingScreen> {
                     ),
                   ),
                   action == AuthenticationAction.login
-                      ? LoginGroup()
-                      : Column(children: [
-                          CarouselWithIndicatorDemo(),
-                          Padding(padding: EdgeInsets.only(top: 20)),
-                          landingActionGroup(() => setState(
-                              () => action = AuthenticationAction.login)),
-                        ]),
+                      ? LoginGroup(() => setState(
+                          () => action = AuthenticationAction.register))
+                      : action == AuthenticationAction.register
+                          ? RegisterGroup(() => setState(
+                              () => action = AuthenticationAction.login))
+                          : Column(children: [
+                              CarouselWithIndicatorDemo(),
+                              Padding(padding: EdgeInsets.only(top: 20)),
+                              landingActionGroup(
+                                  () => setState(() =>
+                                      action = AuthenticationAction.login),
+                                  () => setState(() =>
+                                      action = AuthenticationAction.register)),
+                            ]),
                   Row(children: <Widget>[
                     Expanded(
                       flex: 1,

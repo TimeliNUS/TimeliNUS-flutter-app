@@ -1,16 +1,19 @@
+import 'package:TimeliNUS/utils/services/firebase.dart';
 import 'package:TimeliNUS/widgets/formInput.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class SignInGroup extends StatefulWidget {
+class RegisterGroup extends StatefulWidget {
+  final authenticationActionFunction;
+  const RegisterGroup(this.authenticationActionFunction);
   @override
   State<StatefulWidget> createState() {
-    return _SignInGroupState();
+    return _RegisterGroupState();
   }
 }
 
-class _SignInGroupState extends State<SignInGroup> {
+class _RegisterGroupState extends State<RegisterGroup> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool isRemembered = false;
@@ -22,7 +25,14 @@ class _SignInGroupState extends State<SignInGroup> {
       child: Column(
         // mainAxisSize: MainAxisSize.max,
         children: [
-          Image(image: AssetImage("assets/images/loginScreen/login.png")),
+          Text("Sign up now to start using TimeliNUS",
+              style: TextStyle(color: Colors.white)),
+          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
+          Image(
+            image: AssetImage("assets/images/loginScreen/register.png"),
+            height: MediaQuery.of(context).size.height * 0.2,
+          ),
+          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
           getEmailInput(_emailController),
           Padding(padding: EdgeInsets.symmetric(vertical: 10)),
           getPasswordInput(_passwordController),
@@ -46,7 +56,7 @@ class _SignInGroupState extends State<SignInGroup> {
                       setState(() => isRemembered = isSetToRemembered)),
             ),
             Padding(padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30)),
-            Text("Remember me", style: defaultText())
+            Text("Remember me", style: ThemeTextStyle.defaultText)
           ]),
           Padding(padding: EdgeInsets.only(bottom: 10)),
           Row(
@@ -66,11 +76,35 @@ class _SignInGroupState extends State<SignInGroup> {
                                 ),
                               ),
                             ),
-                            onPressed: () => {},
+                            onPressed: () => FirebaseService.register(
+                                _emailController.text,
+                                _passwordController.text),
                             child: Padding(
                                 padding: EdgeInsets.all(15),
                                 child: Text("Sign Up")))))
-              ])
+              ]),
+          // Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Have an account?",
+                  style: TextStyle(color: Colors.black54, fontSize: 12)),
+              new InkWell(
+                onTap: () {
+                  // Navigator.pushNamed(context, "YourRoute");
+                  widget.authenticationActionFunction();
+                },
+                child: new Padding(
+                  padding: new EdgeInsets.all(10.0),
+                  child: new Text("Sign in here",
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.black54,
+                          fontSize: 12)),
+                ),
+              )
+            ],
+          ),
         ],
       ),
     );

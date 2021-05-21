@@ -57,14 +57,15 @@ final List<Widget> imageSliders = imgList()
 class CarouselWithIndicatorDemo extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _CarouselWithIndicatorState();
+    return CarouselWithIndicatorState();
   }
 }
 
-class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
+class CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
   List<dynamic> textList;
   List<Image> imagesList;
-  int _current = 0;
+  int current;
+  CarouselController buttonCarouselController = CarouselController();
 
   // void loadAssets() {
   //   List<Image> images = [];
@@ -79,9 +80,7 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
   @override
   void initState() {
     super.initState();
-    List<Future> futures = [];
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    // loadAssets();
+    current = 0;
     new Future(() => loadJson()).then((returnedData) => {
           setState(() {
             textList = returnedData;
@@ -97,13 +96,14 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
       return Column(children: [
         CarouselSlider(
           items: imageSliders,
+          carouselController: buttonCarouselController,
           options: CarouselOptions(
               height: 420.0,
               viewportFraction: 1.0,
               enableInfiniteScroll: false,
               onPageChanged: (index, reason) {
                 setState(() {
-                  _current = index;
+                  current = index;
                 });
               }),
         ),
@@ -111,13 +111,13 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [0, 1, 2].map((url) {
               return AnimatedContainer(
-                width: _current == url ? 25.0 : 15.0,
+                width: current == url ? 25.0 : 15.0,
                 height: 4.0,
                 margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                     shape: BoxShape.rectangle,
-                    color: _current == url
+                    color: current == url
                         ? Colors.orange
                         : Color.fromRGBO(0, 0, 0, 0.4)),
                 duration: Duration(milliseconds: 375),

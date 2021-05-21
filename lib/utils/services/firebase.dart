@@ -8,7 +8,7 @@ class FirebaseService {
   static FirebaseAuth auth = FirebaseAuth.instance;
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  static Future<User> signUp(String email, String password) async {
+  static Future<User> register(String email, String password) async {
     // FirebaseAuth.instance.useEmulator('http://localhost:9099');
     User user;
     try {
@@ -18,6 +18,23 @@ class FirebaseService {
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
       print(e.message);
+    }
+    return user;
+  }
+
+  static Future<User> login(String email, String password) async {
+    // FirebaseAuth.instance.useEmulator('http://localhost:9099');
+    User user;
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
     }
     return user;
   }

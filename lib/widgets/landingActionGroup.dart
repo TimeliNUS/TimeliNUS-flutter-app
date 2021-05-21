@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-Widget landingActionGroup(Function() trigger) {
+Widget landingActionGroup(Function() login, Function() register) {
   return Padding(
     padding: EdgeInsets.only(top: 20, left: 20, right: 20),
     child: Column(
@@ -17,7 +17,7 @@ Widget landingActionGroup(Function() trigger) {
             new InkWell(
               onTap: () {
                 // Navigator.pushNamed(context, "YourRoute");
-                trigger();
+                login();
               },
               child: new Padding(
                 padding: new EdgeInsets.all(10.0),
@@ -48,7 +48,7 @@ Widget landingActionGroup(Function() trigger) {
                               ),
                             ),
                           ),
-                          onPressed: () => {},
+                          onPressed: () => register(),
                           child: Padding(
                               padding: EdgeInsets.all(15),
                               child: Text("Continue with Email")))))

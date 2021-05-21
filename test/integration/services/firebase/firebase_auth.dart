@@ -3,14 +3,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:TimeliNUS/utils/services/firebase.dart';
 
-import '../../utils/firebase_util.dart';
+import '../../../utils/firebase_util.dart';
 
 void main() {
   String email = generateRandomEmail();
 
   test('should throw user-not-found or user-mismatch ', () async {
     // Setup
-    User user = await FirebaseService.signUp(email, testPassword);
+    User user = await FirebaseService.register(email, testPassword);
 
     try {
       // Test

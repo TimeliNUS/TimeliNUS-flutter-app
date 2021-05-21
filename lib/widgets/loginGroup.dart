@@ -1,9 +1,13 @@
+import 'package:TimeliNUS/utils/services/firebase.dart';
 import 'package:TimeliNUS/widgets/formInput.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class LoginGroup extends StatefulWidget {
+  final authenticationActionFunction;
+  const LoginGroup(this.authenticationActionFunction);
+
   @override
   State<StatefulWidget> createState() {
     return _loginGroupState();
@@ -24,21 +28,14 @@ class _loginGroupState extends State<LoginGroup> {
         children: [
           Text("To continue your access",
               style: TextStyle(color: Colors.white)),
-          Image(image: AssetImage("assets/images/loginScreen/login.png")),
+          Image(
+            image: AssetImage("assets/images/loginScreen/login.png"),
+          ),
+          Padding(padding: EdgeInsets.symmetric(vertical: 10)),
           getEmailInput(_emailController),
           Padding(padding: EdgeInsets.symmetric(vertical: 10)),
           getPasswordInput(_passwordController),
-          Padding(padding: EdgeInsets.only(top: 20)),
-          Row(
-            children: [
-              Text(
-                "Password should consist of at least 8 characters,\nincluding letters and numbers ",
-                style: TextStyle(color: Colors.black38, fontSize: 12),
-                textAlign: TextAlign.left,
-              )
-            ],
-          ),
-          Row(children: [
+          Row(mainAxisSize: MainAxisSize.max, children: [
             SizedBox(
               height: 24.0,
               width: 24.0,
@@ -48,9 +45,14 @@ class _loginGroupState extends State<LoginGroup> {
                       setState(() => isRemembered = isSetToRemembered)),
             ),
             Padding(padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30)),
-            Text("Remember me", style: defaultTextStyle())
+            Text("Remember me", style: ThemeTextStyle.defaultText),
+            Expanded(
+                child: Text(
+              "Forgot Password?",
+              style: ThemeTextStyle.defaultText,
+              textAlign: TextAlign.right,
+            ))
           ]),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
           Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -68,7 +70,9 @@ class _loginGroupState extends State<LoginGroup> {
                                 ),
                               ),
                             ),
-                            onPressed: () => {},
+                            onPressed: () => FirebaseService.login(
+                                _emailController.text,
+                                _passwordController.text),
                             child: Padding(
                                 padding: EdgeInsets.all(15),
                                 child: Text("Login")))))
@@ -81,6 +85,7 @@ class _loginGroupState extends State<LoginGroup> {
               new InkWell(
                 onTap: () {
                   // Navigator.pushNamed(context, "YourRoute");
+                  widget.authenticationActionFunction();
                 },
                 child: new Padding(
                   padding: new EdgeInsets.all(10.0),
