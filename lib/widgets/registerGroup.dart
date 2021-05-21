@@ -1,6 +1,8 @@
 import 'package:TimeliNUS/utils/services/firebase.dart';
+import 'package:TimeliNUS/widgets/actionButton.dart';
 import 'package:TimeliNUS/widgets/formInput.dart';
 import 'package:TimeliNUS/widgets/style.dart';
+import 'package:TimeliNUS/widgets/textWithAction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -9,11 +11,11 @@ class RegisterGroup extends StatefulWidget {
   const RegisterGroup(this.authenticationActionFunction);
   @override
   State<StatefulWidget> createState() {
-    return _RegisterGroupState();
+    return RegisterGroupState();
   }
 }
 
-class _RegisterGroupState extends State<RegisterGroup> {
+class RegisterGroupState extends State<RegisterGroup> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool isRemembered = false;
@@ -23,7 +25,6 @@ class _RegisterGroupState extends State<RegisterGroup> {
     return Padding(
       padding: EdgeInsets.only(top: 20, left: 45, right: 45),
       child: Column(
-        // mainAxisSize: MainAxisSize.max,
         children: [
           Text("Sign up now to start using TimeliNUS",
               style: TextStyle(color: Colors.white)),
@@ -56,55 +57,17 @@ class _RegisterGroupState extends State<RegisterGroup> {
                       setState(() => isRemembered = isSetToRemembered)),
             ),
             Padding(padding: EdgeInsets.symmetric(horizontal: 5, vertical: 30)),
-            Text("Remember me", style: ThemeTextStyle.defaultText)
+            InkWell(
+                onTap: () => setState(() => isRemembered = !isRemembered),
+                child: Text("Remember me", style: ThemeTextStyle.defaultText))
           ]),
           Padding(padding: EdgeInsets.only(bottom: 10)),
-          Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.orange),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                            onPressed: () => FirebaseService.register(
-                                _emailController.text,
-                                _passwordController.text),
-                            child: Padding(
-                                padding: EdgeInsets.all(15),
-                                child: Text("Sign Up")))))
-              ]),
-          // Padding(padding: EdgeInsets.symmetric(vertical: 5)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Have an account?",
-                  style: TextStyle(color: Colors.black54, fontSize: 12)),
-              new InkWell(
-                onTap: () {
-                  // Navigator.pushNamed(context, "YourRoute");
-                  widget.authenticationActionFunction();
-                },
-                child: new Padding(
-                  padding: new EdgeInsets.all(10.0),
-                  child: new Text("Sign in here",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.black54,
-                          fontSize: 12)),
-                ),
-              )
-            ],
-          ),
+          wideActionButton(
+              "Sign Up",
+              () => FirebaseService.register(
+                  _emailController.text, _passwordController.text)),
+          textWithAction("Have an account?", "Sign in here",
+              () => widget.authenticationActionFunction()),
         ],
       ),
     );

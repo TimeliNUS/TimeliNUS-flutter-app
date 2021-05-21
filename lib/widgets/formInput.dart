@@ -14,12 +14,6 @@ Widget getEmailInput(TextEditingController _emailController) {
               borderRadius: const BorderRadius.all(
                 Radius.circular(5.0),
               ),
-              // boxShadow: <BoxShadow>[
-              //   BoxShadow(
-              //       color: Colors.grey.withOpacity(0.2),
-              //       offset: const Offset(0, 2),
-              //       blurRadius: 8.0),
-              // ],
             ),
             child: Padding(
               padding:
@@ -34,7 +28,7 @@ Widget getEmailInput(TextEditingController _emailController) {
                 cursorColor: Colors.white,
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: 'Please enter your email',
+                  labelText: 'Please enter your email',
                 ),
               ),
             ),
@@ -86,7 +80,7 @@ Widget getPasswordInput(TextEditingController _passwordController) {
                 cursorColor: Colors.white,
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: 'Password',
+                  labelText: 'Password',
                 ),
               ),
             ),

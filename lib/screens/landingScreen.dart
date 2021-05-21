@@ -36,6 +36,9 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    var height = screenSize.height;
+
     return Scaffold(
         // appBar: AppBar(
         //   // Here we take the value from the MyHomePage object that was created by
@@ -56,7 +59,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(top: 100),
+                    padding: EdgeInsets.only(top: height * 0.1),
                     child: Text(
                       action == AuthenticationAction.login
                           ? 'Login'
@@ -89,7 +92,7 @@ class _LandingScreenState extends State<LandingScreen> {
                       flex: 1,
                       child: Padding(
                           padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 40),
+                              vertical: 10, horizontal: 40),
                           child: Row(
                             children: <Widget>[
                               Expanded(child: Divider()),

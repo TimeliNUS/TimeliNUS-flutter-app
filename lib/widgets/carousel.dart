@@ -90,6 +90,8 @@ class CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    var height = screenSize.height;
     if (textList == null) {
       return new Text("Loading...");
     } else {
@@ -98,7 +100,7 @@ class CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
           items: imageSliders,
           carouselController: buttonCarouselController,
           options: CarouselOptions(
-              height: 420.0,
+              height: height * 0.375,
               viewportFraction: 1.0,
               enableInfiniteScroll: false,
               onPageChanged: (index, reason) {

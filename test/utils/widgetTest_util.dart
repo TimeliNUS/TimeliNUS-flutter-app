@@ -3,6 +3,6 @@ import 'package:flutter/widgets.dart';
 
 Widget makeTesteableWidget({Widget child}) {
   return MaterialApp(
-    home: child,
+    home: Scaffold(body: child),
   );
 }

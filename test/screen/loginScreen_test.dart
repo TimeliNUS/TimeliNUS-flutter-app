@@ -44,13 +44,13 @@ void main() {
   // });
 
   testWidgets('carousel is found', (WidgetTester tester) async {
-    expect(true, true);
-    // final testWidget = MaterialApp(
-    //   home: LandingScreen(),
-    // );
-    // await tester.pumpWidget(testWidget);
-    // await tester.pumpAndSettle();
-    // expect(find.byWidgetPredicate((Widget widget) => widget is CarouselSlider),
-    //     findsOneWidget);
+    // expect(true, true);
+    final testWidget = MaterialApp(
+      home: LandingScreen(),
+    );
+    await tester.pumpWidget(testWidget);
+    await tester.pumpAndSettle();
+    expect(find.byWidgetPredicate((Widget widget) => widget is CarouselSlider),
+        findsOneWidget);
   });
 }

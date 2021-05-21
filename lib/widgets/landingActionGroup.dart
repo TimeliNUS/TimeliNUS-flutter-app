@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:TimeliNUS/widgets/actionButton.dart';
+import 'package:TimeliNUS/widgets/textWithAction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -9,50 +11,9 @@ Widget landingActionGroup(Function() login, Function() register) {
     child: Column(
       // mainAxisSize: MainAxisSize.max,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Have an account?",
-                style: TextStyle(color: Colors.black54, fontSize: 12)),
-            new InkWell(
-              onTap: () {
-                // Navigator.pushNamed(context, "YourRoute");
-                login();
-              },
-              child: new Padding(
-                padding: new EdgeInsets.all(10.0),
-                child: new Text("Sign in here",
-                    style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        color: Colors.black54,
-                        fontSize: 12)),
-              ),
-            )
-          ],
-        ),
+        textWithAction("Have an account?", "Sign in here", () => login()),
         Padding(padding: EdgeInsets.only(bottom: 10)),
-        Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                  child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30),
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.orange),
-                            shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          onPressed: () => register(),
-                          child: Padding(
-                              padding: EdgeInsets.all(15),
-                              child: Text("Continue with Email")))))
-            ])
+        wideActionButton("Continue with Email", () => register())
       ],
     ),
   );

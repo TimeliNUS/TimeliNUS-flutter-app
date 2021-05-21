@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -9,7 +8,7 @@ class FirebaseService {
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   static Future<User> register(String email, String password) async {
-    // FirebaseAuth.instance.useEmulator('http://localhost:9099');
+    FirebaseAuth.instance.useEmulator('http://localhost:9099');
     User user;
     try {
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
@@ -23,7 +22,7 @@ class FirebaseService {
   }
 
   static Future<User> login(String email, String password) async {
-    // FirebaseAuth.instance.useEmulator('http://localhost:9099');
+    FirebaseAuth.instance.useEmulator('http://localhost:9099');
     User user;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -41,7 +40,7 @@ class FirebaseService {
 
   static Future<User> signInWithGoogle({BuildContext context}) async {
     User user;
-
+    FirebaseAuth.instance.useEmulator('http://localhost:9099');
     final GoogleSignIn googleSignIn = GoogleSignIn();
 
     final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
@@ -75,6 +74,8 @@ class FirebaseService {
   }
 
   static Future<String> add() async {
+    FirebaseFirestore.instance.settings = Settings(
+        host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     return users
         .add({
