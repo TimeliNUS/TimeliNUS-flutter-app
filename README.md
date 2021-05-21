@@ -1,5 +1,5 @@
-[![codecov](https://codecov.io/gh/TimelinNUS/TimeliNUS-flutter-app/branch/main/graph/badge.svg?token=ZHO77VBN1U)](https://codecov.io/gh/TimelinNUS/TimeliNUS-flutter-app)
-[![Build Status](https://travis-ci.com/TimelinNUS/TimeliNUS-flutter-app.svg?branch=main)](https://travis-ci.com/TimelinNUS/TimeliNUS-flutter-app)
+[![codecov](https://codecov.io/gh/TimeliNUS/TimeliNUS-flutter-app/branch/main/graph/badge.svg?token=ZHO77VBN1U)](https://codecov.io/gh/TimeliNUS/TimeliNUS-flutter-app)
+[![Build Status](https://travis-ci.com/TimeliNUS/TimeliNUS-flutter-app.svg?branch=main)](https://travis-ci.com/TimeliNUS/TimeliNUS-flutter-app)
 # TimeliNUS-flutter-app
 
 A new Flutter project.
