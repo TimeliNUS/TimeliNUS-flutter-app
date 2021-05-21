@@ -33,9 +33,10 @@ jobs:
 
     - stage: App's Flutter Test
       script:
-        - cd $APP
-        - $FLUTTER_UP clean
-        - $FLUTTER_UP test --coverage
+        # - cd $APP
+        - pwd
+        - $FLUTTER clean
+        - $FLUTTER test --coverage
       after_success:
         - bash <(curl -s $CODECOV)
 
