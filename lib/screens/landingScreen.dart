@@ -64,11 +64,10 @@ class _LandingScreenState extends State<LandingScreen> {
                       action == AuthenticationAction.login
                           ? 'Login'
                           : 'Welcome',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 40.0,
-                          fontFamily: "DMSans",
-                          fontWeight: FontWeight.w700),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline6
+                          .apply(color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                   ),

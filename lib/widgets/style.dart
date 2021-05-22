@@ -21,3 +21,15 @@ class ThemeColor {
 class ThemeTextStyle {
   static final defaultText = TextStyle(color: Colors.black54, fontSize: 12);
 }
+
+ThemeData appTheme = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: HexColor.fromHex('#FF7200'),
+  fontFamily: "DMSans",
+  textTheme: TextTheme(
+    headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+    headline6: TextStyle(
+        fontSize: 40.0, fontFamily: "DMSans", fontWeight: FontWeight.w700),
+    bodyText1: TextStyle(color: Colors.black54, fontSize: 12),
+  ),
+);

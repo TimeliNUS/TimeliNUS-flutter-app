@@ -1,4 +1,5 @@
 import 'package:TimeliNUS/screens/landingScreen.dart';
+import 'package:TimeliNUS/widgets/style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: appTheme,
       home: LandingScreen(),
     );
   }
