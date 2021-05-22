@@ -33,8 +33,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                   _isSigningIn = true;
                 });
 
-                User user =
-                    (await FirebaseService.signInWithGoogle(context: context));
+                await FirebaseService.signInWithGoogle(context: context);
 
                 setState(() {
                   _isSigningIn = false;

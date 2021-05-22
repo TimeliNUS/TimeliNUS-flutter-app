@@ -14,28 +14,25 @@ class FirebaseService {
     _googleSignIn = newGoogleSignIn;
   }
 
-  static Stream<User> get user => _auth.authStateChanges();
-
-  static Future<User> register(String email, String password) async {
-    // FirebaseAuth.instance.useEmulator('http://localhost:9099');
-    User user;
-    try {
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
-      user = userCredential.user;
-    } on FirebaseAuthException catch (e) {
-      print('Failed with error code: ${e.code}');
-      print(e.message);
-    }
-    return user;
+  static Future<void> switchToEmulator() async {
+    await FirebaseAuth.instance.useEmulator('http://localhost:9099');
   }
 
-  static Future<dynamic> login(String email, String password) async {
-    User user;
+  static Stream<User> get user => _auth.authStateChanges();
+
+  static Future<String> register(String email, String password) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      return ('Failed with error code: ${e.code} ${e.message}');
+    }
+    return '';
+  }
+
+  static Future<String> login(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         return 'No user found for that email.';
@@ -43,11 +40,10 @@ class FirebaseService {
         return 'Wrong password provided for that user.';
       }
     }
-    return user;
+    return '';
   }
 
-  static Future<User> signInWithGoogle({BuildContext context}) async {
-    User user;
+  static Future<void> signInWithGoogle({BuildContext context}) async {
     final GoogleSignInAccount googleSignInAccount =
         (await _googleSignIn.signIn());
 
@@ -61,10 +57,7 @@ class FirebaseService {
       );
 
       try {
-        final UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
-
-        user = userCredential.user;
+        await _auth.signInWithCredential(credential);
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
           // handle the error here
@@ -75,8 +68,6 @@ class FirebaseService {
         // handle the error here
       }
     }
-
-    return user;
   }
 
   static Future<User> getUser() async {

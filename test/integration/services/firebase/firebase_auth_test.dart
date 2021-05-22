@@ -63,13 +63,14 @@ void main() {
   });
 
   test(('test firebase register'), () async {
-    User returnedUser =
-        await FirebaseService.register(registerEmail, "password");
+    await FirebaseService.register(registerEmail, "password");
+    User returnedUser = await FirebaseService.getUser();
     expect(returnedUser, registerUser);
   });
 
   test(('test firebase login'), () async {
-    User returnedUser = await FirebaseService.login(userEmail, "password");
+    await FirebaseService.login(userEmail, "password");
+    User returnedUser = await FirebaseService.getUser();
     expect(returnedUser, loginUser);
   });
 
@@ -81,7 +82,8 @@ void main() {
   });
 
   test(('test firebase Google login'), () async {
-    User returnedUser = await FirebaseService.signInWithGoogle();
+    await FirebaseService.signInWithGoogle();
+    User returnedUser = await FirebaseService.getUser();
     expect(returnedUser, loginUser);
   });
 

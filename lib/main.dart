@@ -1,4 +1,5 @@
 import 'package:TimeliNUS/screens/landingScreen.dart';
+import 'package:TimeliNUS/utils/services/firebase.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,7 +15,7 @@ Future<void> main() async {
   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
   await Firebase.initializeApp();
   if (!iosInfo.isPhysicalDevice) {
-    await FirebaseAuth.instance.useEmulator('http://localhost:9099');
+    await FirebaseService.switchToEmulator();
   }
   runApp(MyApp());
 }
