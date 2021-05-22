@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:TimeliNUS/widgets/actionButton.dart';
+import 'package:TimeliNUS/widgets/landingScreen/actionButton.dart';
 import 'package:TimeliNUS/widgets/textWithAction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

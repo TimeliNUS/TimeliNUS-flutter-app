@@ -1,6 +1,6 @@
 import 'package:TimeliNUS/utils/services/firebase.dart';
-import 'package:TimeliNUS/widgets/actionButton.dart';
-import 'package:TimeliNUS/widgets/formInput.dart';
+import 'package:TimeliNUS/widgets/landingScreen/actionButton.dart';
+import 'package:TimeliNUS/widgets/landingScreen/formInput.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/textWithAction.dart';
 import 'package:flutter/material.dart';

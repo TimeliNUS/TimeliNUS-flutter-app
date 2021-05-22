@@ -70,6 +70,11 @@ class FirebaseService {
     }
   }
 
+  static Future<bool> isSignedIn() async {
+    final currentUser = await getUser();
+    return currentUser != null;
+  }
+
   static Future<User> getUser() async {
     return _auth.currentUser;
   }
