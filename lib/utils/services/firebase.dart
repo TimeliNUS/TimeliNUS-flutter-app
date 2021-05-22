@@ -4,24 +4,24 @@ import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {
-  static FirebaseAuth auth = FirebaseAuth.instance;
+  static FirebaseAuth _auth = FirebaseAuth.instance;
   // static FirebaseFirestore firestore = FirebaseFirestore.instance;
-  static GoogleSignIn googleSignIn = GoogleSignIn();
+  static GoogleSignIn _googleSignIn = GoogleSignIn();
 
   static void changeAuthInstance(
       FirebaseAuth newInstance, GoogleSignIn newGoogleSignIn) {
-    auth = newInstance;
-    googleSignIn = newGoogleSignIn;
+    _auth = newInstance;
+    _googleSignIn = newGoogleSignIn;
   }
 
-  Stream<User> get user => auth.authStateChanges();
+  static Stream<User> get user => _auth.authStateChanges();
 
   static Future<User> register(String email, String password) async {
     // FirebaseAuth.instance.useEmulator('http://localhost:9099');
     User user;
     try {
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
       user = userCredential.user;
     } on FirebaseAuthException catch (e) {
       print('Failed with error code: ${e.code}');
@@ -33,7 +33,7 @@ class FirebaseService {
   static Future<dynamic> login(String email, String password) async {
     User user;
     try {
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
@@ -49,7 +49,7 @@ class FirebaseService {
   static Future<User> signInWithGoogle({BuildContext context}) async {
     User user;
     final GoogleSignInAccount googleSignInAccount =
-        (await googleSignIn.signIn());
+        (await _googleSignIn.signIn());
 
     if (googleSignInAccount != null) {
       final GoogleSignInAuthentication googleSignInAuthentication =
@@ -62,7 +62,7 @@ class FirebaseService {
 
       try {
         final UserCredential userCredential =
-            await auth.signInWithCredential(credential);
+            await _auth.signInWithCredential(credential);
 
         user = userCredential.user;
       } on FirebaseAuthException catch (e) {
@@ -79,6 +79,9 @@ class FirebaseService {
     return user;
   }
 
+  static Future<User> getUser() async {
+    return _auth.currentUser;
+  }
   // static Future<String> add() async {
   //   FirebaseFirestore.instance.settings = Settings(
   //       host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
