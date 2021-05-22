@@ -87,9 +87,10 @@ void main() {
     expect(returnedUser, loginUser);
   });
 
-  test(('test firebase Google login'), () async {
+  test(('test firebase logout'), () async {
     await FirebaseService.signInWithGoogle();
+    await FirebaseService.logOut();
     User returnedUser = await FirebaseService.getUser();
-    expect(returnedUser, loginUser);
+    expect(returnedUser, null);
   });
 }

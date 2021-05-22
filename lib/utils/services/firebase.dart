@@ -73,6 +73,14 @@ class FirebaseService {
   static Future<User> getUser() async {
     return _auth.currentUser;
   }
+
+  static Future<void> logOut() async {
+    return Future.wait([
+      _auth.signOut(),
+      // _googleSignIn.signOut(),
+    ]);
+  }
+
   // static Future<String> add() async {
   //   FirebaseFirestore.instance.settings = Settings(
   //       host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
