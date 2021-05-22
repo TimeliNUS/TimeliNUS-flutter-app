@@ -1,7 +1,9 @@
 import 'dart:math';
+import 'dart:collection';
 
+import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -9,6 +11,8 @@ import 'package:firebase_core_platform_interface/firebase_core_platform_interfac
 import 'package:firebase_auth_platform_interface/src/method_channel/method_channel_firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'dart:async';
+import 'package:mockito/mockito.dart';
 
 const String testDisabledEmail = 'disabled@example.com';
 const String testEmail = 'test@example.com';
@@ -96,10 +100,9 @@ Future<EmulatorOobCode> emulatorOutOfBandCode(
 
   final responseBody = Map<String, dynamic>.from(jsonDecode(response.body));
   final oobCodes = List<Map<String, dynamic>>.from(responseBody['oobCodes']);
-  final oobCode = oobCodes.reversed.firstWhere(
+  final dynamic oobCode = oobCodes.reversed.firstWhere(
     (oobCode) =>
         oobCode['email'] == email && oobCode['requestType'] == requestType,
-    orElse: () => null,
   );
 
   if (oobCode == null) {
@@ -162,4 +165,169 @@ String createCryptoRandomString([int length = 32]) {
   var values = List<int>.generate(length, (i) => _random.nextInt(256));
 
   return base64Url.encode(values).toLowerCase();
+}
+
+class MockFirebaseAuth extends Mock implements FirebaseAuth {
+  final stateChangedStreamController = StreamController<User>();
+  MockUser _mockUser;
+  User _currentUser;
+
+  MockFirebaseAuth({signedIn = false, MockUser mockUser})
+      : _mockUser = mockUser {
+    if (signedIn) {
+      signInWithCredential(null);
+    }
+  }
+
+  @override
+  User get currentUser {
+    return _currentUser;
+  }
+
+  @override
+  Future<UserCredential> createUserWithEmailAndPassword({
+    String email,
+    String password,
+  }) {
+    _mockUser = MockUser(email: email);
+    return _fakeSignIn();
+  }
+
+  @override
+  Future<UserCredential> signInWithCredential(AuthCredential credential) {
+    return _fakeSignIn();
+  }
+
+  @override
+  Future<UserCredential> signInWithEmailAndPassword({
+    String email,
+    String password,
+  }) {
+    if (email != _mockUser._email) {
+      throw FirebaseAuthException(code: 'user-not-found');
+    } else {
+      return _fakeSignIn();
+    }
+  }
+
+  @override
+  Future<UserCredential> signInWithCustomToken(String token) async {
+    return _fakeSignIn();
+  }
+
+  @override
+  Future<ConfirmationResult> signInWithPhoneNumber(String phoneNumber,
+      [RecaptchaVerifier verifier]) async {
+    return MockConfirmationResult(onConfirm: () => _fakeSignIn());
+  }
+
+  @override
+  Future<UserCredential> signInAnonymously() {
+    return _fakeSignIn(isAnonymous: true);
+  }
+
+  @override
+  Future<void> signOut() async {
+    _currentUser = null;
+    stateChangedStreamController.add(null);
+  }
+
+  Future<UserCredential> _fakeSignIn({bool isAnonymous = false}) {
+    final userCredential =
+        MockUserCredential(isAnonymous: isAnonymous, mockUser: _mockUser);
+    _currentUser = userCredential.user;
+    stateChangedStreamController.add(_currentUser);
+    return Future.value(userCredential);
+  }
+
+  @override
+  Stream<User> authStateChanges() => stateChangedStreamController.stream;
+}
+
+class MockConfirmationResult extends Mock implements ConfirmationResult {
+  Function onConfirm;
+
+  MockConfirmationResult({this.onConfirm});
+
+  @override
+  Future<UserCredential> confirm(String verificationCode) {
+    return onConfirm();
+  }
+}
+
+class MockUserCredential extends Mock implements UserCredential {
+  final bool _isAnonymous;
+  final MockUser _mockUser;
+
+  MockUserCredential({bool isAnonymous, MockUser mockUser})
+      // Ensure no mocked credentials or mocked for Anonymous
+      : assert(mockUser == null || mockUser.isAnonymous == isAnonymous),
+        _isAnonymous = isAnonymous,
+        _mockUser = mockUser;
+
+  @override
+  User get user => _mockUser ?? MockUser(isAnonymous: _isAnonymous);
+}
+
+class MockUser extends Mock with EquatableMixin implements User {
+  final bool _isAnonymous;
+  final String _uid;
+  final String _email;
+  final String _displayName;
+  final String _phoneNumber;
+  final String _photoURL;
+  final String _refreshToken;
+
+  MockUser({
+    bool isAnonymous = false,
+    String uid = 'some_random_id',
+    String email,
+    String displayName,
+    String phoneNumber,
+    String photoURL,
+    String refreshToken,
+  })  : _isAnonymous = isAnonymous,
+        _uid = uid,
+        _email = email,
+        _displayName = displayName,
+        _phoneNumber = phoneNumber,
+        _photoURL = photoURL,
+        _refreshToken = refreshToken;
+
+  @override
+  bool get isAnonymous => _isAnonymous;
+
+  @override
+  String get uid => _uid;
+
+  @override
+  String get email => _email;
+
+  @override
+  String get displayName => _displayName;
+
+  @override
+  String get phoneNumber => _phoneNumber;
+
+  @override
+  String get photoURL => _photoURL;
+
+  @override
+  String get refreshToken => _refreshToken;
+
+  @override
+  Future<String> getIdToken([bool forceRefresh = false]) async {
+    return Future.value('fake_token');
+  }
+
+  @override
+  List<Object> get props => [
+        _isAnonymous,
+        _uid,
+        _email,
+        _displayName,
+        _phoneNumber,
+        _photoURL,
+        _refreshToken,
+      ];
 }

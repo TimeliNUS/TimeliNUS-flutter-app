@@ -9,11 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:TimeliNUS/utils/services/firebase.dart';
 import '../../../utils/firebase_util.dart';
 import 'firebase_auth.dart';
-import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
+// import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
 import 'package:firebase_core_platform_interface/firebase_core_platform_interface.dart';
-import 'package:firebase_auth_platform_interface/src/method_channel/method_channel_firebase_auth.dart';
-import 'package:google_sign_in_mocks/google_sign_in_mocks.dart';
+// import 'package:firebase_auth_platform_interface/src/method_channel/method_channel_firebase_auth.dart';
 
 bool useEmulator = true;
 setupCloudFirestoreMocks([Callback customHandlers]) {
@@ -52,10 +51,45 @@ setupCloudFirestoreMocks([Callback customHandlers]) {
 }
 
 void main() {
+  final String userEmail = "bob@somedomain.com";
+  final String registerEmail = "markmcwong@yahoo.com";
+  final loginUser = MockUser(
+    isAnonymous: false,
+    uid: 'someuid',
+    email: userEmail,
+    displayName: 'Bob',
+  );
+  final registerUser =
+      MockUser(isAnonymous: false, uid: 'some_random_id', email: registerEmail);
   setupCloudFirestoreMocks();
-
-  setUpAll(() async {
+  setUp(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
+    final auth = MockFirebaseAuth(mockUser: loginUser);
+    MockGoogleSignIn googleSignIn = MockGoogleSignIn();
+    FirebaseService.changeAuthInstance(auth, googleSignIn);
+  });
+
+  test(('test firebase register'), () async {
+    User returnedUser =
+        await FirebaseService.register(registerEmail, "password");
+    expect(returnedUser, registerUser);
+  });
+
+  test(('test firebase login'), () async {
+    User returnedUser = await FirebaseService.login(userEmail, "password");
+    expect(returnedUser, loginUser);
+  });
+
+  test(('test firebase login with invalid email'), () async {
+    final testResult =
+        await FirebaseService.login("userEmail@asd.com", "password");
+    expect(testResult, "No user found for that email.");
+    // throwsA(isInstanceOf<FirebaseAuthException>()));
+  });
+
+  test(('test firebase Google login'), () async {
+    User returnedUser = await FirebaseService.signInWithGoogle();
+    expect(returnedUser, loginUser);
   });
 }

@@ -5,10 +5,19 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {
   static FirebaseAuth auth = FirebaseAuth.instance;
-  static FirebaseFirestore firestore = FirebaseFirestore.instance;
+  // static FirebaseFirestore firestore = FirebaseFirestore.instance;
+  static GoogleSignIn googleSignIn = GoogleSignIn();
+
+  static void changeAuthInstance(
+      FirebaseAuth newInstance, GoogleSignIn newGoogleSignIn) {
+    auth = newInstance;
+    googleSignIn = newGoogleSignIn;
+  }
+
+  Stream<User> get user => auth.authStateChanges();
 
   static Future<User> register(String email, String password) async {
-    FirebaseAuth.instance.useEmulator('http://localhost:9099');
+    // FirebaseAuth.instance.useEmulator('http://localhost:9099');
     User user;
     try {
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
@@ -21,18 +30,17 @@ class FirebaseService {
     return user;
   }
 
-  static Future<User> login(String email, String password) async {
-    FirebaseAuth.instance.useEmulator('http://localhost:9099');
+  static Future<dynamic> login(String email, String password) async {
     User user;
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await auth.signInWithEmailAndPassword(
+          email: email, password: password);
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
+        return 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
+        return 'Wrong password provided for that user.';
       }
     }
     return user;
@@ -40,10 +48,8 @@ class FirebaseService {
 
   static Future<User> signInWithGoogle({BuildContext context}) async {
     User user;
-    FirebaseAuth.instance.useEmulator('http://localhost:9099');
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-
-    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAccount googleSignInAccount =
+        (await googleSignIn.signIn());
 
     if (googleSignInAccount != null) {
       final GoogleSignInAuthentication googleSignInAuthentication =
@@ -73,17 +79,17 @@ class FirebaseService {
     return user;
   }
 
-  static Future<String> add() async {
-    FirebaseFirestore.instance.settings = Settings(
-        host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-    return users
-        .add({
-          'full_name': 'fullName', // John Doe
-          'company': 'company', // Stokes and Sons
-          'age': 'age' // 42
-        })
-        .then((value) => ("User Added"))
-        .catchError((error) => ("Failed to add user: $error"));
-  }
+  // static Future<String> add() async {
+  //   FirebaseFirestore.instance.settings = Settings(
+  //       host: 'localhost:8080', sslEnabled: false, persistenceEnabled: false);
+  //   CollectionReference users = FirebaseFirestore.instance.collection('users');
+  //   return users
+  //       .add({
+  //         'full_name': 'fullName', // John Doe
+  //         'company': 'company', // Stokes and Sons
+  //         'age': 'age' // 42
+  //       })
+  //       .then((value) => ("User Added"))
+  //       .catchError((error) => ("Failed to add user: $error"));
+  // }
 }
