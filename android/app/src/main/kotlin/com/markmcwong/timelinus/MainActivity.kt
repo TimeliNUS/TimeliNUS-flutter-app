@@ -1,4 +1,4 @@
-package com.example.tes
+package com.markmcwong.timelinus
 
 import io.flutter.embedding.android.FlutterActivity
 

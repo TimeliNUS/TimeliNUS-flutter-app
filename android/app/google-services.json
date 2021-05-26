@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "114066663509",
+    "project_id": "timelinus-2021",
+    "storage_bucket": "timelinus-2021.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114066663509:android:74a1a848028febd6600cdc",
+        "android_client_info": {
+          "package_name": "com.markmcwong.timelinus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "114066663509-j11htpbtn3u1p7dulr22bpjldopg3d11.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDk8A6SNXWoooYj5Y000JnHTvd8JO4tu4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "114066663509-j11htpbtn3u1p7dulr22bpjldopg3d11.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "114066663509-lgkdnnv5af5eej2a777s8nu3cqa8es3a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.markmcwong.timelinus"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
