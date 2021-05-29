@@ -33,7 +33,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                   _isSigningIn = true;
                 });
 
-                await FirebaseService.signInWithGoogle(context: context);
+                await FirebaseService().signInWithGoogle(context: context);
 
                 setState(() {
                   _isSigningIn = false;
@@ -53,11 +53,6 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                         padding: const EdgeInsets.only(left: 10),
                         child: Text(
                           'Google',
-                          // style: TextStyle(
-                          //   // fontSize: 20,
-                          //   color: Colors.black26,
-                          //   // fontWeight: FontWeight.w600,
-                          // ),
                         ),
                       )
                     ]),

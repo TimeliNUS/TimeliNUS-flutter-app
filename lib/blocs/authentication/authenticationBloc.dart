@@ -26,9 +26,9 @@ class AuthenticationBloc
 
   Stream<AuthenticationState> _mapAppStartedToState() async* {
     try {
-      final isSignedIn = await FirebaseService.isSignedIn();
+      final isSignedIn = await FirebaseService().isSignedIn();
       if (isSignedIn) {
-        final name = await FirebaseService.getUser();
+        final name = await FirebaseService().getUser();
         yield Authenticated(name.displayName);
       } else {
         yield Unauthenticated();
@@ -40,11 +40,11 @@ class AuthenticationBloc
 
   Stream<AuthenticationState> _mapLoggedInToState() async* {
     yield Authenticated(
-        await (FirebaseService.getUser().then((value) => value.displayName)));
+        await (FirebaseService().getUser().then((value) => value.displayName)));
   }
 
   Stream<AuthenticationState> _mapLoggedOutToState() async* {
     yield Unauthenticated();
-    FirebaseService.logOut();
+    FirebaseService().logOut();
   }
 }

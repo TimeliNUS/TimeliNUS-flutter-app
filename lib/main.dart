@@ -1,33 +1,70 @@
+import 'package:TimeliNUS/blocs/app/appBloc.dart';
+import 'package:TimeliNUS/blocs/app/appState.dart';
+import 'package:TimeliNUS/blocs/app/blocObserver.dart';
+import 'package:TimeliNUS/blocs/app/routes/routes.dart';
+import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/screens/landingScreen.dart';
 import 'package:TimeliNUS/utils/services/firebase.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> main() async {
+  Bloc.observer = AppBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
+
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
   // print('Is emulator: ${androidInfo.isPhysicalDevice}');
 
-  IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+  // IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
   await Firebase.initializeApp();
-  if (!iosInfo.isPhysicalDevice) {
-    await FirebaseService.switchToEmulator();
-  }
-  runApp(MyApp());
+  // if (!iosInfo.isPhysicalDevice) {
+  //   await FirebaseService().switchToEmulator();
+  // }
+  final authenticationRepository = AuthenticationRepository();
+  await authenticationRepository.user.first;
+  runApp(App(authenticationRepository: authenticationRepository));
 }
 
-class MyApp extends StatelessWidget {
+class App extends StatelessWidget {
+  const App({
+    Key key,
+    @required AuthenticationRepository authenticationRepository,
+  })  : _authenticationRepository = authenticationRepository,
+        super(key: key);
   // This widget is the root of your application.
+
+  final AuthenticationRepository _authenticationRepository;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepositoryProvider.value(
+      value: _authenticationRepository,
+      child: BlocProvider(
+          create: (_) => AppBloc(
+                authenticationRepository: _authenticationRepository,
+              ),
+          child: AppView()),
+    );
+  }
+}
+
+class AppView extends StatelessWidget {
+  const AppView({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: appTheme,
-      home: LandingScreen(),
+      home: FlowBuilder<AppStatus>(
+        state: context.select((AppBloc bloc) => bloc.state.status),
+        onGeneratePages: onGenerateAppViewPages,
+      ),
     );
   }
 }

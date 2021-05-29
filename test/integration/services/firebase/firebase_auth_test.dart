@@ -59,38 +59,38 @@ void main() {
     await Firebase.initializeApp();
     final auth = MockFirebaseAuth(mockUser: loginUser);
     MockGoogleSignIn googleSignIn = MockGoogleSignIn();
-    FirebaseService.changeAuthInstance(auth, googleSignIn);
+    FirebaseService().changeAuthInstance(auth, googleSignIn);
   });
 
   test(('test firebase register'), () async {
-    await FirebaseService.register(registerEmail, "password");
-    User returnedUser = await FirebaseService.getUser();
+    await FirebaseService().register(registerEmail, "password");
+    User returnedUser = await FirebaseService().getUser();
     expect(returnedUser, registerUser);
   });
 
   test(('test firebase login'), () async {
-    await FirebaseService.login(userEmail, "password");
-    User returnedUser = await FirebaseService.getUser();
+    await FirebaseService().login(userEmail, "password");
+    User returnedUser = await FirebaseService().getUser();
     expect(returnedUser, loginUser);
   });
 
   test(('test firebase login with invalid email'), () async {
     final testResult =
-        await FirebaseService.login("userEmail@asd.com", "password");
+        await FirebaseService().login("userEmail@asd.com", "password");
     expect(testResult, "No user found for that email.");
     // throwsA(isInstanceOf<FirebaseAuthException>()));
   });
 
   test(('test firebase Google login'), () async {
-    await FirebaseService.signInWithGoogle();
-    User returnedUser = await FirebaseService.getUser();
+    await FirebaseService().signInWithGoogle();
+    User returnedUser = await FirebaseService().getUser();
     expect(returnedUser, loginUser);
   });
 
   test(('test firebase logout'), () async {
-    await FirebaseService.signInWithGoogle();
-    await FirebaseService.logOut();
-    User returnedUser = await FirebaseService.getUser();
+    await FirebaseService().signInWithGoogle();
+    await FirebaseService().logOut();
+    User returnedUser = await FirebaseService().getUser();
     expect(returnedUser, null);
   });
 }

@@ -1,5 +1,4 @@
-import 'package:TimeliNUS/widgets/carousel.dart';
-import 'package:TimeliNUS/widgets/formInput.dart';
+import 'package:TimeliNUS/widgets/landingScreen/formInput.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';

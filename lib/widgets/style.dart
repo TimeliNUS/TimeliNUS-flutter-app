@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 
 extension HexColor on Color {
   /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
@@ -23,13 +24,34 @@ class ThemeTextStyle {
 }
 
 ThemeData appTheme = ThemeData(
-  brightness: Brightness.light,
-  primaryColor: HexColor.fromHex('#FF7200'),
-  fontFamily: "DMSans",
-  textTheme: TextTheme(
-    headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-    headline6: TextStyle(
-        fontSize: 40.0, fontFamily: "DMSans", fontWeight: FontWeight.w700),
-    bodyText1: TextStyle(color: Colors.black54, fontSize: 12),
-  ),
-);
+    brightness: Brightness.light,
+    primaryColor: HexColor.fromHex('#FF7200'),
+    accentColor: HexColor.fromHex('#FF932F'),
+    primaryColorLight: HexColor.fromHex('#FF9D66'),
+    fontFamily: "DMSans",
+    textTheme: TextTheme(
+        headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+        headline6: TextStyle(
+            fontSize: 40.0, fontFamily: "DMSans", fontWeight: FontWeight.w700),
+        bodyText1: TextStyle(color: Colors.black54, fontSize: 12),
+        bodyText2:
+            TextStyle(color: HexColor.fromHex('#FF932F'), fontSize: 14)));
+
+class ColoredSafeArea extends StatelessWidget {
+  final Color backgroundColor;
+  final Widget childWidget;
+  const ColoredSafeArea(this.backgroundColor, this.childWidget);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        color: this.backgroundColor,
+        child: SafeArea(top: true, bottom: false, child: childWidget));
+  }
+
+  // Widget build(BuildContext context) {
+  //   return AnnotatedRegion<SystemUiOverlayStyle>(
+  //       value: SystemUiOverlayStyle.dark
+  //           .copyWith(statusBarColor: appTheme.accentColor),
+  //       child: SafeArea(top: true, bottom: false, child: childWidget));
+  // }
+}

@@ -4,23 +4,29 @@ import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {
-  static FirebaseAuth _auth = FirebaseAuth.instance;
-  // static FirebaseFirestore firestore = FirebaseFirestore.instance;
-  static GoogleSignIn _googleSignIn = GoogleSignIn();
+  FirebaseService._internal();
+  static final FirebaseService _singleton = FirebaseService._internal();
+  factory FirebaseService() {
+    return _singleton;
+  }
 
-  static void changeAuthInstance(
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  // static FirebaseFirestore firestore = FirebaseFirestore.instance;
+  GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  void changeAuthInstance(
       FirebaseAuth newInstance, GoogleSignIn newGoogleSignIn) {
     _auth = newInstance;
     _googleSignIn = newGoogleSignIn;
   }
 
-  static Future<void> switchToEmulator() async {
+  Future<void> switchToEmulator() async {
     await FirebaseAuth.instance.useEmulator('http://localhost:9099');
   }
 
-  static Stream<User> get user => _auth.authStateChanges();
+  Stream<User> get user => _auth.authStateChanges();
 
-  static Future<String> register(String email, String password) async {
+  Future<String> register(String email, String password) async {
     try {
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
@@ -30,7 +36,7 @@ class FirebaseService {
     return '';
   }
 
-  static Future<String> login(String email, String password) async {
+  Future<String> login(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {
@@ -43,7 +49,7 @@ class FirebaseService {
     return '';
   }
 
-  static Future<void> signInWithGoogle({BuildContext context}) async {
+  Future<void> signInWithGoogle({BuildContext context}) async {
     final GoogleSignInAccount googleSignInAccount =
         (await _googleSignIn.signIn());
 
@@ -70,16 +76,16 @@ class FirebaseService {
     }
   }
 
-  static Future<bool> isSignedIn() async {
+  Future<bool> isSignedIn() async {
     final currentUser = await getUser();
     return currentUser != null;
   }
 
-  static Future<User> getUser() async {
+  Future<User> getUser() async {
     return _auth.currentUser;
   }
 
-  static Future<void> logOut() async {
+  Future<void> logOut() async {
     return Future.wait([
       _auth.signOut(),
       // _googleSignIn.signOut(),

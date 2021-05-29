@@ -11,7 +11,6 @@ class Uninitialized extends AuthenticationState {}
 
 class Authenticated extends AuthenticationState {
   final String userId;
-
   const Authenticated(this.userId);
 
   @override

@@ -1,4 +1,4 @@
-import 'package:TimeliNUS/widgets/registerGroup.dart';
+import 'package:TimeliNUS/widgets/landingScreen/registerGroup.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

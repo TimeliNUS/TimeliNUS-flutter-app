@@ -1,5 +1,4 @@
-import 'package:TimeliNUS/widgets/carousel.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:TimeliNUS/widgets/landingScreen/carousel.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
