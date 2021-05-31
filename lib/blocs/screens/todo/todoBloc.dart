@@ -59,6 +59,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       }).toList();
       yield TodoLoaded(updatedTodos);
     }
+    todoRepository.updateTodo(event.updatedTodo.toEntity());
   }
 
   Stream<TodoState> _mapDeleteTodoToState(DeleteTodo event) async* {

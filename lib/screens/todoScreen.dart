@@ -160,65 +160,71 @@ class _TodoItemState extends State<TodoItem> {
   bool isChecked;
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-              child: Container(
-            child: Padding(
-              padding: EdgeInsets.all(15),
-              child: Column(
-                children: [
-                  Row(children: [
-                    Text(
-                      widget.todo.title,
-                      style: TextStyle(color: appTheme.primaryColor),
-                    )
-                  ]),
-                  Padding(padding: EdgeInsets.only(top: 5)),
-                  Row(
+    final todosBloc = BlocProvider.of<TodoBloc>(context);
+    return BlocProvider(
+        create: (_) => TodoBloc(todoRepository: context.read<TodoRepository>()),
+        child: Column(children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                  child: Container(
+                child: Padding(
+                  padding: EdgeInsets.all(15),
+                  child: Column(
                     children: [
-                      Icon(Icons.calendar_today_rounded,
-                          color: appTheme.primaryColorLight),
-                      Padding(padding: EdgeInsets.only(right: 5)),
-                      Text(
-                          widget.todo.deadline != null
-                              ? DateFormat('MMM dd, yyyy – kk:mm')
-                                  .format(widget.todo.deadline)
-                              : "No deadline set",
-                          style: TextStyle(color: appTheme.primaryColor))
+                      Row(children: [
+                        Text(
+                          widget.todo.title,
+                          style: TextStyle(color: appTheme.primaryColor),
+                        )
+                      ]),
+                      Padding(padding: EdgeInsets.only(top: 5)),
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today_rounded,
+                              color: appTheme.primaryColorLight),
+                          Padding(padding: EdgeInsets.only(right: 5)),
+                          Text(
+                              widget.todo.deadline != null
+                                  ? DateFormat('MMM dd, yyyy – kk:mm')
+                                      .format(widget.todo.deadline)
+                                  : "No deadline set",
+                              style: TextStyle(color: appTheme.primaryColor))
+                        ],
+                      )
                     ],
-                  )
-                ],
+                  ),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                        color: appTheme.primaryColorLight,
+                        spreadRadius: 1,
+                        blurRadius: 1),
+                  ],
+                ),
+              )),
+              Padding(
+                padding: EdgeInsets.only(right: 40),
               ),
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: appTheme.primaryColorLight,
-                    spreadRadius: 1,
-                    blurRadius: 1),
-              ],
-            ),
-          )),
-          Padding(
-            padding: EdgeInsets.only(right: 40),
+              SizedBox(
+                  height: 24.0,
+                  width: 24.0,
+                  child: Checkbox(
+                      value: isChecked ?? widget.todo.complete,
+                      onChanged: (boolean) {
+                        setState(() => isChecked = (isChecked != null
+                            ? !isChecked
+                            : !widget.todo.complete));
+                        todosBloc.add(UpdateTodo(
+                            widget.todo.copyWith(complete: isChecked)));
+                      }))
+            ],
           ),
-          SizedBox(
-              height: 24.0,
-              width: 24.0,
-              child: Checkbox(
-                  value: isChecked ?? widget.todo.complete,
-                  onChanged: (boolean) => setState(() => isChecked =
-                      (isChecked != null
-                          ? !isChecked
-                          : !widget.todo.complete))))
-        ],
-      ),
-      Padding(padding: EdgeInsets.only(bottom: 10)),
-    ]);
+          Padding(padding: EdgeInsets.only(bottom: 10)),
+        ]));
   }
 }
