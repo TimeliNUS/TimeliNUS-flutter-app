@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/mark/OneDrive - National University of Singapore/orbital/Best-Flutter-UI-Templates/tes/ios/GoogleService-Info.plist">
-   </FileRef>
-   <FileRef
-      location = "self:">
+      location = "self:/Users/markwong/OneDrive - National University of Singapore/TimeliNUS-flutter-app/ios/Runner.xcodeproj">
    </FileRef>
 </Workspace>

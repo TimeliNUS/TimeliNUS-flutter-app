@@ -9,46 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class NewTodoPopup extends PopupRoute {
+class NewTodoPopup extends StatefulWidget {
   @override
-  Duration get transitionDuration => Duration(milliseconds: 500);
+  State<NewTodoPopup> createState() => _NewTodoPopupState();
+}
+
+class _NewTodoPopupState extends State<NewTodoPopup> {
+  DateTime deadlineValue;
 
   final TextEditingController textController = new TextEditingController();
   final TextEditingController noteController = new TextEditingController();
-
   @override
-  Color get barrierColor => null;
-
-  @override
-  bool get barrierDismissible => false;
-
-  @override
-  String get barrierLabel => "Add Todo Popup";
-
-  DateTime deadlineValue;
-
-  // final AnimationController _controller = AnimationController(
-  //   duration: const Duration(seconds: 2), vsync: 10,
-  // );
-  // final Animation<Offset> _offsetAnimation = Tween<Offset>(
-  //   begin: Offset.zero,
-  //   end: const Offset(1.5, 0.0),
-  // ).animate(CurvedAnimation(
-  //   parent: _controller,
-  //   curve: Curves.elasticIn,
-  // ));
-
-  // @override
-  // Widget buildTransitions(BuildContext context, Animation<double> animation,
-  //     Animation<double> secondaryAnimation, Widget widget) {
-  //   return SlideTransition(
-  //     position: 0.5,
-  //   );
-  // }
-
-  @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget build(BuildContext context) {
     final todosBloc = BlocProvider.of<TodoBloc>(context);
     final appBloc = BlocProvider.of<AppBloc>(context);
     return ColoredSafeArea(
@@ -128,7 +100,15 @@ class NewTodoPopup extends PopupRoute {
                                         EdgeInsets.symmetric(horizontal: 10),
                                     child: Text("Add & Done",
                                         style: appTheme.textTheme.bodyText2)),
-                                onPressed: () => {})
+                                onPressed: () {
+                                  todosBloc.add(AddTodo(
+                                      Todo(textController.text,
+                                          note: noteController.text,
+                                          deadline: deadlineValue,
+                                          complete: true),
+                                      appBloc.getCurrentUser().id));
+                                  Navigator.pop(context);
+                                })
                           ],
                         )),
                   )
