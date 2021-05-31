@@ -45,21 +45,20 @@ class _LandingScreenState extends State<LandingScreen> {
     final screenSize = MediaQuery.of(context).size;
     final screenHeight = screenSize.height;
 
-    return ColoredSafeArea(
-        appTheme.accentColor,
-        Scaffold(
-            body: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image:
-                        AssetImage("assets/images/loginScreen/background.png"),
-                    alignment: Alignment.topCenter,
-                    fit: BoxFit.fitWidth,
-                  ),
-                ),
-                child: BlocProvider(
-                    create: (_) =>
-                        LandingCubit(context.read<AuthenticationRepository>()),
+    return BlocProvider(
+        create: (_) => LandingCubit(context.read<AuthenticationRepository>()),
+        child: ColoredSafeArea(
+            appTheme.accentColor,
+            Scaffold(
+                body: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(
+                            "assets/images/loginScreen/background.png"),
+                        alignment: Alignment.topCenter,
+                        fit: BoxFit.fitWidth,
+                      ),
+                    ),
                     child: Center(
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -79,66 +78,82 @@ class _LandingScreenState extends State<LandingScreen> {
                             ),
                           ),
                           LandingScreenGroupSwitcher(),
-                          Row(children: <Widget>[
-                            Expanded(
-                              flex: 1,
-                              child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 40),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(child: Divider()),
-                                      Padding(
-                                          padding: EdgeInsets.all(
-                                              screenHeight * 0.01),
-                                          child: Text("OR",
-                                              style: TextStyle(
-                                                  color: Colors.black12))),
-                                      Expanded(child: Divider()),
-                                    ],
-                                  )),
-                            )
-                          ]),
-                          Row(children: <Widget>[
-                            new Expanded(
-                              flex: 1,
-                              child: Column(
-                                children: <Widget>[
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 50.0, right: 20.0),
-                                      child: GoogleSignInButton()),
-                                ],
-                              ),
-                            ),
-                            new Expanded(
-                                flex: 1,
-                                child: Padding(
+                          Spacer(),
+                          Container(
+                              alignment: Alignment.bottomCenter,
+                              child: Column(children: [
+                                Row(children: <Widget>[
+                                  Expanded(
+                                    flex: 1,
+                                    child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 40),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Expanded(child: Divider()),
+                                            Padding(
+                                                padding: EdgeInsets.all(
+                                                    screenHeight * 0.01),
+                                                child: Text("OR",
+                                                    style: TextStyle(
+                                                        color:
+                                                            Colors.black12))),
+                                            Expanded(child: Divider()),
+                                          ],
+                                        )),
+                                  )
+                                ]),
+                                Row(children: <Widget>[
+                                  new Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      children: <Widget>[
+                                        Padding(
+                                            padding: EdgeInsets.only(
+                                                left: 50.0, right: 20.0),
+                                            child: GoogleSignInButton()),
+                                      ],
+                                    ),
+                                  ),
+                                  new Expanded(
+                                      flex: 1,
+                                      child: Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 20.0, right: 50.0),
+                                          child: new ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                                maxHeight: 45,
+                                                minHeight: 45,
+                                                maxWidth: 40),
+                                            child: OutlinedButton(
+                                                style: ButtonStyle(
+                                                  shape:
+                                                      MaterialStateProperty.all(
+                                                    RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                  ),
+                                                ),
+                                                onPressed: () {},
+                                                child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10,
+                                                            bottom: 10),
+                                                    child: Text(
+                                                      "NUS Email",
+                                                    ))),
+                                          )))
+                                ]),
+                                Padding(
                                     padding: EdgeInsets.only(
-                                        left: 20.0, right: 50.0),
-                                    child: new ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                          maxHeight: 45,
-                                          minHeight: 45,
-                                          maxWidth: 40),
-                                      child: OutlinedButton(
-                                          style: ButtonStyle(
-                                            shape: MaterialStateProperty.all(
-                                              RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                            ),
-                                          ),
-                                          onPressed: () {},
-                                          child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 10, bottom: 10),
-                                              child: Text(
-                                                "NUS Email",
-                                              ))),
-                                    )))
-                          ]),
+                                        bottom: MediaQuery.of(context)
+                                                .padding
+                                                .bottom +
+                                            15))
+                              ]))
                         ]))))));
   }
 }

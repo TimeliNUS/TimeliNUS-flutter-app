@@ -35,8 +35,8 @@ class LandingCubit extends Cubit<LandingState> {
       status: Formz.validate([
         state.email,
         password,
-        if (state.landingStatus == LandingStatus.isSigningUp)
-          state.confirmedPassword
+        // if (state.landingStatus == LandingStatus.isSigningUp)
+        //   state.confirmedPassword
       ]),
     ));
   }
@@ -110,7 +110,6 @@ class LandingCubit extends Cubit<LandingState> {
 
   @override
   void onChange(Change<LandingState> change) {
-    print(change);
     super.onChange(change);
   }
 }

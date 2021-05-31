@@ -2,7 +2,9 @@ import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/app/appState.dart';
 import 'package:TimeliNUS/blocs/app/blocObserver.dart';
 import 'package:TimeliNUS/blocs/app/routes/routes.dart';
+import 'package:TimeliNUS/blocs/screens/todo/todoBloc.dart';
 import 'package:TimeliNUS/repository/authenticationRepository.dart';
+import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/screens/landingScreen.dart';
 import 'package:TimeliNUS/utils/services/firebase.dart';
 import 'package:TimeliNUS/widgets/style.dart';
@@ -27,30 +29,38 @@ Future<void> main() async {
   //   await FirebaseService().switchToEmulator();
   // }
   final authenticationRepository = AuthenticationRepository();
+  final todoRepository = TodoRepository();
   await authenticationRepository.user.first;
-  runApp(App(authenticationRepository: authenticationRepository));
+  runApp(App(
+      authenticationRepository: authenticationRepository,
+      todoRepository: todoRepository));
 }
 
 class App extends StatelessWidget {
   const App({
     Key key,
     @required AuthenticationRepository authenticationRepository,
+    @required TodoRepository todoRepository,
   })  : _authenticationRepository = authenticationRepository,
+        _todoRepository = todoRepository,
         super(key: key);
   // This widget is the root of your application.
 
   final AuthenticationRepository _authenticationRepository;
+  final TodoRepository _todoRepository;
 
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
-      value: _authenticationRepository,
-      child: BlocProvider(
-          create: (_) => AppBloc(
-                authenticationRepository: _authenticationRepository,
-              ),
-          child: AppView()),
-    );
+        value: _authenticationRepository,
+        child: BlocProvider(
+            create: (_) => AppBloc(
+                  authenticationRepository: _authenticationRepository,
+                ),
+            child: BlocProvider<TodoBloc>(
+              create: (_) => TodoBloc(todoRepository: _todoRepository),
+              child: AppView(),
+            )));
   }
 }
 

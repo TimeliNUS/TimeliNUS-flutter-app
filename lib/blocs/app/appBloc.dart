@@ -21,6 +21,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final AuthenticationRepository _authenticationRepository;
   StreamSubscription<User> _userSubscription;
 
+  User getCurrentUser() {
+    return _authenticationRepository.currentUser;
+  }
+
   void _onUserChanged(User user) => add(AppUserChanged(user));
 
   @override
