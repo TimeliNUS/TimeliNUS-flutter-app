@@ -7,6 +7,7 @@ import 'package:TimeliNUS/widgets/textWithAction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
 
 class LoginGroup extends StatefulWidget {
   @override
@@ -18,7 +19,23 @@ class LoginGroup extends StatefulWidget {
 class LoginGroupState extends State<LoginGroup> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LandingCubit, LandingState>(
+    return BlocConsumer<LandingCubit, LandingState>(
+        listener: (context, state) {
+          if (state.status == FormzStatus.submissionFailure &&
+              state.errMsg != '')
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: appTheme.primaryColorLight,
+                content: Text(state.errMsg),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () {
+                    // Code to execute.
+                  },
+                ),
+              ),
+            );
+        },
         buildWhen: (previous, current) =>
             previous.email != current.email ||
             previous.remembered != current.remembered,

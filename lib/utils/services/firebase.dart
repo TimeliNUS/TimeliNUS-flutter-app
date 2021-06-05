@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -62,17 +61,17 @@ class FirebaseService {
         idToken: googleSignInAuthentication.idToken,
       );
 
-      try {
-        await _auth.signInWithCredential(credential);
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'account-exists-with-different-credential') {
-          // handle the error here
-        } else if (e.code == 'invalid-credential') {
-          // handle the error here
-        }
-      } catch (e) {
-        // handle the error here
-      }
+      // try {
+      await _auth.signInWithCredential(credential);
+      // } on FirebaseAuthException catch (e) {
+      //   if (e.code == 'account-exists-with-different-credential') {
+      //     // handle the error here
+      //   } else if (e.code == 'invalid-credential') {
+      //     // handle the error here
+      //   }
+      // } catch (e) {
+      //   // handle the error here
+      // }
     }
   }
 

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:TimeliNUS/blocs/app/appEvent.dart';
 import 'package:TimeliNUS/blocs/app/appState.dart';
-import 'package:TimeliNUS/blocs/user/userModel.dart';
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
@@ -50,7 +50,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   @override
   void onChange(Change<AppState> change) {
-    print("Hello " + change.toString());
+    print("App Bloc: " + change.toString());
     super.onChange(change);
   }
 }

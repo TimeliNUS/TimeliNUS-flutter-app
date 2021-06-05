@@ -173,10 +173,7 @@ class LandingScreenGroupSwitcher extends StatelessWidget {
             return Column(children: [
               CarouselWithIndicatorDemo(),
               Padding(padding: EdgeInsets.only(top: 20)),
-              landingActionGroup(
-                () => null,
-                () => null,
-              )
+              landingActionGroup()
             ]);
         }
       }()));

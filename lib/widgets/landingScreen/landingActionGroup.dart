@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-Widget landingActionGroup(Function() login, Function() register) {
+Widget landingActionGroup() {
   return BlocBuilder<LandingCubit, LandingState>(builder: (context, state) {
     return Padding(
       padding: EdgeInsets.only(top: 20, left: 20, right: 20),

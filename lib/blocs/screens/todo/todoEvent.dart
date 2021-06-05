@@ -17,13 +17,22 @@ class LoadTodos extends TodoEvent {
   String toString() => 'LoadTodos';
 }
 
+class ReorderTodos extends TodoEvent {
+  final List<Todo> todos;
+  final String id;
+
+  ReorderTodos(this.todos, this.id) : super([todos, id]);
+  @override
+  String toString() => 'ReorderTodos';
+}
+
 class AddTodo extends TodoEvent {
   final Todo todo;
-  final String userId;
-  AddTodo(this.todo, this.userId) : super([todo, userId]);
+  final String id;
+  AddTodo(this.todo, this.id) : super([todo, id]);
 
   @override
-  String toString() => 'AddTodo { todo: $todo, id: $userId }';
+  String toString() => 'AddTodo { todo: $todo, id: $id }';
 }
 
 class UpdateTodo extends TodoEvent {
@@ -37,8 +46,9 @@ class UpdateTodo extends TodoEvent {
 
 class DeleteTodo extends TodoEvent {
   final Todo todo;
+  final String userId;
 
-  DeleteTodo(this.todo) : super([todo]);
+  DeleteTodo(this.todo, this.userId) : super([todo, userId]);
 
   @override
   String toString() => 'DeleteTodo { todo: $todo }';

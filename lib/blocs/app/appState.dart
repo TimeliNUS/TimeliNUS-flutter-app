@@ -1,4 +1,4 @@
-import 'package:TimeliNUS/blocs/user/userModel.dart';
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 

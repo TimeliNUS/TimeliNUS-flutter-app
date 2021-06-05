@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
-import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 extension HexColor on Color {
@@ -47,11 +45,4 @@ class ColoredSafeArea extends StatelessWidget {
         color: this.backgroundColor,
         child: SafeArea(top: true, bottom: false, child: childWidget));
   }
-
-  // Widget build(BuildContext context) {
-  //   return AnnotatedRegion<SystemUiOverlayStyle>(
-  //       value: SystemUiOverlayStyle.dark
-  //           .copyWith(statusBarColor: appTheme.accentColor),
-  //       child: SafeArea(top: true, bottom: false, child: childWidget));
-  // }
 }

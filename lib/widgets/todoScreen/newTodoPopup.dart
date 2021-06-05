@@ -1,8 +1,10 @@
+import 'dart:ui';
+
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
 import 'package:TimeliNUS/models/todo.dart';
+import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/screens/todoScreen.dart';
-import 'package:TimeliNUS/widgets/landingScreen/actionButton.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,140 +12,159 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class NewTodoPopup extends StatefulWidget {
+  final TodoBloc todosBloc;
+  const NewTodoPopup(this.todosBloc);
   @override
   State<NewTodoPopup> createState() => _NewTodoPopupState();
 }
 
 class _NewTodoPopupState extends State<NewTodoPopup> {
   DateTime deadlineValue;
-
   final TextEditingController textController = new TextEditingController();
   final TextEditingController noteController = new TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final todosBloc = BlocProvider.of<TodoBloc>(context);
-    final appBloc = BlocProvider.of<AppBloc>(context);
-    return ColoredSafeArea(
-        appTheme.primaryColorLight,
-        Scaffold(
-            body: Container(
-                color: appTheme.primaryColorLight,
-                child: Column(children: [
-                  TopBar(() => Navigator.pop(context), "Create Todo"),
-                  Expanded(
-                      child: GestureDetector(
-                          onTap: () =>
-                              FocusManager.instance.primaryFocus?.unfocus(),
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(40.0),
-                                      topLeft: Radius.circular(40.0))),
-                              child: Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 30, right: 30, top: 15),
-                                  child: ListView(
-                                    // mainAxisAlignment: MainAxisAlignment.start,
-                                    // mainAxisSize: MainAxisSize.min,
-                                    // crossAxisAlignment:
-                                    //     CrossAxisAlignment.start,
-                                    children: [
-                                      // TopBar(),
-                                      TodoInput(textController),
-                                      customPadding(),
-                                      MyStatefulWidget(),
-                                      customPadding(),
-                                      PersonInChargeChips([
-                                        appBloc.getCurrentUser().name ??
-                                            "Myself"
-                                      ]),
-                                      customPadding(),
-                                      // constraints: BoxConstraints.expand(height: 200)),
-                                      DeadlineInput((val) =>
-                                          setState(() => deadlineValue = val)),
-                                      customPadding(),
-                                      NotesInput(noteController),
-                                    ],
-                                  ))))),
-                  Container(
-                    color: Colors.white,
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                        padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).padding.bottom),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            appTheme.primaryColorLight)),
-                                child: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 10),
-                                    child: Text("Add & Next",
-                                        style: appTheme.textTheme.bodyText2
-                                            .apply(color: Colors.white))),
-                                onPressed: () {
-                                  todosBloc.add(AddTodo(
-                                      Todo(textController.text,
-                                          note: noteController.text,
-                                          deadline: deadlineValue),
-                                      appBloc.getCurrentUser().id));
-                                  Navigator.pop(context);
-                                }),
-                            OutlinedButton(
-                                child: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 10),
-                                    child: Text("Add & Done",
-                                        style: appTheme.textTheme.bodyText2)),
-                                onPressed: () {
-                                  todosBloc.add(AddTodo(
-                                      Todo(textController.text,
-                                          note: noteController.text,
-                                          deadline: deadlineValue,
-                                          complete: true),
-                                      appBloc.getCurrentUser().id));
-                                  Navigator.pop(context);
-                                })
-                          ],
-                        )),
-                  )
-                ]))));
+    final todosBloc = TodoBloc(todoRepository: context.read<TodoRepository>());
+    return BlocProvider<TodoBloc>(
+        create: (context) => todosBloc,
+        child: ColoredSafeArea(
+            appTheme.primaryColorLight,
+            Scaffold(
+                body: Container(
+                    color: appTheme.primaryColorLight,
+                    child: Column(children: [
+                      TopBar(() => Navigator.pop(context), "Create Todo"),
+                      Expanded(
+                          child: GestureDetector(
+                              onTap: () =>
+                                  FocusManager.instance.primaryFocus?.unfocus(),
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(40.0),
+                                          topLeft: Radius.circular(40.0))),
+                                  child: Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 30, right: 30, top: 15),
+                                      child: ListView(
+                                        children: [
+                                          // TopBar(),
+                                          TodoInput(textController),
+                                          customPadding(),
+                                          TodoDropdown(),
+                                          customPadding(),
+                                          PersonInChargeChips([
+                                            context.select((AppBloc bloc) =>
+                                                    bloc.state.user.name) ??
+                                                "Myself"
+                                          ]),
+                                          customPadding(),
+                                          // constraints: BoxConstraints.expand(height: 200)),
+                                          DeadlineInput((val) => setState(
+                                              () => deadlineValue = val)),
+                                          customPadding(),
+                                          NotesInput(noteController),
+                                        ],
+                                      ))))),
+                      Container(
+                        color: Colors.white,
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                            padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).padding.bottom),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                appTheme.primaryColorLight)),
+                                    child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Text("Add & Next",
+                                            style: appTheme.textTheme.bodyText2
+                                                .apply(color: Colors.white))),
+                                    onPressed: () {
+                                      widget.todosBloc.add(AddTodo(
+                                          Todo(textController.text,
+                                              note: noteController.text,
+                                              deadline: deadlineValue),
+                                          context
+                                              .read<AppBloc>()
+                                              .getCurrentUser()
+                                              .id));
+                                      Navigator.pop(context);
+                                    }),
+                                OutlinedButton(
+                                    child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Text("Add & Done",
+                                            style:
+                                                appTheme.textTheme.bodyText2)),
+                                    onPressed: () {
+                                      widget.todosBloc.add(AddTodo(
+                                          Todo(textController.text,
+                                              note: noteController.text,
+                                              deadline: deadlineValue,
+                                              complete: true),
+                                          context
+                                              .read<AppBloc>()
+                                              .getCurrentUser()
+                                              .id));
+                                      Navigator.pop(context);
+                                    })
+                              ],
+                            )),
+                      )
+                    ])))));
   }
 }
 
-class TodoInput extends StatelessWidget {
+class TodoInput extends StatefulWidget {
   final TextEditingController controller;
-  const TodoInput(this.controller);
+  const TodoInput(this.controller, {Key key}) : super(key: key);
+
+  @override
+  State<TodoInput> createState() => _TodoInputState();
+}
+
+class _TodoInputState extends State<TodoInput> {
+  String currentText = '';
+
+  @override
+  void initState() {
+    super.initState();
+    currentText = widget.controller.text;
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       key: const Key('todoTitle_textField'),
-      controller: controller,
+      controller: widget.controller,
+      onChanged: (value) => setState(() => currentText = value),
       decoration: InputDecoration(
-          labelText: 'Todo Title',
-          labelStyle: TextStyle(color: appTheme.accentColor, fontSize: 18),
-          floatingLabelBehavior: FloatingLabelBehavior.always
-          // errorText: controller.text.length < 3 ? 'Invalid Task!' : null,
-          ),
+        labelText: 'Todo Title',
+        labelStyle: TextStyle(color: appTheme.accentColor, fontSize: 18),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        errorText: currentText.length < 3 ? 'Please enter your task!' : null,
+      ),
     );
   }
 }
 
-class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({Key key}) : super(key: key);
+class TodoDropdown extends StatefulWidget {
+  const TodoDropdown({Key key}) : super(key: key);
 
   @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+  State<TodoDropdown> createState() => TodoDropdownState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+class TodoDropdownState extends State<TodoDropdown> {
   String dropdownValue = 'CS2103 Software Engineering Project';
 
   @override
@@ -241,8 +262,19 @@ class _DeadlineInputState extends State<DeadlineInput> {
                   ),
                   CupertinoButton(
                     child: Text('Confirm'),
-                    onPressed: () =>
-                        {Navigator.of(context, rootNavigator: true).pop("OK")},
+                    onPressed: () {
+                      if (chosenDateTime == null) {
+                        DateTime now = DateTime.now();
+                        setState(() {
+                          chosenDateTime = isWithTime
+                              ? now
+                              : new DateTime(now.year, now.month, now.day);
+                        });
+                        print(chosenDateTime);
+                        widget.callback(chosenDateTime);
+                      }
+                      Navigator.of(context, rootNavigator: true).pop("OK");
+                    },
                   )
                 ],
               ),

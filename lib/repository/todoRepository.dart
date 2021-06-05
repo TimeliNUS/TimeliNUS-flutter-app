@@ -1,6 +1,5 @@
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/models/todoEntity.dart';
-import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TodoRepository {
@@ -13,7 +12,7 @@ class TodoRepository {
 
   const TodoRepository({this.firestore});
 
-  Future<void> addNewTodo(TodoEntity todo, String id) async {
+  Future<DocumentReference> addNewTodo(TodoEntity todo, String id) async {
     Map<String, dynamic> tempJson = todo.toJson();
     tempJson.addEntries(
         [MapEntry("_createdAt", Timestamp.fromDate(DateTime.now()))]);
@@ -26,37 +25,46 @@ class TodoRepository {
       person.doc(id).set({
         'todo': [newTodoRef]
       });
-      return;
     } else {
       await person.doc(id).update({
         'todo': FieldValue.arrayUnion([newTodoRef])
       });
     }
+    return newTodoRef;
   }
 
-  Future<void> deleteTodo(List<String> idList) async {
-    await Future.wait<void>(idList.map((id) {
-      return ref.doc(id).delete();
-    }));
+  Future<void> deleteTodo(Todo todo, String id) async {
+    // await Future.wait<void>(idList.map((id) {
+    //   return ref.doc(id).delete();
+    // }));
+    print(todo.ref);
+    await person.doc(id).update({
+      'todo': FieldValue.arrayRemove([todo.ref])
+    });
+    return ref.doc(todo.id).delete();
+  }
+
+  Future<void> reorderTodo(List<DocumentReference> refs, String id) async {
+    return await person.doc(id).update({
+      'todo': [...refs]
+    });
   }
 
   Future<List<TodoEntity>> loadTodos(String id) async {
     DocumentSnapshot documentSnapshot = await person.doc(id).get();
-    if (documentSnapshot.exists) {
-      print('Document exists on the database');
-      print(documentSnapshot.data());
+    if (!documentSnapshot.exists) {
+      print('Document exists on the database: ' + documentSnapshot.data());
     }
     final list = documentSnapshot.get("todo");
     List<TodoEntity> tasks = [];
-    print(list);
     for (DocumentReference documentReference in list) {
       final DocumentSnapshot temp = await documentReference.get();
       // print(documentReference);
       TodoEntity documentSnapshotTask =
-          TodoEntity.fromJson(temp.data(), temp.id);
+          TodoEntity.fromJson(temp.data(), temp.id, documentReference);
       tasks.add(documentSnapshotTask);
     }
-    print("Task: " + tasks.toString());
+    // print("Task: " + tasks.toString());
     return tasks;
   }
 

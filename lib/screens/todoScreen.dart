@@ -1,58 +1,77 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
-import 'package:TimeliNUS/blocs/authentication/authenticationBloc.dart';
-import 'package:TimeliNUS/blocs/screens/landing/landingCubit.dart';
+import 'package:TimeliNUS/blocs/app/appEvent.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
 import 'package:TimeliNUS/models/todo.dart';
-import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/utils/transitionBuilder.dart';
-import 'package:TimeliNUS/widgets/landingScreen/actionButton.dart';
 import 'package:TimeliNUS/widgets/style.dart';
+import 'package:TimeliNUS/widgets/todoScreen/editTodoPopup.dart';
 import 'package:TimeliNUS/widgets/todoScreen/newTodoPopup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-// import 'package:percent_indicator/percent_indicator.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart'; // import 'package:percent_indicator/percent_indicator.dart';
+import 'package:provider/provider.dart';
 
 class TodoScreen extends StatelessWidget {
   static Page page() => MaterialPage(child: TodoScreen());
 
   @override
   Widget build(BuildContext context) {
-    final appBloc = BlocProvider.of<AppBloc>(context);
-    final todosBloc = BlocProvider.of<TodoBloc>(context)
-      ..add(LoadTodos(appBloc.getCurrentUser().id));
-    return BlocBuilder(
-        bloc: todosBloc,
-        builder: (BuildContext context, TodoState state) {
-          return ColoredSafeArea(
-              appTheme.primaryColorLight,
-              Scaffold(
-                  body: BlocProvider(
-                      create: (_) => LandingCubit(
-                          context.read<AuthenticationRepository>()),
-                      child: Container(
-                          color: appTheme.primaryColorLight,
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TopBar(
-                                    () => context
-                                        .read<AuthenticationRepository>()
-                                        .logOut(),
-                                    "EG1234",
-                                    "Example Project"),
-                                Expanded(
-                                  child: CustomCard(),
-                                ),
-                                // wideActionButton(
-                                //     "test",
-                                //     () => todosBloc.add(AddTodo(
-                                //         Todo("test", "1234"),
-                                //         appBloc.getCurrentUser().id))),
-                              ])))));
-        });
+    final id = context.select((AppBloc bloc) => bloc.state.user.id);
+    final todoBloc = TodoBloc(todoRepository: context.read<TodoRepository>())
+      ..add(LoadTodos(id));
+    return BlocProvider<TodoBloc>(
+        create: (context) => todoBloc,
+        child: ColoredSafeArea(
+            appTheme.primaryColorLight,
+            Scaffold(
+                body: Container(
+                    color: appTheme.primaryColorLight,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TopBar(
+                              () => context
+                                  .read<AppBloc>()
+                                  .add(AppLogoutRequested()),
+                              "EG1234",
+                              subtitle: "Example Project",
+                              rightWidget: CircularProgress()),
+                          Expanded(
+                            child: CustomCard(),
+                          ),
+                        ])))));
+  }
+}
+
+class CircularProgress extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TodoBloc, TodoState>(buildWhen: (previousState, state) {
+      return previousState != state;
+    }, builder: (context, state) {
+      return (state is TodoLoaded
+          ? new CircularPercentIndicator(
+              radius: 60.0,
+              lineWidth: 10,
+              percent: state.progress,
+              animation: true,
+              animationDuration: 500,
+              center: new Text((state.progress * 100).toInt().toString() + "%",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold)),
+              progressColor: Colors.white,
+              animateFromLastPercent: true,
+              circularStrokeCap: CircularStrokeCap.round,
+              backgroundColor: HexColor.fromHex('FFD8B4'),
+            )
+          : Container());
+    });
   }
 }
 
@@ -60,7 +79,9 @@ class TopBar extends StatelessWidget {
   final Function() onPressedCallback;
   final String title;
   final String subtitle;
-  const TopBar(this.onPressedCallback, this.title, [this.subtitle]);
+  final Widget rightWidget;
+  const TopBar(this.onPressedCallback, this.title,
+      {this.subtitle, this.rightWidget});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -83,13 +104,7 @@ class TopBar extends StatelessWidget {
                             style: TextStyle(color: Colors.white, fontSize: 16))
                         : Container()
                   ])),
-              // CircularPercentIndicator(
-              //   radius: 60.0,
-              //   lineWidth: 5.0,
-              //   percent: 1.0,
-              //   center: new Text("100%"),
-              //   progressColor: appTheme.accentColor,
-              // )
+              rightWidget ?? Container()
             ])));
   }
 }
@@ -115,42 +130,112 @@ class CustomCard extends StatelessWidget {
                     IconButton(
                       icon: Icon(Icons.add, color: appTheme.primaryColorLight),
                       onPressed: () => Navigator.push(
-                          context, SlideRightRoute(page: NewTodoPopup())),
+                          context,
+                          SlideRightRoute(
+                              page: NewTodoPopup(context.read<TodoBloc>()))),
                     )
                   ],
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 ),
                 Padding(padding: EdgeInsets.only(bottom: 15)),
                 Expanded(
-                    child: SingleChildScrollView(
-                        clipBehavior: Clip.hardEdge,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 2.0, horizontal: 2),
-                          child: BlocBuilder<TodoBloc, TodoState>(
-                            buildWhen: (previousState, state) {
-                              return state is TodoLoaded;
-                            },
-                            builder: (context, state) {
-                              if (!(state is TodoLoaded)) {
-                                return Container();
-                              }
-                              TodoLoaded temp = state as TodoLoaded;
-                              return Column(
-                                  children: temp.todos
-                                      .map((todo) => TodoItem(todo))
-                                      .toList());
-                            },
-                          ),
-                        )))
+                  // child: SingleChildScrollView(
+                  //     clipBehavior: Clip.hardEdge,
+
+                  child: TodoList(),
+                  // )
+                )
               ],
             )));
   }
 }
 
+class TodoList extends StatefulWidget {
+  @override
+  State<TodoList> createState() => _TodoListState();
+}
+
+class _TodoListState extends State<TodoList>
+    with SingleTickerProviderStateMixin {
+  // RefreshController _refreshController =
+  //     RefreshController(initialRefresh: false);
+  AnimationController _controller;
+
+  @override
+  void initState() {
+    _controller =
+        AnimationController(vsync: this, duration: Duration(seconds: 2));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Animation<double> offsetAnimation = Tween(begin: 0.0, end: 24.0)
+        .chain(CurveTween(curve: Curves.elasticIn))
+        .animate(_controller)
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+              _controller.reverse();
+            }
+          });
+    return BlocBuilder<TodoBloc, TodoState>(buildWhen: (previousState, state) {
+      return previousState != state;
+    }, builder: (context, state) {
+      if (state is TodoNotLoaded) {
+        return Container(child: Text("Error occur, Todos not loaded"));
+      }
+      return RefreshIndicator(
+          onRefresh: () async {
+            context
+                .read<TodoBloc>()
+                .add(LoadTodos(context.read<AppBloc>().getCurrentUser().id));
+            // await Future.delayed(Duration(milliseconds: 1000));
+            await context
+                .read<TodoBloc>()
+                .stream
+                .firstWhere((state) => state is TodoLoaded);
+          },
+          child: Theme(
+              data: Theme.of(context).copyWith(
+                  shadowColor: Colors.transparent,
+                  canvasColor: Colors.transparent),
+              child: ReorderableListView(
+                  clipBehavior: Clip.hardEdge,
+                  onReorder: (int oldIndex, int newIndex) {
+                    setState(() {
+                      if (oldIndex < newIndex) {
+                        newIndex -= 1;
+                      }
+                      final List<Todo> currentTodos = state.todos;
+                      final Todo item = currentTodos.removeAt(oldIndex);
+                      currentTodos.insert(newIndex, item);
+                      context.read<TodoBloc>().add(ReorderTodos(currentTodos,
+                          context.read<AppBloc>().getCurrentUser().id));
+                    });
+                  },
+                  children: context
+                      .select((TodoBloc bloc) => bloc.state.todos)
+                      .map((todo) => //     clipBehavior: Clip.hardEdge,
+                          Container(
+                              key: Key(todo.id),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 2.0, horizontal: 2),
+                              child: TodoItem(todo)))
+                      .toList())));
+    });
+  }
+}
+
 class TodoItem extends StatefulWidget {
   final Todo todo;
-  const TodoItem(this.todo);
+  final bool hasCheckbox;
+  const TodoItem(this.todo, {this.hasCheckbox = true});
 
   @override
   State<TodoItem> createState() => _TodoItemState();
@@ -160,71 +245,107 @@ class _TodoItemState extends State<TodoItem> {
   bool isChecked;
   @override
   Widget build(BuildContext context) {
-    final todosBloc = BlocProvider.of<TodoBloc>(context);
-    return BlocProvider(
-        create: (_) => TodoBloc(todoRepository: context.read<TodoRepository>()),
-        child: Column(children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
+    return BlocBuilder<TodoBloc, TodoState>(buildWhen: (previous, current) {
+      return previous != current;
+    }, builder: (context, state) {
+      return Column(children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      SlideRightRoute(
+                          page: EditTodoPopup(
+                              widget.todo, context.read<TodoBloc>()))),
                   child: Container(
-                child: Padding(
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                    children: [
-                      Row(children: [
-                        Text(
-                          widget.todo.title,
-                          style: TextStyle(color: appTheme.primaryColor),
-                        )
-                      ]),
-                      Padding(padding: EdgeInsets.only(top: 5)),
-                      Row(
+                    child: Padding(
+                      padding: EdgeInsets.all(15),
+                      child: Column(
                         children: [
-                          Icon(Icons.calendar_today_rounded,
-                              color: appTheme.primaryColorLight),
-                          Padding(padding: EdgeInsets.only(right: 5)),
-                          Text(
-                              widget.todo.deadline != null
-                                  ? DateFormat('MMM dd, yyyy – kk:mm')
-                                      .format(widget.todo.deadline)
-                                  : "No deadline set",
-                              style: TextStyle(color: appTheme.primaryColor))
+                          Row(children: [
+                            Text(
+                              widget.todo.title,
+                              style: TextStyle(color: appTheme.primaryColor),
+                            )
+                          ]),
+                          Padding(padding: EdgeInsets.only(top: 5)),
+                          Row(
+                            children: [
+                              Icon(Icons.calendar_today_rounded,
+                                  color: appTheme.primaryColorLight),
+                              Padding(padding: EdgeInsets.only(right: 5)),
+                              Text(
+                                  widget.todo.deadline != null
+                                      ? DateFormat('MMM dd, yyyy – kk:mm')
+                                          .format(widget.todo.deadline)
+                                      : "No deadline set",
+                                  style:
+                                      TextStyle(color: appTheme.primaryColor))
+                            ],
+                          )
                         ],
-                      )
-                    ],
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: appTheme.primaryColorLight,
-                        spreadRadius: 1,
-                        blurRadius: 1),
-                  ],
-                ),
-              )),
-              Padding(
-                padding: EdgeInsets.only(right: 40),
-              ),
-              SizedBox(
-                  height: 24.0,
-                  width: 24.0,
-                  child: Checkbox(
-                      value: isChecked ?? widget.todo.complete,
-                      onChanged: (boolean) {
-                        setState(() => isChecked = (isChecked != null
-                            ? !isChecked
-                            : !widget.todo.complete));
-                        todosBloc.add(UpdateTodo(
-                            widget.todo.copyWith(complete: isChecked)));
-                      }))
-            ],
-          ),
-          Padding(padding: EdgeInsets.only(bottom: 10)),
-        ]));
+                      ),
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                            color: appTheme.primaryColorLight,
+                            spreadRadius: 1,
+                            blurRadius: 1),
+                      ],
+                    ),
+                  )),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 40),
+            ),
+            widget.hasCheckbox
+                ? Transform.scale(
+                    scale: 1.2,
+                    child: SizedBox(
+                        height: 24.0,
+                        width: 24.0,
+                        child: Container(
+                            // decoration: new BoxDecoration(
+                            //   border: Border.all(
+                            //       width: 1.5, color: appTheme.primaryColorLight),
+                            //   borderRadius: new BorderRadius.circular(5),
+                            // ),
+                            // child: Theme(
+                            //     data: Theme.of(context).copyWith(
+                            //       unselectedWidgetColor: Colors.transparent,
+                            //     ),
+                            child: Checkbox(
+                                // activeColor: Colors.transparent,
+                                // checkColor: appTheme.primaryColorLight,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.padded,
+                                value: isChecked ?? widget.todo.complete,
+                                onChanged: (boolean) {
+                                  setState(() => isChecked = (isChecked != null
+                                      ? !isChecked
+                                      : !widget.todo.complete));
+                                  print("Hellosasdas " +
+                                      state.todos
+                                          .firstWhere((element) =>
+                                              element.id == widget.todo.id)
+                                          .toString());
+                                  context.read<TodoBloc>().add(UpdateTodo(state
+                                      .todos
+                                      .firstWhere((element) =>
+                                          element.id == widget.todo.id)
+                                      .copyWith(complete: isChecked)));
+                                }))))
+                // )
+                : Container()
+          ],
+        ),
+        Padding(padding: EdgeInsets.only(bottom: 10)),
+      ]);
+    });
   }
 }

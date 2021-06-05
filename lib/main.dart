@@ -2,13 +2,10 @@ import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/app/appState.dart';
 import 'package:TimeliNUS/blocs/app/blocObserver.dart';
 import 'package:TimeliNUS/blocs/app/routes/routes.dart';
-import 'package:TimeliNUS/blocs/screens/todo/todoBloc.dart';
 import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
-import 'package:TimeliNUS/screens/landingScreen.dart';
 import 'package:TimeliNUS/utils/services/firebase.dart';
 import 'package:TimeliNUS/widgets/style.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +16,7 @@ Future<void> main() async {
   Bloc.observer = AppBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
 
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
   // print('Is emulator: ${androidInfo.isPhysicalDevice}');
 
@@ -51,16 +48,21 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
-        value: _authenticationRepository,
-        child: BlocProvider(
-            create: (_) => AppBloc(
-                  authenticationRepository: _authenticationRepository,
-                ),
-            child: BlocProvider<TodoBloc>(
-              create: (_) => TodoBloc(todoRepository: _todoRepository),
-              child: AppView(),
-            )));
+    return BlocProvider(
+        create: (_) => AppBloc(
+              authenticationRepository: _authenticationRepository,
+            ),
+        child: MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider<AuthenticationRepository>(
+              create: (context) => _authenticationRepository,
+            ),
+            RepositoryProvider<TodoRepository>(
+              create: (context) => _todoRepository,
+            ),
+          ],
+          child: AppView(),
+        ));
   }
 }
 

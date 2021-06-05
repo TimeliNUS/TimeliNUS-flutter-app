@@ -1,6 +1,6 @@
-import 'package:TimeliNUS/blocs/form/confirmedPassword.dart';
-import 'package:TimeliNUS/blocs/form/email.dart';
-import 'package:TimeliNUS/blocs/form/password.dart';
+import 'package:TimeliNUS/models/form/confirmedPassword.dart';
+import 'package:TimeliNUS/models/form/email.dart';
+import 'package:TimeliNUS/models/form/password.dart';
 import 'package:TimeliNUS/blocs/screens/landing/landingState.dart';
 import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:bloc/bloc.dart';
@@ -18,7 +18,7 @@ class LandingCubit extends Cubit<LandingState> {
       status: Formz.validate([
         email,
         state.password,
-        state.confirmedPassword,
+        // state.confirmedPassword,
       ]),
     ));
   }
@@ -77,8 +77,9 @@ class LandingCubit extends Cubit<LandingState> {
         password: state.password.value,
       );
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
-    } on Exception {
-      emit(state.copyWith(status: FormzStatus.submissionFailure));
+    } catch (err) {
+      emit(state.copyWith(
+          status: FormzStatus.submissionFailure, errMsg: err.toString()));
     }
   }
 
@@ -91,8 +92,9 @@ class LandingCubit extends Cubit<LandingState> {
         password: state.password.value,
       );
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
-    } on Exception {
-      emit(state.copyWith(status: FormzStatus.submissionFailure));
+    } catch (err) {
+      emit(state.copyWith(
+          status: FormzStatus.submissionFailure, errMsg: err.toString()));
     }
   }
 
@@ -101,8 +103,9 @@ class LandingCubit extends Cubit<LandingState> {
     try {
       await _authenticationRepository.logInWithGoogle();
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
-    } on Exception {
-      emit(state.copyWith(status: FormzStatus.submissionFailure));
+    } on Exception catch (err) {
+      emit(state.copyWith(
+          status: FormzStatus.submissionFailure, errMsg: err.toString()));
     } on NoSuchMethodError {
       emit(state.copyWith(status: FormzStatus.pure));
     }
@@ -112,4 +115,8 @@ class LandingCubit extends Cubit<LandingState> {
   void onChange(Change<LandingState> change) {
     super.onChange(change);
   }
+
+  // Stream<LandingState> get landingState async* {
+  //   return state;
+  // }
 }

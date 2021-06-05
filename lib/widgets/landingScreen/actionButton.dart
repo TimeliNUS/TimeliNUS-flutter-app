@@ -10,9 +10,6 @@ Widget wideActionButton(String buttonText, onPressedAction) {
       buildWhen: (previous, current) => previous.status != current.status,
       builder: (context, state) {
         return Column(children: [
-          Text(state.status == FormzStatus.submissionFailure
-              ? "Wrong credentials"
-              : ""),
           state.status == FormzStatus.submissionInProgress
               ? const CircularProgressIndicator()
               : Row(

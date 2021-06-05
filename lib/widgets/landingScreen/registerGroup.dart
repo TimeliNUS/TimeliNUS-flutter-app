@@ -7,6 +7,8 @@ import 'package:TimeliNUS/widgets/textWithAction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
+import 'package:formz/formz.dart';
 
 class RegisterGroup extends StatefulWidget {
   final authenticationActionFunction;
@@ -23,10 +25,26 @@ class RegisterGroupState extends State<RegisterGroup> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    return BlocBuilder<LandingCubit, LandingState>(
+    return BlocConsumer<LandingCubit, LandingState>(
+        listener: (context, state) {
+          if (state.status == FormzStatus.submissionFailure)
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: appTheme.primaryColorLight,
+                content: Text(state.errMsg),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () {
+                    // Code to execute.
+                  },
+                ),
+              ),
+            );
+        },
         buildWhen: (previous, current) =>
             previous.email != current.email ||
-            previous.remembered != current.remembered,
+            previous.remembered != current.remembered ||
+            current.status == FormzStatus.submissionFailure,
         builder: (context, state) {
           return Padding(
             padding:
@@ -75,8 +93,9 @@ class RegisterGroupState extends State<RegisterGroup> {
                           style: ThemeTextStyle.defaultText)),
                 ]),
                 Padding(padding: EdgeInsets.only(bottom: 10)),
-                wideActionButton("Sign Up",
-                    () => context.read<LandingCubit>().signUpFormSubmitted()),
+                wideActionButton("Sign Up", () {
+                  context.read<LandingCubit>().signUpFormSubmitted();
+                }),
                 textWithAction(
                     "Have an account?",
                     "Sign in here",

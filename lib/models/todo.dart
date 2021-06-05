@@ -12,38 +12,40 @@ class Todo extends Equatable {
   final String title;
   final DateTime deadline;
   final Person pic;
+  final DocumentReference ref;
 
   const Todo(this.title,
       {this.id,
       this.complete = false,
       this.note = '',
       this.deadline,
-      this.pic});
+      this.pic,
+      this.ref});
 
   Todo copyWith(
       {String title,
       bool complete,
       String note,
       DateTime deadline,
-      Person pic}) {
-    return Todo(
-      title ?? this.title,
-      id: id ?? this.id,
-      complete: complete ?? this.complete,
-      note: note ?? '',
-      deadline: deadline ?? this.deadline,
-      pic: pic ?? this.pic,
-    );
+      Person pic,
+      DocumentReference ref}) {
+    return Todo(title ?? this.title,
+        id: id ?? this.id,
+        complete: complete ?? this.complete,
+        note: note ?? (this.note ?? ''),
+        deadline: deadline ?? this.deadline,
+        pic: pic ?? this.pic,
+        ref: ref ?? this.ref);
   }
 
   @override
   String toString() {
-    return 'Todo { complete: $complete, title: $title, note: $note, id: $id }';
+    return 'Todo { complete: $complete, title: $title, note: $note, id: $id, ref: $ref}';
   }
 
   TodoEntity toEntity() {
     return TodoEntity(title, id, note, complete,
-        deadline != null ? Timestamp.fromDate(deadline) : null);
+        deadline != null ? Timestamp.fromDate(deadline) : null, ref);
   }
 
   static Todo fromEntity(TodoEntity entity) {
@@ -51,9 +53,10 @@ class Todo extends Equatable {
         id: entity.id,
         complete: entity.complete ?? false,
         note: entity.note,
-        deadline: entity.deadline != null ? entity.deadline.toDate() : null);
+        deadline: entity.deadline != null ? entity.deadline.toDate() : null,
+        ref: entity.ref);
   }
 
   @override
-  List<Object> get props => [complete, id, note, title];
+  List<Object> get props => [complete, id, note, title, pic, deadline];
 }
