@@ -1,30 +1,82 @@
+import 'package:TimeliNUS/blocs/app/appBloc.dart';
+import 'package:TimeliNUS/blocs/app/appState.dart';
+import 'package:TimeliNUS/blocs/app/blocObserver.dart';
+import 'package:TimeliNUS/blocs/app/routes/routes.dart';
+import 'package:TimeliNUS/repository/authenticationRepository.dart';
+import 'package:TimeliNUS/repository/todoRepository.dart';
+import 'package:TimeliNUS/utils/services/firebase.dart';
+import 'package:TimeliNUS/widgets/style.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:tes/screens/MyHomePage.dart';
+import 'package:device_info/device_info.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
+Future<void> main() async {
+  Bloc.observer = AppBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+
+  // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  // print('Is emulator: ${androidInfo.isPhysicalDevice}');
+
+  // IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+  await Firebase.initializeApp();
+  // if (!iosInfo.isPhysicalDevice) {
+  //   await FirebaseService().switchToEmulator();
+  // }
+  final authenticationRepository = AuthenticationRepository();
+  final todoRepository = TodoRepository();
+  await authenticationRepository.user.first;
+  runApp(App(
+      authenticationRepository: authenticationRepository,
+      todoRepository: todoRepository));
 }
 
-class MyApp extends StatelessWidget {
+class App extends StatelessWidget {
+  const App({
+    Key key,
+    @required AuthenticationRepository authenticationRepository,
+    @required TodoRepository todoRepository,
+  })  : _authenticationRepository = authenticationRepository,
+        _todoRepository = todoRepository,
+        super(key: key);
   // This widget is the root of your application.
+
+  final AuthenticationRepository _authenticationRepository;
+  final TodoRepository _todoRepository;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+        create: (_) => AppBloc(
+              authenticationRepository: _authenticationRepository,
+            ),
+        child: MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider<AuthenticationRepository>(
+              create: (context) => _authenticationRepository,
+            ),
+            RepositoryProvider<TodoRepository>(
+              create: (context) => _todoRepository,
+            ),
+          ],
+          child: AppView(),
+        ));
+  }
+}
+
+class AppView extends StatelessWidget {
+  const AppView({Key key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+      theme: appTheme,
+      home: FlowBuilder<AppStatus>(
+        state: context.select((AppBloc bloc) => bloc.state.status),
+        onGeneratePages: onGenerateAppViewPages,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
