@@ -11,7 +11,7 @@ class Todo extends Equatable {
   final String note;
   final String title;
   final DateTime deadline;
-  final Person pic;
+  final List<Person> pic;
   final DocumentReference ref;
 
   const Todo(this.title,
@@ -27,7 +27,7 @@ class Todo extends Equatable {
       bool complete,
       String note,
       DateTime deadline,
-      Person pic,
+      List<Person> pic,
       DocumentReference ref}) {
     return Todo(title ?? this.title,
         id: id ?? this.id,
@@ -40,7 +40,7 @@ class Todo extends Equatable {
 
   @override
   String toString() {
-    return 'Todo { complete: $complete, title: $title, note: $note, id: $id, ref: $ref}';
+    return 'Todo { complete: $complete, title: $title, note: $note, id: $id, deadline: $deadline, ref: $ref}';
   }
 
   TodoEntity toEntity() {
@@ -58,5 +58,5 @@ class Todo extends Equatable {
   }
 
   @override
-  List<Object> get props => [complete, id, note, title, pic, deadline];
+  List<Object> get props => [complete, id, note, title, pic, deadline, ref];
 }

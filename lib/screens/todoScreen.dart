@@ -4,9 +4,11 @@ import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/utils/transitionBuilder.dart';
+import 'package:TimeliNUS/widgets/bottomNavigationBar.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/todoScreen/editTodoPopup.dart';
 import 'package:TimeliNUS/widgets/todoScreen/newTodoPopup.dart';
+import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -28,6 +30,7 @@ class TodoScreen extends StatelessWidget {
         child: ColoredSafeArea(
             appTheme.primaryColorLight,
             Scaffold(
+                bottomNavigationBar: BottomBar(0),
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(
@@ -53,59 +56,23 @@ class CircularProgress extends StatelessWidget {
     return BlocBuilder<TodoBloc, TodoState>(buildWhen: (previousState, state) {
       return previousState != state;
     }, builder: (context, state) {
-      return (state is TodoLoaded
-          ? new CircularPercentIndicator(
-              radius: 60.0,
-              lineWidth: 10,
-              percent: state.progress,
-              animation: true,
-              animationDuration: 500,
-              center: new Text((state.progress * 100).toInt().toString() + "%",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold)),
-              progressColor: Colors.white,
-              animateFromLastPercent: true,
-              circularStrokeCap: CircularStrokeCap.round,
-              backgroundColor: HexColor.fromHex('FFD8B4'),
-            )
-          : Container());
+      return CircularPercentIndicator(
+        radius: 60.0,
+        lineWidth: 10,
+        percent: (state is TodoLoaded ? state.progress : 0),
+        animation: true,
+        animationDuration: 500,
+        center: new Text((state.progress * 100).toInt().toString() + "%",
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold)),
+        progressColor: Colors.white,
+        animateFromLastPercent: true,
+        circularStrokeCap: CircularStrokeCap.round,
+        backgroundColor: HexColor.fromHex('FFD8B4'),
+      );
     });
-  }
-}
-
-class TopBar extends StatelessWidget {
-  final Function() onPressedCallback;
-  final String title;
-  final String subtitle;
-  final Widget rightWidget;
-  const TopBar(this.onPressedCallback, this.title,
-      {this.subtitle, this.rightWidget});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        color: appTheme.primaryColorLight,
-        child: Padding(
-            padding: EdgeInsets.only(left: 25, right: 25, bottom: 15),
-            child: Row(children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: onPressedCallback,
-              ),
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text(this.title,
-                        style: TextStyle(color: Colors.white, fontSize: 20)),
-                    this.subtitle != null
-                        ? Text(this.subtitle,
-                            style: TextStyle(color: Colors.white, fontSize: 16))
-                        : Container()
-                  ])),
-              rightWidget ?? Container()
-            ])));
   }
 }
 
@@ -176,14 +143,6 @@ class _TodoListState extends State<TodoList>
 
   @override
   Widget build(BuildContext context) {
-    final Animation<double> offsetAnimation = Tween(begin: 0.0, end: 24.0)
-        .chain(CurveTween(curve: Curves.elasticIn))
-        .animate(_controller)
-          ..addStatusListener((status) {
-            if (status == AnimationStatus.completed) {
-              _controller.reverse();
-            }
-          });
     return BlocBuilder<TodoBloc, TodoState>(buildWhen: (previousState, state) {
       return previousState != state;
     }, builder: (context, state) {

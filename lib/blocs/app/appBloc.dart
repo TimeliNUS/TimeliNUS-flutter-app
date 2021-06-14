@@ -9,7 +9,8 @@ import 'package:flutter/foundation.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({@required AuthenticationRepository authenticationRepository})
-      : _authenticationRepository = authenticationRepository,
+      : assert(authenticationRepository != null),
+        _authenticationRepository = authenticationRepository,
         super(
           authenticationRepository.currentUser.isNotEmpty
               ? AppState.authenticated(authenticationRepository.currentUser)
@@ -33,6 +34,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       yield _mapUserChangedToState(event, state);
     } else if (event is AppLogoutRequested) {
       _authenticationRepository.logOut();
+      yield (AppState.unauthenticated());
+    } else if (event is AppOnTodo) {
+      yield (AppState.onTodo(state.user));
+    } else if (event is AppOnProject) {
+      yield (AppState.onProject(state.user));
     }
   }
 

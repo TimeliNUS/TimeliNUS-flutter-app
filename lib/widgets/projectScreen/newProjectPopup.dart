@@ -1,59 +1,44 @@
+import 'dart:ui';
+
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
+import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
+import 'package:TimeliNUS/models/models.dart';
 import 'package:TimeliNUS/models/todo.dart';
+import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/screens/todoScreen.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
-import 'package:TimeliNUS/widgets/todoScreen/newTodoPopup.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
-class EditTodoPopup extends StatefulWidget {
-  final Todo todoToEdit;
-  final TodoBloc todosBloc;
-  const EditTodoPopup(this.todoToEdit, this.todosBloc);
+class NewProjectPopup extends StatefulWidget {
+  final ProjectBloc projectBloc;
+  const NewProjectPopup(this.projectBloc);
   @override
-  State<EditTodoPopup> createState() => _EditTodoPopupState();
+  State<NewProjectPopup> createState() => _NewProjectPopupState();
 }
 
-class _EditTodoPopupState extends State<EditTodoPopup> {
+class _NewProjectPopupState extends State<NewProjectPopup> {
   DateTime deadlineValue;
-  TextEditingController textController = new TextEditingController();
-  TextEditingController noteController;
-  @override
-  void initState() {
-    super.initState();
-    print(widget.todoToEdit.toString());
-    textController = new TextEditingController(text: widget.todoToEdit.title);
-    noteController = new TextEditingController(text: widget.todoToEdit.note);
-  }
-
+  final TextEditingController textController = new TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final todosBloc = TodoBloc(todoRepository: context.read<TodoRepository>());
-    return BlocProvider<TodoBloc>(
-        create: (context) => todosBloc,
+    // final projectBloc =
+    //     ProjectBloc(projectRepository: context.read<ProjectRepository>());
+    return BlocProvider<ProjectBloc>(
+        create: (context) => widget.projectBloc,
         child: ColoredSafeArea(
             appTheme.primaryColorLight,
             Scaffold(
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
-                      TopBar(() => Navigator.pop(context), "Todo Details",
-                          rightWidget: IconButton(
-                              icon: Icon(Icons.delete, color: Colors.white),
-                              onPressed: () {
-                                widget.todosBloc.add(DeleteTodo(
-                                    widget.todoToEdit,
-                                    context
-                                        .read<AppBloc>()
-                                        .getCurrentUser()
-                                        .id));
-                                Navigator.pop(context);
-                              })),
+                      TopBar(() => Navigator.pop(context), "Create Project"),
                       Expanded(
                           child: GestureDetector(
                               onTap: () =>
@@ -70,25 +55,26 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                       child: ListView(
                                         children: [
                                           // TopBar(),
-                                          PopupInput(textController),
+                                          PopupInput(textController,
+                                              inputLabel: 'Project Title',
+                                              errorMsg:
+                                                  'Please enter your project title!'),
                                           customPadding(),
                                           PopupDropdown(
-                                            dropdownLabel: 'Module Project',
+                                            dropdownLabel: 'Module Code',
                                           ),
                                           customPadding(),
                                           PersonInChargeChips([
                                             context.select((AppBloc bloc) =>
                                                     bloc.state.user.name) ??
                                                 "Myself"
-                                          ], "Person in Charge"),
+                                          ], "Groupmates"),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           DeadlineInput(
                                               (val) => setState(
                                                   () => deadlineValue = val),
-                                              true),
-                                          customPadding(),
-                                          NotesInput(noteController),
+                                              false),
                                         ],
                                       ))))),
                       Container(
@@ -100,6 +86,20 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
+                                // ElevatedButton(
+                                //     style: ButtonStyle(
+                                //         backgroundColor:
+                                //             MaterialStateProperty.all<Color>(
+                                //                 appTheme.primaryColorLight)),
+                                //     child: Padding(
+                                //         padding: EdgeInsets.symmetric(
+                                //             horizontal: 10),
+                                //         child: Text("Add & Next",
+                                //             style: appTheme.textTheme.bodyText2
+                                //                 .apply(color: Colors.white))),
+                                //     onPressed: () {
+                                //       Navigator.pop(context);
+                                //     }),
                                 ElevatedButton(
                                     style: ButtonStyle(
                                         backgroundColor:
@@ -108,16 +108,19 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                     child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 10),
-                                        child: Text("Update",
+                                        child: Text("Done",
                                             style: appTheme.textTheme.bodyText2
                                                 .apply(color: Colors.white))),
                                     onPressed: () {
-                                      widget.todosBloc.add(UpdateTodo(Todo(
-                                          textController.text,
-                                          id: widget.todoToEdit.id,
-                                          note: noteController.text,
-                                          complete: widget.todoToEdit.complete,
-                                          deadline: deadlineValue)));
+                                      widget.projectBloc.add(AddProject(
+                                          Project(
+                                            textController.text,
+                                            deadline: deadlineValue,
+                                          ),
+                                          context
+                                              .read<AppBloc>()
+                                              .getCurrentUser()
+                                              .id));
                                       Navigator.pop(context);
                                     })
                               ],
@@ -126,3 +129,5 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                     ])))));
   }
 }
+
+Widget customPadding() => Padding(padding: EdgeInsets.only(bottom: 40));

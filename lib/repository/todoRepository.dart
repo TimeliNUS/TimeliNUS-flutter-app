@@ -56,8 +56,13 @@ class TodoRepository {
       print('Document exists on the database: ' + documentSnapshot.data());
     }
     final list = documentSnapshot.get("todo");
+    return await loadTodosFromReferenceList(list);
+  }
+
+  static Future<List<TodoEntity>> loadTodosFromReferenceList(
+      List<dynamic> refs) async {
     List<TodoEntity> tasks = [];
-    for (DocumentReference documentReference in list) {
+    for (DocumentReference documentReference in refs) {
       final DocumentSnapshot temp = await documentReference.get();
       // print(documentReference);
       TodoEntity documentSnapshotTask =
