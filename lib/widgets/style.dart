@@ -15,6 +15,7 @@ extension HexColor on Color {
 class ThemeColor {
   static final lightGrey = HexColor.fromHex('#F1F1F1');
   static final grey = HexColor.fromHex('#ABABAB');
+  static final lightOrange = HexColor.fromHex('#FFE4CB');
 }
 
 class ThemeTextStyle {
