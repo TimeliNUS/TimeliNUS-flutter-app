@@ -2,7 +2,7 @@ import 'package:TimeliNUS/models/userModel.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-enum AppStatus { authenticated, unauthenticated, onTodo, onProject }
+enum AppStatus { authenticated, unauthenticated, onTodo, onProject, onMeeting }
 
 class AppState extends Equatable {
   const AppState({
@@ -19,6 +19,9 @@ class AppState extends Equatable {
 
   const AppState.onProject(User user)
       : this(status: AppStatus.onProject, user: user);
+
+  const AppState.onMeeting(User user)
+      : this(status: AppStatus.onMeeting, user: user);
 
   final AppStatus status;
   final User user;

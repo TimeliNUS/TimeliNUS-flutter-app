@@ -14,6 +14,8 @@ class AppOnTodo extends AppEvent {}
 
 class AppOnProject extends AppEvent {}
 
+class AppOnMeeting extends AppEvent {}
+
 class AppUserChanged extends AppEvent {
   const AppUserChanged(this.user);
 

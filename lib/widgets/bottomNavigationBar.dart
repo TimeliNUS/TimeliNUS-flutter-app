@@ -3,9 +3,11 @@ import 'package:TimeliNUS/blocs/app/appEvent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../blocs/app/appEvent.dart';
+
 class BottomBar extends StatelessWidget {
   final currentIndex;
-  final buttonToState = [AppOnTodo(), AppOnProject()];
+  final buttonToState = [AppOnTodo(), AppOnProject(), AppOnMeeting()];
 
   BottomBar(this.currentIndex);
   @override

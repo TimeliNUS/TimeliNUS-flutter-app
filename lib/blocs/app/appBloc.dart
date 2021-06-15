@@ -39,6 +39,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       yield (AppState.onTodo(state.user));
     } else if (event is AppOnProject) {
       yield (AppState.onProject(state.user));
+    } else if (event is AppOnMeeting) {
+      yield (AppState.onMeeting(state.user));
     }
   }
 
