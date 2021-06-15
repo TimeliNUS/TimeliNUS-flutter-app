@@ -72,7 +72,7 @@ class ProjectRepository {
     return projects;
   }
 
-  // Future<void> updateProject(ProjectEntity todo) {
-  //   return ref.doc(todo.id).update(todo.toJson());
-  // }
+  Future<void> updateProject(ProjectEntity project) {
+    return ref.doc(project.id).update(project.toJson());
+  }
 }

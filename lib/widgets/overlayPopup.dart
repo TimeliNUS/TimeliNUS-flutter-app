@@ -148,7 +148,8 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 class DeadlineInput extends StatefulWidget {
   final bool isOptional;
   final Function(DateTime date) callback;
-  const DeadlineInput(this.callback, this.isOptional);
+  DateTime initialTime;
+  DeadlineInput(this.callback, this.isOptional, [this.initialTime]);
   @override
   State<DeadlineInput> createState() => _DeadlineInputState();
 }
@@ -156,6 +157,12 @@ class DeadlineInput extends StatefulWidget {
 class _DeadlineInputState extends State<DeadlineInput> {
   bool isWithTime = false;
   DateTime chosenDateTime;
+
+  @override
+  void initState() {
+    super.initState();
+    chosenDateTime = widget.initialTime ?? DateTime.now();
+  }
 
   void _showDatePicker(ctx, bool isWithTime) {
     showCupertinoModalPopup(
@@ -171,7 +178,7 @@ class _DeadlineInputState extends State<DeadlineInput> {
                         mode: isWithTime
                             ? CupertinoDatePickerMode.dateAndTime
                             : CupertinoDatePickerMode.date,
-                        initialDateTime: chosenDateTime ?? DateTime.now(),
+                        initialDateTime: chosenDateTime,
                         onDateTimeChanged: (val) {
                           setState(() {
                             chosenDateTime = val;

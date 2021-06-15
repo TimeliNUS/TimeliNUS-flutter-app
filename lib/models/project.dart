@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 @immutable
 class Project extends Equatable {
   final String title;
+  final String id;
   final double progress;
   final DateTime deadline;
   final List<Meeting> meetings;
@@ -14,7 +15,8 @@ class Project extends Equatable {
   final DocumentReference ref;
 
   const Project(this.title,
-      {this.progress = 1,
+      {this.id,
+      this.progress = 1,
       this.deadline,
       this.meetings = const [],
       this.todos = const [],
@@ -22,6 +24,7 @@ class Project extends Equatable {
 
   static Project fromEntity(ProjectEntity entity) {
     return Project(entity.title,
+        id: entity.id,
         progress: entity.progress,
         deadline: entity.deadline != null ? entity.deadline.toDate() : null,
         meetings: entity.meetings,
@@ -32,6 +35,7 @@ class Project extends Equatable {
   ProjectEntity toEntity() {
     return ProjectEntity(
         title,
+        id,
         progress,
         deadline != null ? Timestamp.fromDate(deadline) : null,
         meetings,
@@ -47,6 +51,7 @@ class Project extends Equatable {
       List<Todo> todos,
       DocumentReference ref}) {
     return Project(title ?? this.title,
+        id: id ?? this.id,
         progress: progress ?? this.progress,
         deadline: deadline ?? this.deadline,
         meetings: meetings ?? this.meetings,
@@ -55,12 +60,15 @@ class Project extends Equatable {
   }
 
   @override
-  List<Object> get props => [title, progress, deadline, meetings];
+  List<Object> get props =>
+      [id, title, progress, deadline, meetings, ref, todos];
 
   @override
   String toString() {
     return 'Project[' +
         this.title +
+        ' ' +
+        this.id +
         ' ' +
         this.progress.toString() +
         ' ' +

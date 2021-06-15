@@ -1,10 +1,12 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
+import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/utils/transitionBuilder.dart';
 import 'package:TimeliNUS/widgets/bottomNavigationBar.dart';
 import 'package:TimeliNUS/widgets/customCard.dart';
+import 'package:TimeliNUS/widgets/projectScreen/editProjectPopup.dart';
 import 'package:TimeliNUS/widgets/projectScreen/newProjectPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:flutter/material.dart';
@@ -92,10 +94,7 @@ class _ProjectScreenState extends State<ProjectScreen>
                               child: ListView(
                                   children: (state.projects.map((project) =>
                                       ProjectCard(
-                                          project.title,
-                                          project.deadline,
-                                          project.progress,
-                                          project.meetings.length,
+                                          project,
                                           project.todos
                                               .where((todo) =>
                                                   todo.complete == false)
@@ -113,20 +112,22 @@ class _ProjectScreenState extends State<ProjectScreen>
 }
 
 class ProjectCard extends StatelessWidget {
-  final String title;
-  final DateTime date;
-  final double progress;
-  final int meetingNumber;
+  final Project project;
   final List<Todo> todos;
-  const ProjectCard(
-      this.title, this.date, this.progress, this.meetingNumber, this.todos);
+  const ProjectCard(this.project, this.todos);
   @override
   Widget build(BuildContext context) {
     return Column(verticalDirection: VerticalDirection.up, children: [
       Padding(padding: EdgeInsets.only(bottom: 15)),
-      ProjectCardDetail(meetingNumber, todos),
+      ProjectCardDetail(project.meetings.length, todos),
       Row(children: [
         Expanded(
+            child: GestureDetector(
+          onTap: () => Navigator.push(
+              context,
+              SlideRightRoute(
+                  page:
+                      EditProjectPopup(project, context.read<ProjectBloc>()))),
           child: CustomCard(
               elevation: 6,
               margin: EdgeInsets.symmetric(horizontal: 30),
@@ -137,7 +138,7 @@ class ProjectCard extends StatelessWidget {
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                          Text(title),
+                          Text(project.title),
                           Text("Software Engineering Project"),
                           Row(
                             children: [
@@ -145,7 +146,7 @@ class ProjectCard extends StatelessWidget {
                                   size: 18, color: appTheme.primaryColorLight),
                               Text(' ' +
                                   DateFormat('MMM dd, yyyy – kk:mm')
-                                      .format(date)),
+                                      .format(project.deadline)),
                               Expanded(
                                   child: Container(
                                       alignment: Alignment.centerRight,
@@ -159,11 +160,11 @@ class ProjectCard extends StatelessWidget {
                     CircularPercentIndicator(
                       radius: 60.0,
                       lineWidth: 10,
-                      percent: progress,
+                      percent: project.progress,
                       animation: true,
                       animationDuration: 500,
                       center: new Text(
-                          (progress * 100).toInt().toString() + '%',
+                          (project.progress * 100).toInt().toString() + '%',
                           style: TextStyle(
                               color: appTheme.primaryColorLight,
                               fontSize: 14,
@@ -174,7 +175,7 @@ class ProjectCard extends StatelessWidget {
                       backgroundColor: HexColor.fromHex('FFD8B4'),
                     )
                   ])),
-        )
+        ))
       ]),
     ]);
   }

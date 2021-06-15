@@ -29,3 +29,16 @@ class AddProject extends ProjectEvent {
   @override
   List<Object> get props => [project, id];
 }
+
+class UpdateProject extends ProjectEvent {
+  final Project updatedProject;
+  final String id;
+
+  UpdateProject(this.updatedProject, this.id) : super();
+
+  @override
+  String toString() => 'UpdateProject { updatedProject: $updatedProject }';
+
+  @override
+  List<Object> get props => [updatedProject];
+}

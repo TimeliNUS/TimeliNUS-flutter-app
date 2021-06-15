@@ -25,6 +25,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       yield* _mapLoadProjectsToState(event);
     } else if (event is AddProject) {
       yield* _mapAddProjectToState(event);
+    } else if (event is UpdateProject) {
+      yield* _mapUpdateProjectToState(event);
     }
   }
 
@@ -50,5 +52,17 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     final updatedProjects = currentProjects
       ..add(event.project.copyWith(ref: newTodoRef));
     yield ProjectLoaded(updatedProjects);
+  }
+
+  Stream<ProjectState> _mapUpdateProjectToState(UpdateProject event) async* {
+    yield ProjectLoading();
+    print("Event: " + event.updatedProject.toString());
+    final updatedProjects = state.projects.map((project) {
+      return project.id == event.updatedProject.id
+          ? event.updatedProject
+          : project;
+    }).toList();
+    yield ProjectLoaded(updatedProjects);
+    await projectRepository.updateProject(event.updatedProject.toEntity());
   }
 }
