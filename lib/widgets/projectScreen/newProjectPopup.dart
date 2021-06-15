@@ -1,8 +1,11 @@
 import 'dart:ui';
 
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
+import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
+import 'package:TimeliNUS/models/models.dart';
 import 'package:TimeliNUS/models/todo.dart';
+import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/screens/todoScreen.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
@@ -13,29 +16,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-class NewTodoPopup extends StatefulWidget {
-  final TodoBloc todosBloc;
-  const NewTodoPopup(this.todosBloc);
+class NewProjectPopup extends StatefulWidget {
+  final ProjectBloc projectBloc;
+  const NewProjectPopup(this.projectBloc);
   @override
-  State<NewTodoPopup> createState() => _NewTodoPopupState();
+  State<NewProjectPopup> createState() => _NewProjectPopupState();
 }
 
-class _NewTodoPopupState extends State<NewTodoPopup> {
+class _NewProjectPopupState extends State<NewProjectPopup> {
   DateTime deadlineValue;
   final TextEditingController textController = new TextEditingController();
-  final TextEditingController noteController = new TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final todosBloc = TodoBloc(todoRepository: context.read<TodoRepository>());
-    return BlocProvider<TodoBloc>(
-        create: (context) => todosBloc,
+    // final projectBloc =
+    //     ProjectBloc(projectRepository: context.read<ProjectRepository>());
+    return BlocProvider<ProjectBloc>(
+        create: (context) => widget.projectBloc,
         child: ColoredSafeArea(
             appTheme.primaryColorLight,
             Scaffold(
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
-                      TopBar(() => Navigator.pop(context), "Create Todo"),
+                      TopBar(() => Navigator.pop(context), "Create Project"),
                       Expanded(
                           child: GestureDetector(
                               onTap: () =>
@@ -52,25 +55,26 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                       child: ListView(
                                         children: [
                                           // TopBar(),
-                                          PopupInput(textController),
+                                          PopupInput(textController,
+                                              inputLabel: 'Project Title',
+                                              errorMsg:
+                                                  'Please enter your project title!'),
                                           customPadding(),
                                           PopupDropdown(
-                                            dropdownLabel: 'Module Project',
+                                            dropdownLabel: 'Module Code',
                                           ),
                                           customPadding(),
                                           PersonInChargeChips([
                                             context.select((AppBloc bloc) =>
                                                     bloc.state.user.name) ??
                                                 "Myself"
-                                          ], "Person in Charge"),
+                                          ], "Groupmates"),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           DeadlineInput(
                                               (val) => setState(
                                                   () => deadlineValue = val),
-                                              true),
-                                          customPadding(),
-                                          NotesInput(noteController),
+                                              false),
                                         ],
                                       ))))),
                       Container(
@@ -82,6 +86,20 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
+                                // ElevatedButton(
+                                //     style: ButtonStyle(
+                                //         backgroundColor:
+                                //             MaterialStateProperty.all<Color>(
+                                //                 appTheme.primaryColorLight)),
+                                //     child: Padding(
+                                //         padding: EdgeInsets.symmetric(
+                                //             horizontal: 10),
+                                //         child: Text("Add & Next",
+                                //             style: appTheme.textTheme.bodyText2
+                                //                 .apply(color: Colors.white))),
+                                //     onPressed: () {
+                                //       Navigator.pop(context);
+                                //     }),
                                 ElevatedButton(
                                     style: ButtonStyle(
                                         backgroundColor:
@@ -90,33 +108,15 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                     child: Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 10),
-                                        child: Text("Add & Next",
+                                        child: Text("Done",
                                             style: appTheme.textTheme.bodyText2
                                                 .apply(color: Colors.white))),
                                     onPressed: () {
-                                      widget.todosBloc.add(AddTodo(
-                                          Todo(textController.text,
-                                              note: noteController.text,
-                                              deadline: deadlineValue),
-                                          context
-                                              .read<AppBloc>()
-                                              .getCurrentUser()
-                                              .id));
-                                      Navigator.pop(context);
-                                    }),
-                                OutlinedButton(
-                                    child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Text("Add & Done",
-                                            style:
-                                                appTheme.textTheme.bodyText2)),
-                                    onPressed: () {
-                                      widget.todosBloc.add(AddTodo(
-                                          Todo(textController.text,
-                                              note: noteController.text,
-                                              deadline: deadlineValue,
-                                              complete: true),
+                                      widget.projectBloc.add(AddProject(
+                                          Project(
+                                            textController.text,
+                                            deadline: deadlineValue,
+                                          ),
                                           context
                                               .read<AppBloc>()
                                               .getCurrentUser()

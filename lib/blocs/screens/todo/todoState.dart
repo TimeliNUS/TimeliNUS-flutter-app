@@ -26,6 +26,9 @@ class TodoLoaded extends TodoState {
 
   @override
   String toString() => 'TodosLoaded { progress: $progress, todos: $todos }';
+
+  @override
+  List<Object> get props => [todos, progress];
 }
 
 class TodoNotLoaded extends TodoState {

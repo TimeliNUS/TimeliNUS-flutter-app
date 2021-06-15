@@ -31,7 +31,7 @@ ThemeData appTheme = ThemeData(
         headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
         headline6: TextStyle(
             fontSize: 40.0, fontFamily: "DMSans", fontWeight: FontWeight.w700),
-        bodyText1: TextStyle(color: Colors.black54, fontSize: 12),
+        bodyText1: TextStyle(color: Colors.black54, fontSize: 14),
         bodyText2:
             TextStyle(color: HexColor.fromHex('#FF932F'), fontSize: 14)));
 

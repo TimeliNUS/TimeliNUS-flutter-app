@@ -4,10 +4,10 @@ import 'package:TimeliNUS/models/models.dart';
 
 @immutable
 abstract class TodoEvent extends Equatable {
-  TodoEvent([List props = const []]) : super();
+  TodoEvent([List props]) : super();
 
   @override
-  List<Object> get props => [props];
+  List<Object> get props => [...props];
 }
 
 class LoadTodos extends TodoEvent {
@@ -15,6 +15,9 @@ class LoadTodos extends TodoEvent {
   LoadTodos(this.id) : super([id]);
   @override
   String toString() => 'LoadTodos';
+
+  @override
+  List<Object> get props => [id];
 }
 
 class ReorderTodos extends TodoEvent {
@@ -23,7 +26,10 @@ class ReorderTodos extends TodoEvent {
 
   ReorderTodos(this.todos, this.id) : super([todos, id]);
   @override
-  String toString() => 'ReorderTodos';
+  String toString() => 'Reorder Todos';
+
+  @override
+  List<Object> get props => [todos, id];
 }
 
 class AddTodo extends TodoEvent {
@@ -33,6 +39,9 @@ class AddTodo extends TodoEvent {
 
   @override
   String toString() => 'AddTodo { todo: $todo, id: $id }';
+
+  @override
+  List<Object> get props => [todo, id];
 }
 
 class UpdateTodo extends TodoEvent {
@@ -42,6 +51,9 @@ class UpdateTodo extends TodoEvent {
 
   @override
   String toString() => 'UpdateTodo { updatedTodo: $updatedTodo }';
+
+  @override
+  List<Object> get props => [updatedTodo];
 }
 
 class DeleteTodo extends TodoEvent {
@@ -52,6 +64,9 @@ class DeleteTodo extends TodoEvent {
 
   @override
   String toString() => 'DeleteTodo { todo: $todo }';
+
+  @override
+  List<Object> get props => [todo, userId];
 }
 
 class ClearCompleted extends TodoEvent {
