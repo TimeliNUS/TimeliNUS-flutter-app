@@ -62,6 +62,14 @@ class RegisterGroupState extends State<RegisterGroup> {
                 EmailInput(),
                 // Padding(padding: EdgeInsets.symmetric(vertical: 5)),
                 PasswordInput(),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Your Name',
+                    helperText: '',
+                  ),
+                  onChanged: (str) =>
+                      context.read<LandingCubit>().changeUserName(str),
+                ),
                 Padding(padding: EdgeInsets.only(top: screenHeight * 0.01)),
                 Row(
                   children: [

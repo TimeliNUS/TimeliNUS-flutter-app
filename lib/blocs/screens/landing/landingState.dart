@@ -14,7 +14,8 @@ class LandingState extends Equatable {
       this.confirmedPassword = const ConfirmedPassword.pure(),
       this.remembered = false,
       this.landingStatus,
-      this.errMsg = ''});
+      this.errMsg = '',
+      this.name = ''});
 
   final Email email;
   final Password password;
@@ -23,6 +24,7 @@ class LandingState extends Equatable {
   final ConfirmedPassword confirmedPassword;
   final LandingStatus landingStatus;
   final String errMsg;
+  final String name;
 
   @override
   List<Object> get props => [
@@ -32,7 +34,8 @@ class LandingState extends Equatable {
         status,
         remembered,
         landingStatus,
-        errMsg
+        errMsg,
+        name
       ];
 
   LandingState copyWith(
@@ -42,7 +45,8 @@ class LandingState extends Equatable {
       ConfirmedPassword confirmedPassword,
       bool remembered,
       LandingStatus landingStatus,
-      String errMsg}) {
+      String errMsg,
+      String name}) {
     return LandingState(
         email: email ?? this.email,
         password: password ?? this.password,
@@ -50,6 +54,7 @@ class LandingState extends Equatable {
         confirmedPassword: confirmedPassword ?? this.confirmedPassword,
         remembered: remembered ?? this.remembered,
         landingStatus: landingStatus ?? this.landingStatus,
-        errMsg: errMsg ?? '');
+        errMsg: errMsg ?? '',
+        name: name ?? this.name);
   }
 }

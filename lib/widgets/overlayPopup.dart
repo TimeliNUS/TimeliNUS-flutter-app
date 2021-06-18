@@ -1,3 +1,5 @@
+import 'package:TimeliNUS/utils/transitionBuilder.dart';
+import 'package:TimeliNUS/widgets/searchUser.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -118,28 +120,38 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
       Wrap(
         spacing: 8.0, // gap between adjacent chips
         runSpacing: 4.0, // gap between lines
-        children: chipInputState.entries
-            .map((e) => InputChip(
-                avatar: CircleAvatar(
-                  backgroundColor: Colors.grey.shade800,
-                  child: const Text('ME'),
-                ),
-                shape: StadiumBorder(
-                    side: BorderSide(color: appTheme.primaryColorLight)),
-                backgroundColor: Colors.transparent,
-                selectedColor: appTheme.primaryColorLight,
-                selected: e.value,
-                onPressed: () {
-                  setState(() => chipInputState = chipInputState
-                    ..update(e.key, (value) => !e.value));
-                  print(chipInputState);
-                },
-                label: Text(e.key,
-                    style: TextStyle(
-                        color: e.value
-                            ? Colors.white
-                            : appTheme.primaryColorLight))))
-            .toList(),
+        children: [
+          ...(chipInputState.entries
+              .map((e) => InputChip(
+                  avatar: CircleAvatar(
+                    backgroundColor: Colors.grey.shade800,
+                    child: const Text('ME'),
+                  ),
+                  shape: StadiumBorder(
+                      side: BorderSide(color: appTheme.primaryColorLight)),
+                  backgroundColor: Colors.transparent,
+                  selectedColor: appTheme.primaryColorLight,
+                  selected: e.value,
+                  onPressed: () {
+                    setState(() => chipInputState = chipInputState
+                      ..update(e.key, (value) => !e.value));
+                    print(chipInputState);
+                  },
+                  label: Text(e.key,
+                      style: TextStyle(
+                          color: e.value
+                              ? Colors.white
+                              : appTheme.primaryColorLight))))
+              .toList()),
+          ActionChip(
+            label: Icon(Icons.add, color: appTheme.primaryColorLight),
+            shape: StadiumBorder(
+                side: BorderSide(color: appTheme.primaryColorLight)),
+            backgroundColor: Colors.transparent,
+            onPressed: () =>
+                Navigator.push(context, SlideRightRoute(page: SearchUser())),
+          )
+        ],
       )
     ]);
   }
@@ -147,9 +159,11 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 
 class DeadlineInput extends StatefulWidget {
   final bool isOptional;
+  final bool isNotMini;
   final Function(DateTime date) callback;
   DateTime initialTime;
-  DeadlineInput(this.callback, this.isOptional, [this.initialTime]);
+  DeadlineInput(this.callback, this.isOptional,
+      {this.initialTime, this.isNotMini = true});
   @override
   State<DeadlineInput> createState() => _DeadlineInputState();
 }
@@ -213,7 +227,9 @@ class _DeadlineInputState extends State<DeadlineInput> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Deadline" + (widget.isOptional ? "(Optional)" : "")),
+          widget.isNotMini
+              ? Text("Deadline" + (widget.isOptional ? "(Optional)" : ""))
+              : Container(),
           InkWell(
               onTap: () => _showDatePicker(context, isWithTime),
               child: new Padding(
@@ -240,41 +256,47 @@ class _DeadlineInputState extends State<DeadlineInput> {
                       border: Border(
                           bottom: BorderSide(
                               color: appTheme.accentColor, width: 1.0))))),
-          Row(children: [
-            Expanded(
-                child: Row(children: [
-              Text("Include Time"),
-              Switch(
-                value: isWithTime,
-                activeColor: appTheme.accentColor,
-                onChanged: (bool) => setState(() => isWithTime = !isWithTime),
-              ),
-            ])),
-            Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: appTheme.primaryColorLight,
-                        spreadRadius: 1,
-                        blurRadius: 1),
-                  ],
-                ),
-                child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    child: Text(
-                        (chosenDateTime != null
-                                ? chosenDateTime.hour.toString().padLeft(2, '0')
-                                : "00") +
-                            " : " +
-                            (chosenDateTime != null
-                                ? chosenDateTime.minute
-                                    .toString()
-                                    .padLeft(2, '0')
-                                : "00"),
-                        textAlign: TextAlign.end)))
-          ])
+          widget.isNotMini
+              ? Row(children: [
+                  Expanded(
+                      child: Row(children: [
+                    Text("Include Time"),
+                    Switch(
+                      value: isWithTime,
+                      activeColor: appTheme.accentColor,
+                      onChanged: (bool) =>
+                          setState(() => isWithTime = !isWithTime),
+                    ),
+                  ])),
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                              color: appTheme.primaryColorLight,
+                              spreadRadius: 1,
+                              blurRadius: 1),
+                        ],
+                      ),
+                      child: Padding(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          child: Text(
+                              (chosenDateTime != null
+                                      ? chosenDateTime.hour
+                                          .toString()
+                                          .padLeft(2, '0')
+                                      : "00") +
+                                  " : " +
+                                  (chosenDateTime != null
+                                      ? chosenDateTime.minute
+                                          .toString()
+                                          .padLeft(2, '0')
+                                      : "00"),
+                              textAlign: TextAlign.end)))
+                ])
+              : Container()
         ]);
   }
 }

@@ -77,8 +77,11 @@ class _LandingScreenState extends State<LandingScreen> {
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          LandingScreenGroupSwitcher(),
-                          Spacer(),
+                          Expanded(
+                              child: ListView(children: [
+                            LandingScreenGroupSwitcher(),
+                          ])),
+                          // Spacer(),
                           Container(
                               alignment: Alignment.bottomCenter,
                               child: Column(children: [

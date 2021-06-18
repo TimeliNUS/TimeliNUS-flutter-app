@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:TimeliNUS/models/userModel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meta/meta.dart';
 
@@ -65,12 +67,23 @@ class AuthenticationRepository {
   ///
   /// Throws a [SignUpFailure] if an exception occurs.
   Future<void> signUp(
-      {@required String email, @required String password}) async {
+      {@required String email,
+      @required String password,
+      @required String name}) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
+      FirebaseAuth.UserCredential credential =
+          await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+      List<Future> promises = [];
+      promises.add(credential.user.updateProfile(displayName: name));
+      promises.add(FirebaseFirestore.instance
+          .collection('user')
+          .doc(credential.user.uid)
+          .set({'name': name, 'email': email}));
+      Future.wait(promises);
+      print(_firebaseAuth.currentUser);
     } on FirebaseAuth.FirebaseAuthException catch (err) {
       throw AuthenticationFailture(err.code);
     }

@@ -57,10 +57,11 @@ class LandingCubit extends Cubit<LandingState> {
   }
 
   void toggleRemembered() async {
-    // if (state.remembered == null) {
-    //   emit(state.copyWith(remembered: true));
-    // }
     emit(state.copyWith(remembered: !state.remembered));
+  }
+
+  void changeUserName(String value) {
+    emit(state.copyWith(name: value));
   }
 
   void changeLandingState(LandingStatus status) {
@@ -75,6 +76,7 @@ class LandingCubit extends Cubit<LandingState> {
       await _authenticationRepository.signUp(
         email: state.email.value,
         password: state.password.value,
+        name: state.name,
       );
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
     } catch (err) {

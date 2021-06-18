@@ -47,3 +47,10 @@ class ColoredSafeArea extends StatelessWidget {
         child: SafeArea(top: true, bottom: false, child: childWidget));
   }
 }
+
+class CustomPadding extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(padding: EdgeInsets.only(bottom: 10));
+  }
+}
