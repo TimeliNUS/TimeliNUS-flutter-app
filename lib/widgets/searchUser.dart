@@ -1,24 +1,29 @@
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SearchUser extends StatefulWidget {
+  final Function callback;
+  const SearchUser(this.callback);
   @override
   _SearchUserState createState() => new _SearchUserState();
 }
 
 class _SearchUserState extends State<SearchUser> {
+  List<User> _searchResult = [];
+  List<User> _userDetails = [];
   TextEditingController controller = new TextEditingController();
 
   // Get json result and convert it to model. Then add
   Future<Null> getUserDetails() async {
     final test = await FirebaseFirestore.instance
         .collection('user')
-        .where("name", isGreaterThan: 'a')
+        .where("name", isGreaterThan: 'A')
         .orderBy("name", descending: true)
         .get();
     test.docs.forEach((e) {
       setState(() {
-        _userDetails.add(UserDetails.fromJson(e.data()));
+        _userDetails.add(User.fromJson(e.data(), e.id));
       });
     });
   }
@@ -63,30 +68,22 @@ class _SearchUserState extends State<SearchUser> {
             ),
           ),
           new Expanded(
-            child: _searchResult.length != 0 || controller.text.isNotEmpty
-                ? new ListView.builder(
-                    itemCount: _searchResult.length,
-                    itemBuilder: (context, i) {
-                      return new Card(
-                        child: new ListTile(
-                          title: new Text(_searchResult[i].name),
-                        ),
-                        margin: const EdgeInsets.all(0.0),
-                      );
-                    },
-                  )
-                : new ListView.builder(
-                    itemCount: _userDetails.length,
-                    itemBuilder: (context, index) {
-                      return new Card(
-                        child: new ListTile(
-                          title: new Text(_userDetails[index].name),
-                        ),
-                        margin: const EdgeInsets.all(0.0),
-                      );
-                    },
-                  ),
-          ),
+              child: ListView.builder(
+            itemCount: _searchResult.length,
+            itemBuilder: (context, i) {
+              return new GestureDetector(
+                  onTap: () {
+                    widget.callback(_searchResult[i]);
+                    Navigator.pop(context);
+                  },
+                  child: Card(
+                    child: new ListTile(
+                        title: new Text(_searchResult[i].name),
+                        subtitle: Text(_userDetails[i].email)),
+                    margin: const EdgeInsets.all(0.0),
+                  ));
+            },
+          )),
         ],
       ),
     );
@@ -104,24 +101,5 @@ class _SearchUserState extends State<SearchUser> {
     });
 
     setState(() {});
-  }
-}
-
-List<UserDetails> _searchResult = [];
-
-List<UserDetails> _userDetails = [];
-
-class UserDetails {
-  final int id;
-  final String email, name;
-
-  UserDetails({this.id, this.email, this.name});
-
-  factory UserDetails.fromJson(Map<String, dynamic> json) {
-    return new UserDetails(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-    );
   }
 }

@@ -60,7 +60,7 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                           customPadding(),
                                           PersonInChargeChips([
                                             context.select((AppBloc bloc) =>
-                                                    bloc.state.user.name) ??
+                                                    bloc.state.user) ??
                                                 "Myself"
                                           ], "Person in Charge"),
                                           customPadding(),

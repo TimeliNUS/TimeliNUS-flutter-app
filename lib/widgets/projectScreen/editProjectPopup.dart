@@ -68,7 +68,7 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                           customPadding(),
                                           PersonInChargeChips([
                                             context.select((AppBloc bloc) =>
-                                                    bloc.state.user.name) ??
+                                                    bloc.state.user) ??
                                                 "Myself"
                                           ], "Groupmates"),
                                           customPadding(),

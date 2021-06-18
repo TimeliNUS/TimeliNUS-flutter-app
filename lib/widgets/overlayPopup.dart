@@ -1,3 +1,4 @@
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:TimeliNUS/utils/transitionBuilder.dart';
 import 'package:TimeliNUS/widgets/searchUser.dart';
 import 'package:TimeliNUS/widgets/style.dart';
@@ -94,19 +95,19 @@ class PopupDropdownState extends State<PopupDropdown> {
 
 class PersonInChargeChips extends StatefulWidget {
   final String chipsLabel;
-  final List<String> chipInput;
+  final List<User> chipInput;
   const PersonInChargeChips(this.chipInput, this.chipsLabel);
   @override
   State<PersonInChargeChips> createState() => _PersonInChargeChipsState();
 }
 
 class _PersonInChargeChipsState extends State<PersonInChargeChips> {
-  Map<String, bool> chipInputState;
+  Map<User, bool> chipInputState;
 
   @override
   void initState() {
-    chipInputState = Map.fromIterable(widget.chipInput,
-        key: (e) => e.toString(), value: (e) => true);
+    chipInputState =
+        Map.fromIterable(widget.chipInput, key: (e) => e, value: (e) => true);
     super.initState();
   }
 
@@ -137,7 +138,7 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
                       ..update(e.key, (value) => !e.value));
                     print(chipInputState);
                   },
-                  label: Text(e.key,
+                  label: Text(e.key.name,
                       style: TextStyle(
                           color: e.value
                               ? Colors.white
@@ -148,8 +149,11 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
             shape: StadiumBorder(
                 side: BorderSide(color: appTheme.primaryColorLight)),
             backgroundColor: Colors.transparent,
-            onPressed: () =>
-                Navigator.push(context, SlideRightRoute(page: SearchUser())),
+            onPressed: () => Navigator.push(
+                context,
+                SlideRightRoute(
+                    page: SearchUser((val) => setState(
+                        () => chipInputState.putIfAbsent(val, () => true))))),
           )
         ],
       )

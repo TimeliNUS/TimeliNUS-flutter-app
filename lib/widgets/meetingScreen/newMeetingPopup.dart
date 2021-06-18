@@ -63,7 +63,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                           customPadding(),
                                           PersonInChargeChips([
                                             context.select((AppBloc bloc) =>
-                                                    bloc.state.user.name) ??
+                                                    bloc.state.user) ??
                                                 "Myself"
                                           ], "Groupmates"),
                                           customPadding(),

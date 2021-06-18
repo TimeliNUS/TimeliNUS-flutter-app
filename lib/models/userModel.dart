@@ -29,4 +29,17 @@ class User extends Equatable {
 
   @override
   List<Object> get props => [email, id, name];
+
+  factory User.fromJson(Map<String, dynamic> json, String id) {
+    return new User(
+      id: id,
+      name: json['name'],
+      email: json['email'],
+    );
+  }
+
+  @override
+  String toString() {
+    return 'id: $id, email: $email, name: $name';
+  }
 }
