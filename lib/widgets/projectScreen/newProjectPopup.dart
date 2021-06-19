@@ -2,19 +2,14 @@ import 'dart:ui';
 
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
-import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
 import 'package:TimeliNUS/models/models.dart';
-import 'package:TimeliNUS/models/todo.dart';
-import 'package:TimeliNUS/repository/projectRepository.dart';
-import 'package:TimeliNUS/repository/todoRepository.dart';
-import 'package:TimeliNUS/screens/todoScreen.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:TimeliNUS/utils/dateTimeExtension.dart';
 
 class NewProjectPopup extends StatefulWidget {
   final ProjectBloc projectBloc;
@@ -24,10 +19,14 @@ class NewProjectPopup extends StatefulWidget {
 }
 
 class _NewProjectPopupState extends State<NewProjectPopup> {
-  DateTime deadlineValue;
+  List<User> groupmates = [];
+  DateTime deadlineValue = DateTime.now().stripTime();
   final TextEditingController textController = new TextEditingController();
   @override
   Widget build(BuildContext context) {
+    if (groupmates.isEmpty) {
+      groupmates.add(context.select((AppBloc bloc) => bloc.state.user));
+    }
     // final projectBloc =
     //     ProjectBloc(projectRepository: context.read<ProjectRepository>());
     return BlocProvider<ProjectBloc>(
@@ -64,11 +63,11 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
                                             dropdownLabel: 'Module Code',
                                           ),
                                           customPadding(),
-                                          PersonInChargeChips([
-                                            context.select((AppBloc bloc) =>
-                                                    bloc.state.user) ??
-                                                "Myself"
-                                          ], "Groupmates"),
+                                          PersonInChargeChips(
+                                              groupmates, "Groupmates",
+                                              callback: (val) {
+                                            setState(() => groupmates = val);
+                                          }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           DeadlineInput(
@@ -116,6 +115,7 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
                                           Project(
                                             textController.text,
                                             deadline: deadlineValue,
+                                            groupmates: groupmates,
                                           ),
                                           context
                                               .read<AppBloc>()

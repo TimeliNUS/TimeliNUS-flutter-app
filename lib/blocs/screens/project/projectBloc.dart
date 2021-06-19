@@ -50,7 +50,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     DocumentReference newTodoRef = await projectRepository.addNewProject(
         event.project.toEntity(), event.id);
     final updatedProjects = currentProjects
-      ..add(event.project.copyWith(ref: newTodoRef));
+      ..add(event.project.copyWith(ref: newTodoRef, id: newTodoRef.id));
     yield ProjectLoaded(updatedProjects);
   }
 

@@ -1,5 +1,6 @@
 import 'package:TimeliNUS/models/person.dart';
 import 'package:TimeliNUS/models/todoEntity.dart';
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
@@ -11,7 +12,7 @@ class Todo extends Equatable {
   final String note;
   final String title;
   final DateTime deadline;
-  final List<Person> pic;
+  final List<User> pic;
   final DocumentReference ref;
 
   const Todo(this.title,
@@ -45,7 +46,7 @@ class Todo extends Equatable {
 
   TodoEntity toEntity() {
     return TodoEntity(title, id, note, complete,
-        deadline != null ? Timestamp.fromDate(deadline) : null, ref);
+        deadline != null ? Timestamp.fromDate(deadline) : null, pic, ref);
   }
 
   static Todo fromEntity(TodoEntity entity) {
@@ -54,6 +55,7 @@ class Todo extends Equatable {
         complete: entity.complete ?? false,
         note: entity.note,
         deadline: entity.deadline != null ? entity.deadline.toDate() : null,
+        pic: entity.pic ?? [],
         ref: entity.ref);
   }
 

@@ -20,6 +20,7 @@ class EditProjectPopup extends StatefulWidget {
 
 class _EditProjectPopupState extends State<EditProjectPopup> {
   DateTime deadlineValue;
+  List<User> groupmates = [];
   TextEditingController textController = new TextEditingController();
   @override
   void initState() {
@@ -66,17 +67,19 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                             dropdownLabel: 'Module Code',
                                           ),
                                           customPadding(),
-                                          PersonInChargeChips([
-                                            context.select((AppBloc bloc) =>
-                                                    bloc.state.user) ??
-                                                "Myself"
-                                          ], "Groupmates"),
+                                          PersonInChargeChips(
+                                              widget.projectToEdit.groupmates,
+                                              "Groupmates", callback: (val) {
+                                            setState(() => groupmates = val);
+                                          }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           DeadlineInput(
                                               (val) => setState(
                                                   () => deadlineValue = val),
-                                              false),
+                                              false,
+                                              initialTime: widget
+                                                  .projectToEdit.deadline),
                                         ],
                                       ))))),
                       Container(
@@ -88,20 +91,6 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                // ElevatedButton(
-                                //     style: ButtonStyle(
-                                //         backgroundColor:
-                                //             MaterialStateProperty.all<Color>(
-                                //                 appTheme.primaryColorLight)),
-                                //     child: Padding(
-                                //         padding: EdgeInsets.symmetric(
-                                //             horizontal: 10),
-                                //         child: Text("Add & Next",
-                                //             style: appTheme.textTheme.bodyText2
-                                //                 .apply(color: Colors.white))),
-                                //     onPressed: () {
-                                //       Navigator.pop(context);
-                                //     }),
                                 ElevatedButton(
                                     style: ButtonStyle(
                                         backgroundColor:
@@ -116,9 +105,9 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                     onPressed: () {
                                       widget.projectBloc.add(UpdateProject(
                                           widget.projectToEdit.copyWith(
-                                            title: textController.text,
-                                            deadline: deadlineValue,
-                                          ),
+                                              title: textController.text,
+                                              deadline: deadlineValue,
+                                              groupmates: groupmates),
                                           context
                                               .read<AppBloc>()
                                               .getCurrentUser()

@@ -9,10 +9,11 @@ class ProjectEntity extends Equatable {
   final Timestamp deadline;
   final List<Meeting> meetings;
   final List<Todo> todos;
+  final List<User> groupmates;
   final DocumentReference ref;
 
   ProjectEntity(this.title, this.id, this.progress, this.deadline,
-      this.meetings, this.todos, this.ref);
+      this.groupmates, this.meetings, this.todos, this.ref);
 
   static ProjectEntity fromJson(Map<String, Object> json, List<Todo> todos,
       [String id, DocumentReference ref]) {
@@ -21,6 +22,11 @@ class ProjectEntity extends Equatable {
         id != null ? id : json['id'] as String,
         double.parse(json['progress'].toString()),
         json['deadline'],
+        json['groupmates'] != null
+            ? (json['groupmates'] as List)
+                .map((x) => User.fromJson(x as Map<String, dynamic>, x['id']))
+                .toList()
+            : [],
         [],
         todos,
         ref);
@@ -32,6 +38,7 @@ class ProjectEntity extends Equatable {
       'title': title,
       'progress': progress,
       'meetings': meetings,
+      'groupmates': groupmates.map((x) => x.toJson()).toList(),
       'todos': todos,
       'deadline': deadline
     };
@@ -39,10 +46,10 @@ class ProjectEntity extends Equatable {
 
   @override
   String toString() {
-    return 'ProjectEntity{title: $title, id: $id, progress: $progress, deadline: $deadline, ref: $ref}';
+    return 'ProjectEntity{title: $title, id: $id, progress: $progress, deadline: $deadline, ref: $ref, groupmates: $groupmates}';
   }
 
   @override
   List<Object> get props =>
-      [title, progress, deadline, meetings, todos, ref, id];
+      [title, progress, deadline, meetings, todos, ref, id, groupmates];
 }

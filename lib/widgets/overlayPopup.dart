@@ -5,6 +5,7 @@ import 'package:TimeliNUS/widgets/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:TimeliNUS/utils/dateTimeExtension.dart';
 
 class PopupInput extends StatefulWidget {
   final TextEditingController controller;
@@ -96,7 +97,8 @@ class PopupDropdownState extends State<PopupDropdown> {
 class PersonInChargeChips extends StatefulWidget {
   final String chipsLabel;
   final List<User> chipInput;
-  const PersonInChargeChips(this.chipInput, this.chipsLabel);
+  final Function callback;
+  const PersonInChargeChips(this.chipInput, this.chipsLabel, {this.callback});
   @override
   State<PersonInChargeChips> createState() => _PersonInChargeChipsState();
 }
@@ -126,7 +128,6 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
               .map((e) => InputChip(
                   avatar: CircleAvatar(
                     backgroundColor: Colors.grey.shade800,
-                    child: const Text('ME'),
                   ),
                   shape: StadiumBorder(
                       side: BorderSide(color: appTheme.primaryColorLight)),
@@ -149,11 +150,13 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
             shape: StadiumBorder(
                 side: BorderSide(color: appTheme.primaryColorLight)),
             backgroundColor: Colors.transparent,
-            onPressed: () => Navigator.push(
-                context,
-                SlideRightRoute(
-                    page: SearchUser((val) => setState(
-                        () => chipInputState.putIfAbsent(val, () => true))))),
+            onPressed: () =>
+                Navigator.push(context, SlideRightRoute(page: SearchUser((val) {
+              setState(() => chipInputState.putIfAbsent(val, () => true));
+              List<User> tempUser = [];
+              chipInputState.forEach((key, value) => tempUser.add(key));
+              widget.callback(tempUser);
+            }))),
           )
         ],
       )
@@ -173,13 +176,15 @@ class DeadlineInput extends StatefulWidget {
 }
 
 class _DeadlineInputState extends State<DeadlineInput> {
-  bool isWithTime = false;
+  bool isWithTime;
   DateTime chosenDateTime;
-
+  DateTime now = DateTime.now();
   @override
   void initState() {
     super.initState();
-    chosenDateTime = widget.initialTime ?? DateTime.now();
+    isWithTime =
+        (widget.initialTime != null ? widget.initialTime.hour != 0 : false);
+    chosenDateTime = widget.initialTime ?? now.stripTime();
   }
 
   void _showDatePicker(ctx, bool isWithTime) {
@@ -208,11 +213,8 @@ class _DeadlineInputState extends State<DeadlineInput> {
                     child: Text('Confirm'),
                     onPressed: () {
                       if (chosenDateTime == null) {
-                        DateTime now = DateTime.now();
                         setState(() {
-                          chosenDateTime = isWithTime
-                              ? now
-                              : new DateTime(now.year, now.month, now.day);
+                          chosenDateTime = isWithTime ? now : now.stripTime();
                         });
                         print(chosenDateTime);
                         widget.callback(chosenDateTime);

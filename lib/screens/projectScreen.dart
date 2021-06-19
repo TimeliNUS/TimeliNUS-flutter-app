@@ -145,8 +145,11 @@ class ProjectCard extends StatelessWidget {
                               Icon(Icons.calendar_today_outlined,
                                   size: 18, color: appTheme.primaryColorLight),
                               Text(' ' +
-                                  DateFormat('MMM dd, yyyy – kk:mm')
-                                      .format(project.deadline)),
+                                  ((project.deadline.hour != 0)
+                                      ? DateFormat('MMM dd, yyyy – kk:mm')
+                                          .format(project.deadline)
+                                      : DateFormat('MMM dd, yyyy')
+                                          .format(project.deadline))),
                               Expanded(
                                   child: Container(
                                       alignment: Alignment.centerRight,

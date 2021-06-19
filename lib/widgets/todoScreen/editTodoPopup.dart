@@ -1,8 +1,8 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
 import 'package:TimeliNUS/models/todo.dart';
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
-import 'package:TimeliNUS/screens/todoScreen.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/todoScreen/newTodoPopup.dart';
@@ -23,6 +23,8 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
   DateTime deadlineValue;
   TextEditingController textController = new TextEditingController();
   TextEditingController noteController;
+  List<User> groupmates = [];
+
   @override
   void initState() {
     super.initState();
@@ -79,7 +81,10 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                             context.select((AppBloc bloc) =>
                                                     bloc.state.user) ??
                                                 "Myself"
-                                          ], "Person in Charge"),
+                                          ], "Person in Charge",
+                                              callback: (val) {
+                                            setState(() => groupmates = val);
+                                          }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           DeadlineInput(

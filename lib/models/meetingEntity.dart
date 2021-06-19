@@ -6,7 +6,7 @@ class MeetingEntity extends Equatable {
   final String title;
   final Timestamp deadline;
   final double timeLength;
-  final List<Person> groupmates;
+  final List<User> groupmates;
   final MeetingVenue meetingVenue;
   final String projectTitle;
   final String id;
@@ -15,8 +15,7 @@ class MeetingEntity extends Equatable {
   MeetingEntity(this.title, this.id, this.timeLength, this.deadline,
       this.groupmates, this.meetingVenue, this.ref, this.projectTitle);
 
-  static MeetingEntity fromJson(
-      Map<String, Object> json, List<Person> groupmates,
+  static MeetingEntity fromJson(Map<String, Object> json, List<User> groupmates,
       [String id, DocumentReference ref]) {
     print('hi');
     print(convertMeetingVenue(json['meetingVenue']));

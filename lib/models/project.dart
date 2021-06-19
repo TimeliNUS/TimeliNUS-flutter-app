@@ -10,6 +10,7 @@ class Project extends Equatable {
   final String id;
   final double progress;
   final DateTime deadline;
+  final List<User> groupmates;
   final List<Meeting> meetings;
   final List<Todo> todos;
   final DocumentReference ref;
@@ -18,6 +19,7 @@ class Project extends Equatable {
       {this.id,
       this.progress = 1,
       this.deadline,
+      this.groupmates = const [],
       this.meetings = const [],
       this.todos = const [],
       this.ref});
@@ -27,6 +29,7 @@ class Project extends Equatable {
         id: entity.id,
         progress: entity.progress,
         deadline: entity.deadline != null ? entity.deadline.toDate() : null,
+        groupmates: entity.groupmates != null ? entity.groupmates : [],
         meetings: entity.meetings,
         todos: entity.todos,
         ref: entity.ref);
@@ -38,6 +41,7 @@ class Project extends Equatable {
         id,
         progress,
         deadline != null ? Timestamp.fromDate(deadline) : null,
+        groupmates,
         meetings,
         todos,
         ref);
@@ -45,8 +49,10 @@ class Project extends Equatable {
 
   Project copyWith(
       {String title,
+      String id,
       double progress,
       DateTime deadline,
+      List<User> groupmates,
       List<Meeting> meetings,
       List<Todo> todos,
       DocumentReference ref}) {
@@ -54,6 +60,7 @@ class Project extends Equatable {
         id: id ?? this.id,
         progress: progress ?? this.progress,
         deadline: deadline ?? this.deadline,
+        groupmates: groupmates ?? this.groupmates,
         meetings: meetings ?? this.meetings,
         todos: todos ?? this.todos,
         ref: ref ?? this.ref);
@@ -61,18 +68,21 @@ class Project extends Equatable {
 
   @override
   List<Object> get props =>
-      [id, title, progress, deadline, meetings, ref, todos];
+      [id, title, progress, deadline, groupmates, meetings, ref, todos];
 
   @override
   String toString() {
     return 'Project[' +
         this.title +
-        ' ' +
-        this.id +
-        ' ' +
-        this.progress.toString() +
-        ' ' +
-        this.deadline.toString() +
+        // ' ' + this.id != null
+        //     ? this.id
+        //     : '' +
+        // ' ' +
+        // this.progress.toString() +
+        // ' ' +
+        // this.deadline.toString() +
+        // ' ' +
+        // this.groupmates.toString() +
         ']';
   }
 }

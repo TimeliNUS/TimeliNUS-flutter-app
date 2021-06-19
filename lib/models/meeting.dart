@@ -1,9 +1,7 @@
 import 'package:TimeliNUS/models/meetingEntity.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
-
-import 'person.dart';
 
 enum MeetingVenue { Zoom, FaceToFace }
 MeetingVenue convertMeetingVenue(input) {
@@ -17,7 +15,7 @@ class Meeting extends Equatable {
   final String title;
   final DateTime deadline;
   final double timeLength;
-  final List<Person> groupmates;
+  final List<User> groupmates;
   final MeetingVenue meetingVenue;
   final String projectTitle;
 

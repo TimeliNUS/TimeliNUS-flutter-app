@@ -38,7 +38,7 @@ class _SearchUserState extends State<SearchUser> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Home'),
+        title: new Text('Add User'),
         elevation: 0.0,
       ),
       body: new Column(

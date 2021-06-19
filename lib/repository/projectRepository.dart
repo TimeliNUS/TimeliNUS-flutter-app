@@ -58,6 +58,7 @@ class ProjectRepository {
     for (DocumentReference documentReference in list) {
       final DocumentSnapshot temp = await documentReference.get();
       Map<String, Object> tempData = temp.data();
+      print(tempData);
       List<TodoEntity> todoEntities =
           await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
       List<Todo> todos = todoEntities
