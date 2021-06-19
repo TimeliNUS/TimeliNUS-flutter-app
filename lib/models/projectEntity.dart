@@ -20,7 +20,9 @@ class ProjectEntity extends Equatable {
     return ProjectEntity(
         json['title'],
         id != null ? id : json['id'] as String,
-        double.parse(json['progress'].toString()),
+        json['progress'] != null
+            ? double.parse(json['progress'].toString())
+            : 0,
         json['deadline'],
         json['groupmates'] != null
             ? (json['groupmates'] as List)

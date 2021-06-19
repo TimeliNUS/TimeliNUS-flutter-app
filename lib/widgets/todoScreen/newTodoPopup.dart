@@ -2,9 +2,7 @@ import 'dart:ui';
 
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
-import 'package:TimeliNUS/models/todo.dart';
-import 'package:TimeliNUS/models/userModel.dart';
-import 'package:TimeliNUS/repository/todoRepository.dart';
+import 'package:TimeliNUS/models/models.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
@@ -24,6 +22,7 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
   final TextEditingController textController = new TextEditingController();
   final TextEditingController noteController = new TextEditingController();
   List<User> pics = [];
+  Project selectedProject;
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +58,11 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                           PopupInput(textController),
                                           customPadding(),
                                           PopupDropdown(
-                                            dropdownLabel: 'Module Project',
-                                          ),
+                                              dropdownLabel: 'Module Project',
+                                              callback: (val) => {
+                                                    setState(() =>
+                                                        selectedProject = val)
+                                                  }),
                                           customPadding(),
                                           PersonInChargeChips([
                                             context.select((AppBloc bloc) =>
@@ -107,6 +109,7 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                               note: noteController.text,
                                               pic: pics,
                                               deadline: deadlineValue,
+                                              project: selectedProject,
                                               complete: false),
                                           userId));
                                       Navigator.pop(context);
@@ -124,6 +127,7 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                               note: noteController.text,
                                               deadline: deadlineValue,
                                               pic: pics,
+                                              project: selectedProject,
                                               complete: true),
                                           userId));
                                       Navigator.pop(context);

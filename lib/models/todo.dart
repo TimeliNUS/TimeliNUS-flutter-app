@@ -1,6 +1,4 @@
-import 'package:TimeliNUS/models/person.dart';
-import 'package:TimeliNUS/models/todoEntity.dart';
-import 'package:TimeliNUS/models/userModel.dart';
+import 'package:TimeliNUS/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
@@ -12,6 +10,7 @@ class Todo extends Equatable {
   final String note;
   final String title;
   final DateTime deadline;
+  final Project project;
   final List<User> pic;
   final DocumentReference ref;
 
@@ -20,6 +19,7 @@ class Todo extends Equatable {
       this.complete = false,
       this.note = '',
       this.deadline,
+      this.project,
       this.pic,
       this.ref});
 
@@ -29,6 +29,7 @@ class Todo extends Equatable {
       bool complete,
       String note,
       DateTime deadline,
+      Project project,
       List<Person> pic,
       DocumentReference ref}) {
     return Todo(title ?? this.title,
@@ -36,6 +37,7 @@ class Todo extends Equatable {
         complete: complete ?? this.complete,
         note: note ?? (this.note ?? ''),
         deadline: deadline ?? this.deadline,
+        project: project ?? this.project,
         pic: pic ?? this.pic,
         ref: ref ?? this.ref);
   }
@@ -46,8 +48,15 @@ class Todo extends Equatable {
   }
 
   TodoEntity toEntity() {
-    return TodoEntity(title, id, note, complete,
-        deadline != null ? Timestamp.fromDate(deadline) : null, pic, ref);
+    return TodoEntity(
+        title,
+        id,
+        note,
+        complete,
+        deadline != null ? Timestamp.fromDate(deadline) : null,
+        project,
+        pic,
+        ref);
   }
 
   static Todo fromEntity(TodoEntity entity) {
@@ -56,10 +65,12 @@ class Todo extends Equatable {
         complete: entity.complete ?? false,
         note: entity.note,
         deadline: entity.deadline != null ? entity.deadline.toDate() : null,
+        project: entity.project,
         pic: entity.pic ?? [],
         ref: entity.ref);
   }
 
   @override
-  List<Object> get props => [complete, id, note, title, pic, deadline, ref];
+  List<Object> get props =>
+      [complete, id, note, title, pic, deadline, project, ref];
 }

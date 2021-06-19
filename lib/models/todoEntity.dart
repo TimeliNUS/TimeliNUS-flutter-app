@@ -1,3 +1,5 @@
+import 'package:TimeliNUS/models/project.dart';
+import 'package:TimeliNUS/models/projectEntity.dart';
 import 'package:TimeliNUS/models/userModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
@@ -8,18 +10,27 @@ class TodoEntity extends Equatable {
   final String note;
   final String task;
   final Timestamp deadline;
+  final Project project;
   final List<User> pic;
   final DocumentReference ref;
 
   TodoEntity(this.task, this.id, this.note, this.complete, this.deadline,
-      this.pic, this.ref);
+      this.project, this.pic, this.ref);
 
   Map<String, Object> toJson() {
+    print('hi');
+    print(project);
     return {
       'complete': complete,
       'task': task,
       'note': note,
       'id': id,
+      'project': project != null
+          ? {
+              'id': project.id,
+              'name': project.title,
+            }
+          : null,
       'pic': pic.map((x) => x.toJson()).toList(),
       'deadline': deadline
     };
@@ -38,6 +49,9 @@ class TodoEntity extends Equatable {
         json['note'] as String,
         json['complete'] as bool,
         json['deadline'] as Timestamp,
+        json['project'] != null
+            ? Project.fromEntity(ProjectEntity.fromJson(json['project'], []))
+            : null,
         json['pic'] != null
             ? (json['pic'] as List)
                 .map((x) => User.fromJson(x as Map<String, dynamic>, x['id']))
@@ -47,5 +61,6 @@ class TodoEntity extends Equatable {
   }
 
   @override
-  List<Object> get props => [task, id, note, complete, deadline, pic, ref];
+  List<Object> get props =>
+      [task, id, note, complete, deadline, pic, project, ref];
 }

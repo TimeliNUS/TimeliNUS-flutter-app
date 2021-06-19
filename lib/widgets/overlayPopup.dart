@@ -52,7 +52,13 @@ class _PopupInputState extends State<PopupInput> {
 
 class PopupDropdown extends StatefulWidget {
   final String dropdownLabel;
-  const PopupDropdown({@required this.dropdownLabel, Key key})
+  final Function callback;
+  final Project initialProject;
+  const PopupDropdown(
+      {@required this.dropdownLabel,
+      this.callback,
+      this.initialProject,
+      Key key})
       : super(key: key);
 
   @override
@@ -60,23 +66,29 @@ class PopupDropdown extends StatefulWidget {
 }
 
 class PopupDropdownState extends State<PopupDropdown> {
-  List<Project> projects = [];
+  List<Project> projects = [new Project('None selected')];
   Project selectedProject;
 
   @override
   void initState() {
     super.initState();
-    loadProjects(BlocProvider.of<AppBloc>(context).state.user.id);
+    loadProjects(
+        BlocProvider.of<AppBloc>(context).state.user.id, widget.initialProject);
   }
 
-  void loadProjects(String id) async {
+  void loadProjects(String id, Project initial) async {
     final returnedProjects = await context
         .read<ProjectRepository>()
         .loadProjects(id)
         .then((x) => x.map((e) => Project.fromEntity(e)).toList());
+
     setState(() {
-      projects = returnedProjects;
-      selectedProject = projects[0];
+      projects.addAll(returnedProjects);
+      if (initial != null) {
+        selectedProject = projects.firstWhere((x) => x.id == initial.id);
+      } else {
+        selectedProject = projects[0];
+      }
     });
   }
 
@@ -98,6 +110,9 @@ class PopupDropdownState extends State<PopupDropdown> {
           color: appTheme.accentColor,
         ),
         onChanged: (Project newValue) {
+          if (newValue != projects[0]) {
+            widget.callback(newValue);
+          }
           setState(() {
             selectedProject = newValue;
           });

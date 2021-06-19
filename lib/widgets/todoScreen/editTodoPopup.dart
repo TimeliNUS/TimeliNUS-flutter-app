@@ -1,5 +1,6 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
+import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/models/userModel.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
@@ -24,6 +25,7 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
   TextEditingController noteController;
   List<User> pics;
   String userId;
+  Project selectedProject;
 
   @override
   void initState() {
@@ -72,8 +74,13 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                           PopupInput(textController),
                                           customPadding(),
                                           PopupDropdown(
-                                            dropdownLabel: 'Module Project',
-                                          ),
+                                              dropdownLabel: 'Module Project',
+                                              initialProject:
+                                                  widget.todoToEdit.project,
+                                              callback: (val) => {
+                                                    setState(() =>
+                                                        selectedProject = val)
+                                                  }),
                                           customPadding(),
                                           PersonInChargeChips(
                                               widget.todoToEdit.pic,
@@ -119,6 +126,7 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                           textController.text,
                                           id: widget.todoToEdit.id,
                                           note: noteController.text,
+                                          project: selectedProject,
                                           complete: widget.todoToEdit.complete,
                                           pic: pics,
                                           deadline: deadlineValue)));
