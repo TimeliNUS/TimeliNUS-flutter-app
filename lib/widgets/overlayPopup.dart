@@ -76,6 +76,7 @@ class PopupDropdownState extends State<PopupDropdown> {
         .then((x) => x.map((e) => Project.fromEntity(e)).toList());
     setState(() {
       projects = returnedProjects;
+      selectedProject = projects[0];
     });
   }
 
@@ -86,7 +87,7 @@ class PopupDropdownState extends State<PopupDropdown> {
       ButtonTheme(
           // alignedDropdown: true,
           child: DropdownButton<Project>(
-        value: projects.isNotEmpty ? projects[0] : null,
+        value: projects.isNotEmpty ? selectedProject : null,
         icon: Icon(Icons.arrow_drop_down, color: appTheme.primaryColor),
         iconSize: 30,
         isExpanded: true,

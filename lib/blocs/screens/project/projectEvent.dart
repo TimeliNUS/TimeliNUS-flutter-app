@@ -30,6 +30,19 @@ class AddProject extends ProjectEvent {
   List<Object> get props => [project, id];
 }
 
+class DeleteProject extends ProjectEvent {
+  final Project project;
+  final String userId;
+
+  DeleteProject(this.project, this.userId) : super();
+
+  @override
+  String toString() => 'DeleteProject { project: $project }';
+
+  @override
+  List<Object> get props => [project, userId];
+}
+
 class UpdateProject extends ProjectEvent {
   final Project updatedProject;
   final String id;

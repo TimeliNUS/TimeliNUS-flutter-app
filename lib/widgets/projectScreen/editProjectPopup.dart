@@ -41,7 +41,15 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
-                      TopBar(() => Navigator.pop(context), "Edit Project"),
+                      TopBar(() => Navigator.pop(context), "Edit Project",
+                          rightWidget: IconButton(
+                              icon: Icon(Icons.delete, color: Colors.white),
+                              onPressed: () {
+                                widget.projectBloc.add(DeleteProject(
+                                    widget.projectToEdit,
+                                    context.read<AppBloc>().state.user.id));
+                                Navigator.pop(context);
+                              })),
                       Expanded(
                           child: GestureDetector(
                               onTap: () =>

@@ -1,10 +1,7 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
-import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/models/userModel.dart';
-import 'package:TimeliNUS/repository/projectRepository.dart';
-import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/todoScreen/newTodoPopup.dart';

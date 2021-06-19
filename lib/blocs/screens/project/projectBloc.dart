@@ -27,6 +27,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       yield* _mapAddProjectToState(event);
     } else if (event is UpdateProject) {
       yield* _mapUpdateProjectToState(event);
+    } else if (event is DeleteProject) {
+      yield* _mapDeleteProjectToState(event);
     }
   }
 
@@ -64,5 +66,18 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     }).toList();
     yield ProjectLoaded(updatedProjects);
     await projectRepository.updateProject(event.updatedProject.toEntity());
+  }
+
+  Stream<ProjectState> _mapDeleteProjectToState(DeleteProject event) async* {
+    // if (state is TodoLoaded) {
+    yield ProjectLoading();
+    final updatedProjects = state.projects
+        .where((project) => project.id != event.project.id)
+        .toList();
+    yield ProjectLoaded(
+      updatedProjects,
+    );
+    // }
+    await projectRepository.deleteTodo(event.project, event.userId);
   }
 }

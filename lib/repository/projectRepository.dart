@@ -1,3 +1,4 @@
+import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/projectEntity.dart';
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
@@ -35,12 +36,12 @@ class ProjectRepository {
     return newTodoRef;
   }
 
-  // Future<void> deleteTodo(Todo todo, String id) async {
-  //   await person.doc(id).update({
-  //     'todo': FieldValue.arrayRemove([todo.ref])
-  //   });
-  //   return ref.doc(todo.id).delete();
-  // }
+  Future<void> deleteTodo(Project project, String id) async {
+    await person.doc(id).update({
+      'project': FieldValue.arrayRemove([project.ref])
+    });
+    return ref.doc(project.id).delete();
+  }
 
   // Future<void> reorderTodo(List<DocumentReference> refs, String id) async {
   //   return await person.doc(id).update({
