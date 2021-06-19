@@ -85,7 +85,8 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                           PersonInChargeChips(
                                               widget.todoToEdit.pic,
                                               "Person in Charge",
-                                              callback: (val) {
+                                              project: widget.todoToEdit
+                                                  .project, callback: (val) {
                                             setState(() => pics = val);
                                           }),
                                           customPadding(),

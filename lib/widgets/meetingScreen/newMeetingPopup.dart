@@ -58,7 +58,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                                   'Please enter your project title!'),
                                           customPadding(),
                                           PopupDropdown(
-                                            dropdownLabel: 'Module Code',
+                                            dropdownLabel: 'Module Project',
                                           ),
                                           customPadding(),
                                           PersonInChargeChips([

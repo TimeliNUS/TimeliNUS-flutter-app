@@ -131,8 +131,10 @@ class PopupDropdownState extends State<PopupDropdown> {
 class PersonInChargeChips extends StatefulWidget {
   final String chipsLabel;
   final List<User> chipInput;
+  final Project project;
   final Function callback;
-  const PersonInChargeChips(this.chipInput, this.chipsLabel, {this.callback});
+  const PersonInChargeChips(this.chipInput, this.chipsLabel,
+      {this.callback, this.options});
   @override
   State<PersonInChargeChips> createState() => _PersonInChargeChipsState();
 }

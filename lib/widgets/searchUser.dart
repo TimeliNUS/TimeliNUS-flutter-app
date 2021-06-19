@@ -4,8 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SearchUser extends StatefulWidget {
+  final List<User> groupmates;
   final Function callback;
-  const SearchUser(this.callback);
+  const SearchUser(this.callback, {this.groupmates = const []});
   @override
   _SearchUserState createState() => new _SearchUserState();
 }
@@ -32,7 +33,14 @@ class _SearchUserState extends State<SearchUser> {
   @override
   void initState() {
     super.initState();
-    getUserDetails();
+    if (widget.groupmates.isEmpty) {
+      getUserDetails();
+    } else {
+      setState(() {
+        _userDetails = widget.groupmates;
+        _searchResult = widget.groupmates;
+      });
+    }
   }
 
   @override
