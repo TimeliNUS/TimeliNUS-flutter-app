@@ -20,6 +20,7 @@ class TodoEntity extends Equatable {
       'task': task,
       'note': note,
       'id': id,
+      'pic': pic.map((x) => x.toJson()).toList(),
       'deadline': deadline
     };
   }
@@ -37,7 +38,11 @@ class TodoEntity extends Equatable {
         json['note'] as String,
         json['complete'] as bool,
         json['deadline'] as Timestamp,
-        (json['pic'] as List<User>),
+        json['pic'] != null
+            ? (json['pic'] as List)
+                .map((x) => User.fromJson(x as Map<String, dynamic>, x['id']))
+                .toList()
+            : [],
         ref);
   }
 

@@ -182,7 +182,7 @@ class _TodoListState extends State<TodoList>
                       .select((TodoBloc bloc) => bloc.state.todos)
                       .map((todo) => //     clipBehavior: Clip.hardEdge,
                           Container(
-                              key: Key(todo.id),
+                              key: Key(todo.id ?? DateTime.now().toString()),
                               padding: EdgeInsets.symmetric(
                                   vertical: 2.0, horizontal: 2),
                               child: TodoItem(todo)))
@@ -237,8 +237,11 @@ class _TodoItemState extends State<TodoItem> {
                               Padding(padding: EdgeInsets.only(right: 5)),
                               Text(
                                   widget.todo.deadline != null
-                                      ? DateFormat('MMM dd, yyyy – kk:mm')
-                                          .format(widget.todo.deadline)
+                                      ? (widget.todo.deadline.hour != 0
+                                          ? DateFormat('MMM dd, yyyy – kk:mm')
+                                              .format(widget.todo.deadline)
+                                          : DateFormat('MMM dd, yyyy')
+                                              .format(widget.todo.deadline))
                                       : "No deadline set",
                                   style:
                                       TextStyle(color: appTheme.primaryColor))

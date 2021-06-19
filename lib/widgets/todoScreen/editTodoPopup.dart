@@ -23,13 +23,15 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
   DateTime deadlineValue;
   TextEditingController textController = new TextEditingController();
   TextEditingController noteController;
-  List<User> groupmates = [];
+  List<User> pics;
 
   @override
   void initState() {
     super.initState();
     textController = new TextEditingController(text: widget.todoToEdit.title);
     noteController = new TextEditingController(text: widget.todoToEdit.note);
+    deadlineValue = widget.todoToEdit.deadline;
+    pics = widget.todoToEdit.pic ?? [];
   }
 
   @override
@@ -77,20 +79,21 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                             dropdownLabel: 'Module Project',
                                           ),
                                           customPadding(),
-                                          PersonInChargeChips([
-                                            context.select((AppBloc bloc) =>
-                                                    bloc.state.user) ??
-                                                "Myself"
-                                          ], "Person in Charge",
+                                          PersonInChargeChips(
+                                              widget.todoToEdit.pic,
+                                              "Person in Charge",
                                               callback: (val) {
-                                            setState(() => groupmates = val);
+                                            setState(() => pics = val);
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           DeadlineInput(
-                                              (val) => setState(
-                                                  () => deadlineValue = val),
-                                              true),
+                                            (val) => setState(
+                                                () => deadlineValue = val),
+                                            true,
+                                            initialTime:
+                                                widget.todoToEdit.deadline,
+                                          ),
                                           customPadding(),
                                           NotesInput(noteController),
                                         ],
@@ -121,6 +124,7 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                           id: widget.todoToEdit.id,
                                           note: noteController.text,
                                           complete: widget.todoToEdit.complete,
+                                          pic: pics,
                                           deadline: deadlineValue)));
                                       Navigator.pop(context);
                                     })

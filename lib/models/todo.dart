@@ -25,6 +25,7 @@ class Todo extends Equatable {
 
   Todo copyWith(
       {String title,
+      String id,
       bool complete,
       String note,
       DateTime deadline,

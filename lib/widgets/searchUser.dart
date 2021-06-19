@@ -1,4 +1,5 @@
 import 'package:TimeliNUS/models/userModel.dart';
+import 'package:TimeliNUS/widgets/style.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -38,13 +39,14 @@ class _SearchUserState extends State<SearchUser> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
+        backgroundColor: appTheme.primaryColorLight,
         title: new Text('Add User'),
         elevation: 0.0,
       ),
       body: new Column(
         children: <Widget>[
           new Container(
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).primaryColorLight,
             child: new Padding(
               padding: const EdgeInsets.all(8.0),
               child: new Card(

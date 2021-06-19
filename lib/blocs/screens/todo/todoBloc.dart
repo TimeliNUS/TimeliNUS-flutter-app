@@ -66,7 +66,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     DocumentReference newTodoRef =
         await todoRepository.addNewTodo(event.todo.toEntity(), event.id);
     final updatedTodos = currentTodos
-      ..add(event.todo.copyWith(ref: newTodoRef));
+      ..add(event.todo.copyWith(ref: newTodoRef, id: newTodoRef.id));
     yield TodoLoaded(calculateProgressPercentage(updatedTodos), updatedTodos);
   }
 

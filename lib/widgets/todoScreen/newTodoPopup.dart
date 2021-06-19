@@ -3,15 +3,14 @@ import 'dart:ui';
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
 import 'package:TimeliNUS/models/todo.dart';
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
-import 'package:TimeliNUS/screens/todoScreen.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 class NewTodoPopup extends StatefulWidget {
   final TodoBloc todosBloc;
@@ -24,8 +23,14 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
   DateTime deadlineValue;
   final TextEditingController textController = new TextEditingController();
   final TextEditingController noteController = new TextEditingController();
+  List<User> pics = [];
+
   @override
   Widget build(BuildContext context) {
+    String userId = context.read<AppBloc>().getCurrentUser().id;
+    if (pics.isEmpty) {
+      pics.add(context.select((AppBloc bloc) => bloc.state.user));
+    }
     final todosBloc = TodoBloc(todoRepository: context.read<TodoRepository>());
     return BlocProvider<TodoBloc>(
         create: (context) => todosBloc,
@@ -62,13 +67,17 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                             context.select((AppBloc bloc) =>
                                                     bloc.state.user) ??
                                                 "Myself"
-                                          ], "Person in Charge"),
+                                          ], "Person in Charge",
+                                              callback: (val) {
+                                            setState(() => pics = val);
+                                          }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           DeadlineInput(
                                               (val) => setState(
                                                   () => deadlineValue = val),
-                                              true),
+                                              true,
+                                              initialTime: null),
                                           customPadding(),
                                           NotesInput(noteController),
                                         ],
@@ -97,11 +106,10 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                       widget.todosBloc.add(AddTodo(
                                           Todo(textController.text,
                                               note: noteController.text,
-                                              deadline: deadlineValue),
-                                          context
-                                              .read<AppBloc>()
-                                              .getCurrentUser()
-                                              .id));
+                                              pic: pics,
+                                              deadline: deadlineValue,
+                                              complete: false),
+                                          userId));
                                       Navigator.pop(context);
                                     }),
                                 OutlinedButton(
@@ -116,11 +124,9 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                           Todo(textController.text,
                                               note: noteController.text,
                                               deadline: deadlineValue,
+                                              pic: pics,
                                               complete: true),
-                                          context
-                                              .read<AppBloc>()
-                                              .getCurrentUser()
-                                              .id));
+                                          userId));
                                       Navigator.pop(context);
                                     })
                               ],

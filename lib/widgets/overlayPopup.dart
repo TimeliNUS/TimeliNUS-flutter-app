@@ -108,8 +108,9 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 
   @override
   void initState() {
-    chipInputState =
-        Map.fromIterable(widget.chipInput, key: (e) => e, value: (e) => true);
+    chipInputState = widget.chipInput.isNotEmpty
+        ? Map.fromIterable(widget.chipInput, key: (e) => e, value: (e) => true)
+        : new Map();
     super.initState();
   }
 
@@ -184,7 +185,8 @@ class _DeadlineInputState extends State<DeadlineInput> {
     super.initState();
     isWithTime =
         (widget.initialTime != null ? widget.initialTime.hour != 0 : false);
-    chosenDateTime = widget.initialTime ?? now.stripTime();
+    chosenDateTime =
+        widget.initialTime ?? (widget.isOptional ? null : now.stripTime());
   }
 
   void _showDatePicker(ctx, bool isWithTime) {
