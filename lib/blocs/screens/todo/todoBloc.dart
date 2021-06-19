@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:TimeliNUS/repository/authenticationRepository.dart';
+import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,14 +11,23 @@ import 'package:TimeliNUS/models/models.dart';
 
 class TodoBloc extends Bloc<TodoEvent, TodoState> {
   final TodoRepository todoRepository;
-
-  TodoBloc({
-    @required this.todoRepository,
-  })  : assert(todoRepository != null),
+  TodoBloc({@required this.todoRepository})
+      : assert(todoRepository != null),
         super(TodoLoading());
+  //       {
+  //   if (id != null) {
+  //     print(id);
+  //     loadProjects();
+  //   }
+  // }
+
+  // Future<List<Project>> loadProjects() async {
+  //   projects = (await ProjectRepository().loadProjects(id))
+  //       .map((project) => Project.fromEntity(project))
+  //       .toList();
+  // }
 
   // TodoState get initialState => TodoLoading();
-
   @override
   Stream<TodoState> mapEventToState(TodoEvent event) async* {
     if (event is LoadTodos) {
@@ -67,7 +78,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         await todoRepository.addNewTodo(event.todo.toEntity(), event.id);
     final updatedTodos = currentTodos
       ..add(event.todo.copyWith(ref: newTodoRef, id: newTodoRef.id));
-    yield TodoLoaded(calculateProgressPercentage(updatedTodos), updatedTodos);
+    yield TodoLoaded(
+      calculateProgressPercentage(updatedTodos),
+      updatedTodos,
+    );
   }
 
   Stream<TodoState> _mapUpdateTodoToState(UpdateTodo event) async* {
@@ -76,7 +90,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     final updatedTodos = state.todos.map((todo) {
       return todo.id == event.updatedTodo.id ? event.updatedTodo : todo;
     }).toList();
-    yield TodoLoaded(calculateProgressPercentage(updatedTodos), updatedTodos);
+    yield TodoLoaded(
+      calculateProgressPercentage(updatedTodos),
+      updatedTodos,
+    );
     await todoRepository.updateTodo(event.updatedTodo.toEntity());
   }
 
@@ -85,7 +102,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     yield TodoLoading();
     final updatedTodos =
         state.todos.where((todo) => todo.id != event.todo.id).toList();
-    yield TodoLoaded(calculateProgressPercentage(updatedTodos), updatedTodos);
+    yield TodoLoaded(
+      calculateProgressPercentage(updatedTodos),
+      updatedTodos,
+    );
     // }
     await todoRepository.deleteTodo(event.todo, event.userId);
   }
@@ -98,7 +118,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
           .todos
           .map((todo) => todo.copyWith(complete: !allComplete))
           .toList();
-      yield TodoLoaded(calculateProgressPercentage(updatedTodos), updatedTodos);
+      yield TodoLoaded(
+        calculateProgressPercentage(updatedTodos),
+        updatedTodos,
+      );
     }
   }
 
@@ -106,7 +129,10 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     if (state is TodoLoaded) {
       final updatedTodos =
           (state as TodoLoaded).todos.where((todo) => !todo.complete).toList();
-      yield TodoLoaded(calculateProgressPercentage(updatedTodos), updatedTodos);
+      yield TodoLoaded(
+        calculateProgressPercentage(updatedTodos),
+        updatedTodos,
+      );
     }
   }
 

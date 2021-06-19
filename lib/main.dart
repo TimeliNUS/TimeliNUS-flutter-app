@@ -3,6 +3,7 @@ import 'package:TimeliNUS/blocs/app/appState.dart';
 import 'package:TimeliNUS/blocs/app/blocObserver.dart';
 import 'package:TimeliNUS/blocs/app/routes/routes.dart';
 import 'package:TimeliNUS/repository/authenticationRepository.dart';
+import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/utils/services/firebase.dart';
 import 'package:TimeliNUS/widgets/style.dart';
@@ -26,25 +27,25 @@ Future<void> main() async {
   //   await FirebaseService().switchToEmulator();
   // }
   final authenticationRepository = AuthenticationRepository();
-  final todoRepository = TodoRepository();
+  final projectRepository = ProjectRepository();
   await authenticationRepository.user.first;
   runApp(App(
       authenticationRepository: authenticationRepository,
-      todoRepository: todoRepository));
+      projectRepository: projectRepository));
 }
 
 class App extends StatelessWidget {
   const App({
     Key key,
     @required AuthenticationRepository authenticationRepository,
-    @required TodoRepository todoRepository,
+    @required ProjectRepository projectRepository,
   })  : _authenticationRepository = authenticationRepository,
-        _todoRepository = todoRepository,
+        _projectRepository = projectRepository,
         super(key: key);
   // This widget is the root of your application.
 
   final AuthenticationRepository _authenticationRepository;
-  final TodoRepository _todoRepository;
+  final ProjectRepository _projectRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +58,8 @@ class App extends StatelessWidget {
             RepositoryProvider<AuthenticationRepository>(
               create: (context) => _authenticationRepository,
             ),
-            RepositoryProvider<TodoRepository>(
-              create: (context) => _todoRepository,
+            RepositoryProvider<ProjectRepository>(
+              create: (context) => _projectRepository,
             ),
           ],
           child: AppView(),

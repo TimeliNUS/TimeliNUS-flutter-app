@@ -1,3 +1,4 @@
+import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/screens/todoScreen.dart';
 import 'package:equatable/equatable.dart';
@@ -20,6 +21,7 @@ class TodoLoading extends TodoState {
 
 class TodoLoaded extends TodoState {
   final List<Todo> todos;
+
   final double progress;
 
   TodoLoaded(this.progress, this.todos) : super(todos, progress);

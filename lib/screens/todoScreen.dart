@@ -20,33 +20,36 @@ import 'package:provider/provider.dart';
 class TodoScreen extends StatelessWidget {
   static Page page() => MaterialPage(child: TodoScreen());
 
+  final _todoRepository = TodoRepository();
+
   @override
   Widget build(BuildContext context) {
     final id = context.select((AppBloc bloc) => bloc.state.user.id);
-    final todoBloc = TodoBloc(todoRepository: context.read<TodoRepository>())
-      ..add(LoadTodos(id));
     return BlocProvider<TodoBloc>(
-        create: (context) => todoBloc,
-        child: ColoredSafeArea(
-            appTheme.primaryColorLight,
-            Scaffold(
-                bottomNavigationBar: BottomBar(0),
-                body: Container(
-                    color: appTheme.primaryColorLight,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TopBar(
-                              () => context
-                                  .read<AppBloc>()
-                                  .add(AppLogoutRequested()),
-                              "EG1234",
-                              subtitle: "Example Project",
-                              rightWidget: CircularProgress()),
-                          Expanded(
-                            child: CustomCard(),
-                          ),
-                        ])))));
+        create: (context) =>
+            TodoBloc(todoRepository: _todoRepository)..add(LoadTodos(id)),
+        child: BlocBuilder<TodoBloc, TodoState>(builder: (context, state) {
+          return ColoredSafeArea(
+              appTheme.primaryColorLight,
+              Scaffold(
+                  bottomNavigationBar: BottomBar(0),
+                  body: Container(
+                      color: appTheme.primaryColorLight,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TopBar(
+                                () => context
+                                    .read<AppBloc>()
+                                    .add(AppLogoutRequested()),
+                                "EG1234",
+                                subtitle: "Example Project",
+                                rightWidget: CircularProgress()),
+                            Expanded(
+                              child: CustomCard(),
+                            ),
+                          ]))));
+        }));
   }
 }
 

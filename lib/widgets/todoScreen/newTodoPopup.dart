@@ -31,9 +31,8 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
     if (pics.isEmpty) {
       pics.add(context.select((AppBloc bloc) => bloc.state.user));
     }
-    final todosBloc = TodoBloc(todoRepository: context.read<TodoRepository>());
     return BlocProvider<TodoBloc>(
-        create: (context) => todosBloc,
+        create: (context) => widget.todosBloc,
         child: ColoredSafeArea(
             appTheme.primaryColorLight,
             Scaffold(

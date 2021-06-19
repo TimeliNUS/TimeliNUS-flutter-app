@@ -1,7 +1,9 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
+import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/models/userModel.dart';
+import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
@@ -24,10 +26,12 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
   TextEditingController textController = new TextEditingController();
   TextEditingController noteController;
   List<User> pics;
+  String userId;
 
   @override
   void initState() {
     super.initState();
+    userId = context.read<AppBloc>().getCurrentUser().id;
     textController = new TextEditingController(text: widget.todoToEdit.title);
     noteController = new TextEditingController(text: widget.todoToEdit.note);
     deadlineValue = widget.todoToEdit.deadline;
@@ -36,9 +40,8 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
 
   @override
   Widget build(BuildContext context) {
-    final todosBloc = TodoBloc(todoRepository: context.read<TodoRepository>());
     return BlocProvider<TodoBloc>(
-        create: (context) => todosBloc,
+        create: (context) => widget.todosBloc,
         child: ColoredSafeArea(
             appTheme.primaryColorLight,
             Scaffold(
@@ -49,12 +52,8 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                           rightWidget: IconButton(
                               icon: Icon(Icons.delete, color: Colors.white),
                               onPressed: () {
-                                widget.todosBloc.add(DeleteTodo(
-                                    widget.todoToEdit,
-                                    context
-                                        .read<AppBloc>()
-                                        .getCurrentUser()
-                                        .id));
+                                widget.todosBloc
+                                    .add(DeleteTodo(widget.todoToEdit, userId));
                                 Navigator.pop(context);
                               })),
                       Expanded(

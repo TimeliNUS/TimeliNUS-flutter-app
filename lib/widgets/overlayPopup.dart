@@ -1,9 +1,13 @@
+import 'package:TimeliNUS/blocs/app/appBloc.dart';
+import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/userModel.dart';
+import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/utils/transitionBuilder.dart';
 import 'package:TimeliNUS/widgets/searchUser.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:TimeliNUS/utils/dateTimeExtension.dart';
 
@@ -56,7 +60,24 @@ class PopupDropdown extends StatefulWidget {
 }
 
 class PopupDropdownState extends State<PopupDropdown> {
-  String dropdownValue = 'CS2103 Software Engineering Project';
+  List<Project> projects = [];
+  Project selectedProject;
+
+  @override
+  void initState() {
+    super.initState();
+    loadProjects(BlocProvider.of<AppBloc>(context).state.user.id);
+  }
+
+  void loadProjects(String id) async {
+    final returnedProjects = await context
+        .read<ProjectRepository>()
+        .loadProjects(id)
+        .then((x) => x.map((e) => Project.fromEntity(e)).toList());
+    setState(() {
+      projects = returnedProjects;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +85,8 @@ class PopupDropdownState extends State<PopupDropdown> {
       Text(widget.dropdownLabel),
       ButtonTheme(
           // alignedDropdown: true,
-          child: DropdownButton<String>(
-        value: dropdownValue,
+          child: DropdownButton<Project>(
+        value: projects.isNotEmpty ? projects[0] : null,
         icon: Icon(Icons.arrow_drop_down, color: appTheme.primaryColor),
         iconSize: 30,
         isExpanded: true,
@@ -75,18 +96,15 @@ class PopupDropdownState extends State<PopupDropdown> {
           height: 2,
           color: appTheme.accentColor,
         ),
-        onChanged: (String newValue) {
+        onChanged: (Project newValue) {
           setState(() {
-            dropdownValue = newValue;
+            selectedProject = newValue;
           });
         },
-        items: <String>[
-          'CS2103 Software Engineering Project',
-          'CS2101 Effective Communication for Computing Professionals Project'
-        ].map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value, overflow: TextOverflow.ellipsis),
+        items: projects.map<DropdownMenuItem<Project>>((Project proj) {
+          return DropdownMenuItem<Project>(
+            value: proj,
+            child: Text(proj.title, overflow: TextOverflow.ellipsis),
           );
         }).toList(),
       ))
