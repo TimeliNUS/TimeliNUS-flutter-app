@@ -73,7 +73,7 @@ class Project extends Equatable {
   @override
   String toString() {
     return 'Project[' +
-        this.title +
+        // this.title +
         // ' ' + this.id != null
         //     ? this.id
         //     : '' +

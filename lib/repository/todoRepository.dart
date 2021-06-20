@@ -1,5 +1,7 @@
 import 'package:TimeliNUS/models/todo.dart';
 import 'package:TimeliNUS/models/todoEntity.dart';
+import 'package:TimeliNUS/models/userModel.dart';
+import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TodoRepository {
@@ -65,8 +67,11 @@ class TodoRepository {
     for (DocumentReference documentReference in refs) {
       final DocumentSnapshot temp = await documentReference.get();
       // print(documentReference);
+      final Map<String, Object> data = temp.data();
+      final List<User> users =
+          await ProjectRepository.findUsersByRef(data['pic']);
       TodoEntity documentSnapshotTask =
-          TodoEntity.fromJson(temp.data(), temp.id, documentReference);
+          TodoEntity.fromJson(temp.data(), users, temp.id, documentReference);
       tasks.add(documentSnapshotTask);
     }
     // print("Task: " + tasks.toString());

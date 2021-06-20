@@ -31,7 +31,7 @@ class TodoEntity extends Equatable {
               'name': project.title,
             }
           : null,
-      'pic': pic.map((x) => x.toJson()).toList(),
+      'pic': pic.map((x) => x.ref).toList(),
       'deadline': deadline
     };
   }
@@ -41,7 +41,7 @@ class TodoEntity extends Equatable {
     return 'TodoEntity{complete: $complete, task: $task, note: $note, id: $id, deadline: $deadline, ref: $ref}';
   }
 
-  static TodoEntity fromJson(Map<String, Object> json,
+  static TodoEntity fromJson(Map<String, Object> json, List<User> users,
       [String id, DocumentReference ref]) {
     return TodoEntity(
         json['task'] as String,
@@ -50,13 +50,15 @@ class TodoEntity extends Equatable {
         json['complete'] as bool,
         json['deadline'] as Timestamp,
         json['project'] != null
-            ? Project.fromEntity(ProjectEntity.fromJson(json['project'], []))
+            ? Project.fromEntity(
+                ProjectEntity.fromJson(json['project'], [], []))
             : null,
-        json['pic'] != null
-            ? (json['pic'] as List)
-                .map((x) => User.fromJson(x as Map<String, dynamic>, x['id']))
-                .toList()
-            : [],
+        users,
+        // json['pic'] != null
+        //     ? (json['pic'] as List)
+        //         .map((x) => User.fromJson(x as Map<String, dynamic>, x['id']))
+        //         .toList()
+        //     : [],
         ref);
   }
 

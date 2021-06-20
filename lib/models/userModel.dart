@@ -1,13 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
 class User extends Equatable {
   /// {@macro user}
-  const User({
-    @required this.id,
-    this.email,
-    this.name,
-  });
+  const User({@required this.id, this.email, this.name, this.ref});
 
   /// The current user's email address.
   final String email;
@@ -17,6 +14,8 @@ class User extends Equatable {
 
   /// The current user's name (display name).
   final String name;
+
+  final DocumentReference ref;
 
   /// Empty user which represents an unauthenticated user.
   static const empty = User(id: '');
@@ -30,12 +29,9 @@ class User extends Equatable {
   @override
   List<Object> get props => [email, id, name];
 
-  static User fromJson(Map<String, dynamic> json, String id) {
-    return new User(
-      id: id,
-      name: json['name'],
-      email: json['email'],
-    );
+  static User fromJson(Map<String, dynamic> json, String id,
+      {DocumentReference ref}) {
+    return new User(id: id, name: json['name'], email: json['email'], ref: ref);
   }
 
   Map<String, Object> toJson() {
@@ -48,6 +44,6 @@ class User extends Equatable {
 
   @override
   String toString() {
-    return 'id: $id, email: $email, name: $name';
+    return 'id: $id, email: $email, name: $name, ref: $ref';
   }
 }

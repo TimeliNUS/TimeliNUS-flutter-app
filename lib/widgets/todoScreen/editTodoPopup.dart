@@ -35,6 +35,7 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
     noteController = new TextEditingController(text: widget.todoToEdit.note);
     deadlineValue = widget.todoToEdit.deadline;
     pics = widget.todoToEdit.pic ?? [];
+    selectedProject = widget.todoToEdit.project;
   }
 
   @override
@@ -85,8 +86,8 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                           PersonInChargeChips(
                                               widget.todoToEdit.pic,
                                               "Person in Charge",
-                                              project: widget.todoToEdit
-                                                  .project, callback: (val) {
+                                              project: selectedProject,
+                                              callback: (val) {
                                             setState(() => pics = val);
                                           }),
                                           customPadding(),

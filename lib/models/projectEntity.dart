@@ -15,7 +15,8 @@ class ProjectEntity extends Equatable {
   ProjectEntity(this.title, this.id, this.progress, this.deadline,
       this.groupmates, this.meetings, this.todos, this.ref);
 
-  static ProjectEntity fromJson(Map<String, Object> json, List<Todo> todos,
+  static ProjectEntity fromJson(
+      Map<String, Object> json, List<Todo> todos, List<User> users,
       [String id, DocumentReference ref]) {
     return ProjectEntity(
         json['title'],
@@ -24,23 +25,20 @@ class ProjectEntity extends Equatable {
             ? double.parse(json['progress'].toString())
             : 0,
         json['deadline'],
-        json['groupmates'] != null
-            ? (json['groupmates'] as List)
-                .map((x) => User.fromJson(x as Map<String, dynamic>, x['id']))
-                .toList()
-            : [],
+        users,
         [],
         todos,
         ref);
   }
 
   Map<String, Object> toJson() {
+    print(groupmates.map((x) => x.ref).toList());
     return {
       'id': id,
       'title': title,
       'progress': progress,
       'meetings': meetings,
-      'groupmates': groupmates.map((x) => x.toJson()).toList(),
+      'groupmates': groupmates.map((x) => x.ref).toList(),
       'todos': todos,
       'deadline': deadline
     };

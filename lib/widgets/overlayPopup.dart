@@ -134,13 +134,26 @@ class PersonInChargeChips extends StatefulWidget {
   final Project project;
   final Function callback;
   const PersonInChargeChips(this.chipInput, this.chipsLabel,
-      {this.callback, this.options});
+      {this.callback, this.project});
   @override
   State<PersonInChargeChips> createState() => _PersonInChargeChipsState();
 }
 
 class _PersonInChargeChipsState extends State<PersonInChargeChips> {
   Map<User, bool> chipInputState;
+  List<User> usersAvailableToChoose = [];
+
+  void loadProjects(String id) async {
+    final List<User> returnedProject = await context
+        .read<ProjectRepository>()
+        .loadProjectById(id)
+        .then((x) => Project.fromEntity(x).groupmates);
+    if (mounted) {
+      setState(() {
+        usersAvailableToChoose = returnedProject;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -152,6 +165,7 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.project != null) loadProjects(widget.project.id);
     // chipInputState = Map.fromIterable(widget.chipInput,
     //     key: (e) => e.toString(),
     //     value: (e) => true); // <<< ADDING THIS HERE IS THE FIX
@@ -174,7 +188,6 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
                   onPressed: () {
                     setState(() => chipInputState = chipInputState
                       ..update(e.key, (value) => !e.value));
-                    print(chipInputState);
                   },
                   label: Text(e.key.name,
                       style: TextStyle(
@@ -187,13 +200,15 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
             shape: StadiumBorder(
                 side: BorderSide(color: appTheme.primaryColorLight)),
             backgroundColor: Colors.transparent,
-            onPressed: () =>
-                Navigator.push(context, SlideRightRoute(page: SearchUser((val) {
-              setState(() => chipInputState.putIfAbsent(val, () => true));
-              List<User> tempUser = [];
-              chipInputState.forEach((key, value) => tempUser.add(key));
-              widget.callback(tempUser);
-            }))),
+            onPressed: () => Navigator.push(
+                context,
+                SlideRightRoute(
+                    page: SearchUser((val) {
+                  setState(() => chipInputState.putIfAbsent(val, () => true));
+                  List<User> tempUser = [];
+                  chipInputState.forEach((key, value) => tempUser.add(key));
+                  widget.callback(tempUser);
+                }, groupmates: usersAvailableToChoose))),
           )
         ],
       )

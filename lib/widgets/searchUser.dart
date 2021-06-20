@@ -25,7 +25,7 @@ class _SearchUserState extends State<SearchUser> {
         .get();
     test.docs.forEach((e) {
       setState(() {
-        _userDetails.add(User.fromJson(e.data(), e.id));
+        _userDetails.add(User.fromJson(e.data(), e.id, ref: e.reference));
       });
     });
   }
