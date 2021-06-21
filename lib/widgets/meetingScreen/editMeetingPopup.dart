@@ -20,8 +20,7 @@ class NewMeetingPopup extends StatefulWidget {
 }
 
 class _NewMeetingPopupState extends State<NewMeetingPopup> {
-  DateTime startDateValue;
-  DateTime endDateValue;
+  DateTime deadlineValue;
   MeetingVenue meetingVenue = MeetingVenue.Zoom;
   List<User> pics = [];
   Project selectedProject;
@@ -81,37 +80,35 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                             'Meeting must be within...',
                                           ),
                                           Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                SizedBox(
-                                                    width: 50,
-                                                    height: 28,
-                                                    child: Text(
-                                                      'From:',
-                                                    )),
-                                                Expanded(
-                                                    child: DeadlineInput(
-                                                  (val) => setState(() =>
-                                                      startDateValue = val),
-                                                  false,
-                                                  isNotMini: false,
-                                                )),
-                                              ]),
-                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              SizedBox(
-                                                  width: 50,
-                                                  height: 14,
+                                              Padding(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 9, right: 10),
                                                   child: Text(
-                                                    'to:',
+                                                    'From',
                                                   )),
                                               Expanded(
                                                   child: DeadlineInput(
                                                 (val) => setState(
-                                                    () => endDateValue = val),
+                                                    () => deadlineValue = val),
+                                                false,
+                                                isNotMini: false,
+                                              )),
+                                              Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical: 9,
+                                                      horizontal: 10),
+                                                  child: Text(
+                                                    'to',
+                                                  )),
+                                              Expanded(
+                                                  child: DeadlineInput(
+                                                (val) => setState(
+                                                    () => deadlineValue = val),
                                                 false,
                                                 isNotMini: false,
                                               )),
@@ -179,8 +176,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                             pics,
                                             meetingVenue,
                                             selectedProject,
-                                            startDate: startDateValue,
-                                            endDate: endDateValue,
+                                            // deadline: deadlineValue,
                                           ),
                                           userId));
                                       Navigator.pop(context);

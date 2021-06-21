@@ -53,34 +53,50 @@ class _MeetingScreenState extends State<MeetingScreen> {
                             radius: BorderRadius.only(
                                 topLeft: Radius.circular(40),
                                 topRight: Radius.circular(40)),
-                            child: Column(children: [
-                              Padding(
-                                padding: EdgeInsets.all(25),
-                                child: Row(
-                                  children: [
-                                    Text("Meeting",
-                                        style: TextStyle(
-                                            fontSize: 24,
-                                            color: appTheme.primaryColorLight)),
-                                    IconButton(
-                                      icon: Icon(Icons.add,
-                                          color: appTheme.primaryColorLight),
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            SlideRightRoute(
-                                                page: NewMeetingPopup(context
-                                                    .read<MeetingBloc>())));
-                                      },
-                                    )
-                                  ],
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                ),
-                              ),
-                              MeetingInvitations(),
-                              UpcomingMeetings(state.meetings),
-                            ])),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(25),
+                                    child: Row(
+                                      children: [
+                                        Text("Meeting",
+                                            style: TextStyle(
+                                                fontSize: 24,
+                                                color: appTheme
+                                                    .primaryColorLight)),
+                                        IconButton(
+                                          icon: Icon(Icons.add,
+                                              color:
+                                                  appTheme.primaryColorLight),
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                SlideRightRoute(
+                                                    page: NewMeetingPopup(
+                                                        context.read<
+                                                            MeetingBloc>())));
+                                          },
+                                        )
+                                      ],
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                    ),
+                                  ),
+                                  MeetingInvitations(),
+                                  Padding(
+                                      padding: EdgeInsets.only(
+                                          left: 25, top: 25, bottom: 10),
+                                      child: Text("Upcoming Meetings",
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: appTheme.accentColor))),
+                                  Expanded(
+                                      child: SingleChildScrollView(
+                                          child: UpcomingMeetings(
+                                              state.meetings))),
+                                ])),
                       ),
                     ],
                   )));
@@ -172,11 +188,8 @@ class _UpcomingMeetingsState extends State<UpcomingMeetings> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.all(25),
+        padding: EdgeInsets.symmetric(horizontal: 25),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text("Upcoming Meetings",
-              textAlign: TextAlign.left,
-              style: TextStyle(fontSize: 16, color: appTheme.accentColor)),
           CustomPadding(),
           ...(widget.meetings.map((meeting) => Padding(
               padding: EdgeInsets.only(bottom: 15),

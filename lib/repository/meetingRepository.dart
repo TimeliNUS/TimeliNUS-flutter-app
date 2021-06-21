@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:TimeliNUS/models/meetingEntity.dart';
 import 'package:TimeliNUS/models/projectEntity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:http/http.dart' as http;
 
 class MeetingRepository {
   static CollectionReference ref =
@@ -18,15 +22,36 @@ class MeetingRepository {
     tempJson.addEntries(
         [MapEntry("_createdAt", Timestamp.fromDate(DateTime.now()))]);
     final newTodoRef = await ref.add(tempJson);
-    // if (!userTodosExist) {
-    //   person.doc(id).set({
-    //     'project': [newTodoRef]
-    //   });
-    // } else {
-    //   await person.doc(id).update({
-    //     'project': FieldValue.arrayUnion([newTodoRef])
-    //   });
-    // }
+    final List<Future> promises = [];
+    // updatedMeetingTimeslotByDateTime
+    dynamic results;
+    // HttpsCallable callable = FirebaseFunctions.instance
+    //     .httpsCallable('updatedMeetingTimeslotByDateTime');
+
+    // Future<dynamic> test = callable.call({
+    //   "startDate": meeting.startDate.toDate().toIso8601String(),
+    //   "endDate": meeting.endDate.toDate().toIso8601String()
+    // });
+
+    final test = http.post(
+      Uri.parse(
+          'https://asia-east2-timelinus-2021.cloudfunctions.net/updatedMeetingTimeslotByDateTime'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        "startDate": meeting.startDate.toDate().toIso8601String(),
+        "endDate": meeting.endDate.toDate().toIso8601String(),
+        "id": newTodoRef.id
+      }),
+    );
+
+    promises.add(results = test);
+    promises.add(person.doc(id).update({
+      'meeting': FieldValue.arrayUnion([newTodoRef])
+    }));
+    Future.wait(promises);
+    print(results);
     return newTodoRef;
   }
 

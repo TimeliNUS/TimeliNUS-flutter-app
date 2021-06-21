@@ -64,11 +64,9 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                                         selectedProject = val)
                                                   }),
                                           customPadding(),
-                                          PersonInChargeChips([
-                                            context.select((AppBloc bloc) =>
-                                                    bloc.state.user) ??
-                                                "Myself"
-                                          ], "Person in Charge",
+                                          PersonInChargeChips(
+                                              pics, "Person in Charge",
+                                              project: selectedProject,
                                               callback: (val) {
                                             setState(() => pics = val);
                                           }),

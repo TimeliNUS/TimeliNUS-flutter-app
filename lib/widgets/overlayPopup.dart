@@ -235,7 +235,8 @@ class _DeadlineInputState extends State<DeadlineInput> {
   void initState() {
     super.initState();
     isWithTime =
-        (widget.initialTime != null ? widget.initialTime.hour != 0 : false);
+        (widget.initialTime != null ? widget.initialTime.hour != 0 : false) ||
+            !widget.isNotMini;
     chosenDateTime =
         widget.initialTime ?? (widget.isOptional ? null : now.stripTime());
   }
@@ -282,39 +283,52 @@ class _DeadlineInputState extends State<DeadlineInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Flex(
+        direction: widget.isNotMini ? Axis.vertical : Axis.horizontal,
         mainAxisAlignment: MainAxisAlignment.start,
+        // mainAxisSize: widget.isNotMini ? MainAxisSize.max : MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           widget.isNotMini
               ? Text("Deadline" + (widget.isOptional ? "(Optional)" : ""))
               : Container(),
-          InkWell(
-              onTap: () => _showDatePicker(context, isWithTime),
-              child: new Padding(
-                  padding: new EdgeInsets.only(top: 10.0),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                            chosenDateTime != null
-                                ? DateFormat.yMMMd().format(chosenDateTime)
-                                : "No deadline set",
-                            style: appTheme.textTheme.bodyText2),
-                        Padding(
-                            padding: EdgeInsets.all(5),
-                            child: Icon(Icons.calendar_today,
-                                size: 24, color: appTheme.accentColor))
-                      ]))),
-          ClipPath(
-              clipper: ShapeBorderClipper(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)))),
-              child: Container(
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                              color: appTheme.accentColor, width: 1.0))))),
+          Expanded(
+              flex: widget.isNotMini ? 0 : 1,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    InkWell(
+                        onTap: () => _showDatePicker(context, isWithTime),
+                        child: new Padding(
+                            padding: new EdgeInsets.only(top: 10.0),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                      chosenDateTime != null
+                                          ? DateFormat.yMMMd()
+                                              .format(chosenDateTime)
+                                          : "No deadline set",
+                                      style: appTheme.textTheme.bodyText2),
+                                  Padding(
+                                      padding: EdgeInsets.all(5),
+                                      child: Icon(Icons.calendar_today,
+                                          size: 24,
+                                          color: appTheme.accentColor))
+                                ]))),
+                    ClipPath(
+                        clipper: ShapeBorderClipper(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)))),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    bottom: BorderSide(
+                                        color: appTheme.accentColor,
+                                        width: 1.0))))),
+                  ])),
           widget.isNotMini
               ? Row(children: [
                   Expanded(
@@ -355,7 +369,35 @@ class _DeadlineInputState extends State<DeadlineInput> {
                                       : "00"),
                               textAlign: TextAlign.end)))
                 ])
-              : Container()
+              : Container(
+                  width: 70,
+                  margin: EdgeInsets.only(top: 15, left: 15),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          color: appTheme.primaryColorLight,
+                          spreadRadius: 1,
+                          blurRadius: 1),
+                    ],
+                  ),
+                  child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      child: Text(
+                          (chosenDateTime != null
+                                  ? chosenDateTime.hour
+                                      .toString()
+                                      .padLeft(2, '0')
+                                  : "00") +
+                              " : " +
+                              (chosenDateTime != null
+                                  ? chosenDateTime.minute
+                                      .toString()
+                                      .padLeft(2, '0')
+                                  : "00"),
+                          textAlign: TextAlign.center)))
         ]);
   }
 }

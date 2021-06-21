@@ -6,3 +6,4 @@ export 'person.dart';
 export 'project.dart';
 export 'meeting.dart';
 export 'projectEntity.dart';
+export 'meetingEntity.dart';
