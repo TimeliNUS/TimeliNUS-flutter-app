@@ -29,3 +29,29 @@ class AddMeeting extends MeetingEvent {
   @override
   List<Object> get props => [meeting, id];
 }
+
+class DeleteMeeting extends MeetingEvent {
+  final Meeting meeting;
+  final String userId;
+
+  DeleteMeeting(this.meeting, this.userId) : super();
+
+  @override
+  String toString() => 'DeleteMeeting { meeting: $meeting }';
+
+  @override
+  List<Object> get props => [meeting, userId];
+}
+
+class UpdateMeeting extends MeetingEvent {
+  final Meeting updatedMeeting;
+  final String id;
+
+  UpdateMeeting(this.updatedMeeting, this.id) : super();
+
+  @override
+  String toString() => 'UpdateMeeting { updatedMeeting: $updatedMeeting }';
+
+  @override
+  List<Object> get props => [updatedMeeting];
+}

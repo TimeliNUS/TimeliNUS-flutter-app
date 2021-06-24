@@ -33,7 +33,6 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   }
 
   Stream<ProjectState> _mapLoadProjectsToState(LoadProjects event) async* {
-    print("yes");
     try {
       yield ProjectLoading();
       final projectEntities = await projectRepository.loadProjects(event.id);
@@ -58,7 +57,6 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
   Stream<ProjectState> _mapUpdateProjectToState(UpdateProject event) async* {
     yield ProjectLoading();
-    print("Event: " + event.updatedProject.toString());
     final updatedProjects = state.projects.map((project) {
       return project.id == event.updatedProject.id
           ? event.updatedProject

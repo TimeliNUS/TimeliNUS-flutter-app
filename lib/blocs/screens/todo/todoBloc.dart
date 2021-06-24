@@ -50,9 +50,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Stream<TodoState> _mapLoadTodosToState(LoadTodos event) async* {
     try {
       yield TodoLoading();
-      print("loading todos");
       final todoEntities = await todoRepository.loadTodos(event.id);
-      print("finish loading todos");
       final List<Todo> todos =
           todoEntities.map((todo) => Todo.fromEntity(todo)).toList();
       yield TodoLoaded(
@@ -141,13 +139,11 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         ? 0
         : (todos.where((todo) => todo.complete).toList().length /
             todos.length));
-    print(progress);
     return progress;
   }
 
   @override
   void onChange(Change<TodoState> change) {
-    print("Todo Bloc: " + change.toString());
     super.onChange(change);
   }
 }

@@ -4,6 +4,7 @@ import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/models/meeting.dart';
 import 'package:TimeliNUS/repository/meetingRepository.dart';
 import 'package:TimeliNUS/repository/projectRepository.dart';
+import 'package:TimeliNUS/widgets/meetingScreen/editMeetingPopup.dart';
 import 'package:TimeliNUS/widgets/meetingScreen/newMeetingPopup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -191,88 +192,100 @@ class _UpcomingMeetingsState extends State<UpcomingMeetings> {
         padding: EdgeInsets.symmetric(horizontal: 25),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           CustomPadding(),
-          ...(widget.meetings.map((meeting) => Padding(
-              padding: EdgeInsets.only(bottom: 15),
-              child: IntrinsicHeight(
-                  child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    Expanded(
-                        child: Container(
-                            // constraints: BoxConstraints.expand(),
+          ...(widget.meetings.map((meeting) => GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  SlideRightRoute(
+                      page: EditMeetingPopup(
+                          context.read<MeetingBloc>(), meeting))),
+              child: Padding(
+                  padding: EdgeInsets.only(bottom: 15),
+                  child: IntrinsicHeight(
+                      child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                        Expanded(
+                            child: Container(
+                                // constraints: BoxConstraints.expand(),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      bottomLeft: Radius.circular(20),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: appTheme.primaryColor,
+                                          spreadRadius: 0.5,
+                                          blurRadius: 0.5)
+                                    ],
+                                    color: Colors.white),
+                                // color: Colors.white,
+                                child: Row(children: [
+                                  Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 15),
+                                      child: Text('Today')),
+                                  Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 25),
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(meeting.title),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(bottom: 5),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.alarm,
+                                                    size: 20,
+                                                    color:
+                                                        appTheme.primaryColor),
+                                                Text("2:00 - 3:00 pm")
+                                              ],
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(bottom: 5),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Icon(Icons.location_pin,
+                                                    size: 20,
+                                                    color:
+                                                        appTheme.primaryColor),
+                                                Text(meeting.meetingVenue
+                                                    .toString()
+                                                    .split('.')[1]
+                                                    .replaceAllMapped(
+                                                        RegExp('([A-Z])'),
+                                                        (Match m) => ' ${m[0]}')
+                                                    .trim())
+                                              ],
+                                            )
+                                          ]))
+                                ]))),
+                        Container(
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  bottomLeft: Radius.circular(20),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: appTheme.primaryColor,
-                                      spreadRadius: 0.5,
-                                      blurRadius: 0.5)
-                                ],
-                                color: Colors.white),
-                            // color: Colors.white,
-                            child: Row(children: [
-                              Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 15),
-                                  child: Text('Today')),
-                              Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 25),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(meeting.title),
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 5),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.alarm,
-                                                size: 20,
-                                                color: appTheme.primaryColor),
-                                            Text("2:00 - 3:00 pm")
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(bottom: 5),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.location_pin,
-                                                size: 20,
-                                                color: appTheme.primaryColor),
-                                            Text(meeting.meetingVenue
-                                                .toString()
-                                                .split('.')[1]
-                                                .replaceAllMapped(
-                                                    RegExp('([A-Z])'),
-                                                    (Match m) => ' ${m[0]}')
-                                                .trim())
-                                          ],
-                                        )
-                                      ]))
-                            ]))),
-                    Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          ),
-                          color: appTheme.primaryColor,
-                        ),
-                        child: Padding(
-                            padding: EdgeInsets.all(15),
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text('Join Now',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(color: Colors.white))
-                                ])))
-                  ])))))
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
+                              ),
+                              color: appTheme.primaryColor,
+                            ),
+                            child: Padding(
+                                padding: EdgeInsets.all(15),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('Join Now',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(color: Colors.white))
+                                    ])))
+                      ]))))))
         ]));
   }
 }

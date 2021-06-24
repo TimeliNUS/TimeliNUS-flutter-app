@@ -18,8 +18,6 @@ class TodoEntity extends Equatable {
       this.project, this.pic, this.ref);
 
   Map<String, Object> toJson() {
-    print('hi');
-    print(project);
     return {
       'complete': complete,
       'task': task,
@@ -51,7 +49,7 @@ class TodoEntity extends Equatable {
         json['deadline'] as Timestamp,
         json['project'] != null
             ? Project.fromEntity(
-                ProjectEntity.fromJson(json['project'], [], []))
+                ProjectEntity.fromJson(json['project'], [], [], []))
             : null,
         users,
         // json['pic'] != null

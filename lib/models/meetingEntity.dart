@@ -18,20 +18,20 @@ class MeetingEntity extends Equatable {
 
   static MeetingEntity fromJson(Map<String, Object> json, List<User> groupmates,
       [String id, DocumentReference ref]) {
-    print('hi');
-    print(convertMeetingVenue(json['meetingVenue']));
     return MeetingEntity(
         json['title'] ?? '',
-        id != null ? id : json['id'] as String,
-        double.parse(json['timeLength'].toString()),
-        null,
-        null,
+        id != null ? id : (json['id'] as String),
+        json['timeLength'] != null
+            ? double.parse(json['timeLength'].toString())
+            : 0,
+        json['startDate'],
+        json['endDate'],
         [],
         convertMeetingVenue(json['meetingVenue']),
         ref,
         json['project'] != null
             ? Project.fromEntity(
-                ProjectEntity.fromJson(json['project'], [], []))
+                ProjectEntity.fromJson(json['project'], [], [], []))
             : null);
   }
 
@@ -45,15 +45,17 @@ class MeetingEntity extends Equatable {
       'project': project != null
           ? {
               'id': project.id,
-              'name': project.title,
+              'title': project.title,
             }
           : null,
+      "startDate": startDate,
+      "endDate": endDate
     };
   }
 
   @override
   String toString() {
-    return 'ProjectEntity{title: $title, id: $id, timeLength: $timeLength, ref: $ref}';
+    return 'MeetingEntity{title: $title, id: $id, timeLength: $timeLength, ref: $ref}';
   }
 
   @override

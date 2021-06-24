@@ -1,4 +1,5 @@
 import 'package:TimeliNUS/models/models.dart';
+import 'package:TimeliNUS/repository/meetingRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -61,17 +62,24 @@ class ProjectRepository {
   Future<ProjectEntity> loadProjectById(String id) async {
     DocumentSnapshot documentSnapshot = await ref.doc(id).get();
     Map<String, Object> tempData = documentSnapshot.data();
+    List<TodoEntity> todoEntities =
+        await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
+    List<Todo> todos =
+        todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
     List<User> users = await findUsersByRef(tempData['groupmates']);
+    List<MeetingEntity> meetings =
+        await MeetingRepository.loadMeetingsFromReferenceList(
+            tempData['meetings']);
     ProjectEntity documentSnapshotTask = ProjectEntity.fromJson(
-        tempData, [], users, id, documentSnapshot.reference);
+        tempData, todos, users, meetings, id, documentSnapshot.reference);
     return documentSnapshotTask;
   }
 
   Future<List<ProjectEntity>> loadProjects(String id) async {
     DocumentSnapshot documentSnapshot = await person.doc(id).get();
-    if (!documentSnapshot.exists) {
-      print('Document exists on the database: ' + documentSnapshot.data());
-    }
+    // if (!documentSnapshot.exists) {
+    //   print('Document exists on the database: ' + documentSnapshot.data());
+    // }
     final list = documentSnapshot.get("project");
     List<ProjectEntity> projects = [];
     for (DocumentReference documentReference in list) {
@@ -83,9 +91,12 @@ class ProjectRepository {
           .map((todoEntity) => Todo.fromEntity(todoEntity))
           .toList();
       List<User> users = await findUsersByRef(tempData['groupmates']);
+      List<MeetingEntity> meetings =
+          await MeetingRepository.loadMeetingsFromReferenceList(
+              tempData['meetings']);
       print(users);
       ProjectEntity documentSnapshotTask = ProjectEntity.fromJson(
-          temp.data(), todos, users, temp.id, documentReference);
+          temp.data(), todos, users, meetings, temp.id, documentReference);
       projects.add(documentSnapshotTask);
     }
     // print("Task: " + tasks.toString());

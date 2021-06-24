@@ -137,6 +137,15 @@ class AuthenticationRepository {
       throw LogOutFailure();
     }
   }
+
+  Future<void> saveTokenToDatabase(String token, String userId) async {
+    // Assume user is logged in for this example
+    // String userId = FirebaseAuth.FirebaseAuth.instance.currentUser.uid;
+
+    await FirebaseFirestore.instance.collection('user').doc(userId).update({
+      'tokens': FieldValue.arrayUnion([token]),
+    });
+  }
 }
 
 extension on FirebaseAuth.User {

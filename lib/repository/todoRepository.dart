@@ -9,6 +9,8 @@ class TodoRepository {
       FirebaseFirestore.instance.collection('todo');
   static CollectionReference person =
       FirebaseFirestore.instance.collection('user');
+  static CollectionReference project =
+      FirebaseFirestore.instance.collection('project');
 
   final FirebaseFirestore firestore;
 
@@ -23,26 +25,32 @@ class TodoRepository {
         .doc(id)
         .get()
         .then((DocumentSnapshot snapshot) => snapshot.exists);
+    final List<Future> promises = [];
     if (!userTodosExist) {
       person.doc(id).set({
         'todo': [newTodoRef]
       });
     } else {
-      await person.doc(id).update({
+      promises.add(person.doc(id).update({
         'todo': FieldValue.arrayUnion([newTodoRef])
-      });
+      }));
     }
+    promises.add(project.doc(todo.project.id).update({
+      'todos': FieldValue.arrayUnion([newTodoRef])
+    }));
+    await Future.wait(promises);
     return newTodoRef;
   }
 
   Future<void> deleteTodo(Todo todo, String id) async {
-    // await Future.wait<void>(idList.map((id) {
-    //   return ref.doc(id).delete();
-    // }));
-    print(todo.ref);
-    await person.doc(id).update({
+    final List<Future> promises = [];
+    promises.add(person.doc(id).update({
       'todo': FieldValue.arrayRemove([todo.ref])
-    });
+    }));
+    promises.add(project.doc(todo.project.id).update({
+      'todos': FieldValue.arrayRemove([todo.ref])
+    }));
+    await Future.wait(promises);
     return ref.doc(todo.id).delete();
   }
 

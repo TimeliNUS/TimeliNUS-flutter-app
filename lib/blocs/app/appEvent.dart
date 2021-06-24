@@ -16,6 +16,11 @@ class AppOnProject extends AppEvent {}
 
 class AppOnMeeting extends AppEvent {}
 
+class AppOnInvitation extends AppEvent {
+  final String invitationId;
+  const AppOnInvitation({this.invitationId});
+}
+
 class AppUserChanged extends AppEvent {
   const AppUserChanged(this.user);
 

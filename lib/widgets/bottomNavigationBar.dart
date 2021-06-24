@@ -7,13 +7,20 @@ import '../blocs/app/appEvent.dart';
 
 class BottomBar extends StatelessWidget {
   final currentIndex;
-  final buttonToState = [AppOnTodo(), AppOnProject(), AppOnMeeting()];
+  final buttonToState = [
+    AppOnTodo(),
+    AppOnProject(),
+    AppOnMeeting(),
+    AppOnInvitation(invitationId: 'lJgJ3oEDfFG20z2CRoTp')
+    // AppOnInvitation(invitationId: '0hscA8lb0nAw4TcmRqv7')
+  ];
 
   BottomBar(this.currentIndex);
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentIndex,
+      type: BottomNavigationBarType.fixed,
       onTap: (int index) =>
           BlocProvider.of<AppBloc>(context).add(buttonToState[index]),
       items: <BottomNavigationBarItem>[
@@ -28,6 +35,10 @@ class BottomBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.group),
           label: 'Meeting',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.email),
+          label: 'Invitation',
         ),
       ],
       // currentIndex: _selectedIndex,

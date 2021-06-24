@@ -28,9 +28,10 @@ class Meeting extends Equatable {
   List<Object> get props => [title, groupmates, timeLength, startDate];
 
   static Meeting fromEntity(MeetingEntity entity) {
-    return Meeting(entity.title, [], MeetingVenue.Zoom, entity.project,
+    return Meeting(entity.title, [], entity.meetingVenue, entity.project,
         startDate: entity.startDate != null ? entity.startDate.toDate() : null,
         endDate: entity.endDate != null ? entity.endDate.toDate() : null,
+        id: entity.id ?? null,
         timeLength: entity.timeLength);
   }
 
@@ -39,8 +40,8 @@ class Meeting extends Equatable {
         title,
         id,
         timeLength,
-        startDate != null ? Timestamp.fromDate(startDate) : null,
-        endDate != null ? Timestamp.fromDate(endDate) : null,
+        startDate != null ? Timestamp.fromDate(startDate.toUtc()) : null,
+        endDate != null ? Timestamp.fromDate(endDate.toUtc()) : null,
         groupmates,
         meetingVenue,
         ref,
@@ -55,14 +56,19 @@ class Meeting extends Equatable {
       double timeLength,
       List<User> groupmates,
       MeetingVenue meetingVenue,
-      String projectTitle,
+      Project project,
       DocumentReference ref}) {
     return Meeting(title ?? this.title, groupmates ?? this.groupmates,
-        meetingVenue ?? this.meetingVenue, projectTitle ?? this.project,
+        meetingVenue ?? this.meetingVenue, project ?? this.project,
         id: id ?? this.id,
         startDate: startDate ?? this.startDate,
         endDate: endDate ?? this.endDate,
         timeLength: timeLength ?? this.timeLength,
         ref: ref ?? this.ref);
+  }
+
+  @override
+  String toString() {
+    return '[Meeting: ' + id != null ? id : "" + "]";
   }
 }

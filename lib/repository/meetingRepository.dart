@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:TimeliNUS/models/meeting.dart';
 import 'package:TimeliNUS/models/meetingEntity.dart';
 import 'package:TimeliNUS/models/projectEntity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,6 +12,8 @@ class MeetingRepository {
       FirebaseFirestore.instance.collection('meeting');
   static CollectionReference person =
       FirebaseFirestore.instance.collection('user');
+  static CollectionReference project =
+      FirebaseFirestore.instance.collection('project');
 
   final FirebaseFirestore firestore;
 
@@ -21,75 +24,107 @@ class MeetingRepository {
     Map<String, dynamic> tempJson = meeting.toJson();
     tempJson.addEntries(
         [MapEntry("_createdAt", Timestamp.fromDate(DateTime.now()))]);
-    final newTodoRef = await ref.add(tempJson);
+    final newMeetingref = await ref.add(tempJson);
     final List<Future> promises = [];
-    // updatedMeetingTimeslotByDateTime
-    dynamic results;
-    // HttpsCallable callable = FirebaseFunctions.instance
-    //     .httpsCallable('updatedMeetingTimeslotByDateTime');
-
-    // Future<dynamic> test = callable.call({
-    //   "startDate": meeting.startDate.toDate().toIso8601String(),
-    //   "endDate": meeting.endDate.toDate().toIso8601String()
-    // });
-
-    final test = http.post(
+    final updateTimeslot = http.post(
       Uri.parse(
-          'https://asia-east2-timelinus-2021.cloudfunctions.net/updatedMeetingTimeslotByDateTime'),
+          // 'http://localhost:5001/timelinus-2021/asia-east2/updateMeetingTimeslotByDateTime'),
+          'https://asia-east2-timelinus-2021.cloudfunctions.net/updateMeetingTimeslotByDateTime'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        "startDate": meeting.startDate.toDate().toIso8601String(),
-        "endDate": meeting.endDate.toDate().toIso8601String(),
-        "id": newTodoRef.id
+        "startDate": meeting.startDate.toDate().toUtc().toIso8601String(),
+        "endDate": meeting.endDate.toDate().toUtc().toIso8601String(),
+        "id": newMeetingref.id
       }),
     );
 
-    promises.add(results = test);
+    promises.add(updateTimeslot);
     promises.add(person.doc(id).update({
-      'meeting': FieldValue.arrayUnion([newTodoRef])
+      'meeting': FieldValue.arrayUnion([newMeetingref])
+    }));
+    promises.add(project.doc(meeting.project.id).update({
+      'meetings': FieldValue.arrayUnion([newMeetingref])
     }));
     Future.wait(promises);
-    print(results);
-    return newTodoRef;
+    return newMeetingref;
   }
-
-  // Future<void> deleteTodo(Todo todo, String id) async {
-  //   await person.doc(id).update({
-  //     'todo': FieldValue.arrayRemove([todo.ref])
-  //   });
-  //   return ref.doc(todo.id).delete();
-  // }
-
-  // Future<void> reorderTodo(List<DocumentReference> refs, String id) async {
-  //   return await person.doc(id).update({
-  //     'todo': [...refs]
-  //   });
-  // }
 
   Future<List<MeetingEntity>> loadMeetings(String id) async {
     DocumentSnapshot documentSnapshot = await person.doc(id).get();
-    if (!documentSnapshot.exists) {
-      print('Document exists on the database: ' + documentSnapshot.data());
-    }
-    print(documentSnapshot.get("meeting"));
+    // if (!documentSnapshot.exists) {
+    //   print('Document exists on the database: ' + documentSnapshot.data());
+    // }
     final list = documentSnapshot.get("meeting");
     List<MeetingEntity> meetings = [];
     for (DocumentReference documentReference in list) {
       final DocumentSnapshot temp = await documentReference.get();
       Map<String, Object> tempData = temp.data();
-      print(tempData);
+      // print(tempData);
       MeetingEntity documentSnapshotTask =
           MeetingEntity.fromJson(temp.data(), [], temp.id, documentReference);
-      print(documentSnapshotTask);
+      // print(documentSnapshotTask);
       meetings.add(documentSnapshotTask);
     }
-    print(meetings);
+    // print(meetings);
     return meetings;
   }
 
-  Future<void> updateProject(ProjectEntity project) {
-    return ref.doc(project.id).update(project.toJson());
+  Future<MeetingEntity> loadMeetingById(String id) async {
+    DocumentSnapshot snapshot = await ref.doc(id).get();
+    return MeetingEntity.fromJson(
+        snapshot.data(), [], snapshot.id, snapshot.reference);
+  }
+
+  Future<void> updateMeeting(MeetingEntity meeting) {
+    print("Update meeting");
+    print(meeting);
+    return ref.doc(meeting.id).update(meeting.toJson());
+  }
+
+  Future<void> acceptInvitation(Meeting meeting, String id, String url) {
+    print({
+      "link": url,
+      "startDate": meeting.startDate.toUtc().toIso8601String(),
+      "endDate": meeting.endDate.toUtc().toIso8601String(),
+      "id": id
+    });
+    return http.post(
+      Uri.parse(
+          'https://asia-east2-timelinus-2021.cloudfunctions.net/findNusModsCommon'),
+      // 'http://localhost:5001/timelinus-2021/asia-east2/findNusModsCommon'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        "link": url,
+        "startDate": meeting.startDate.toUtc().toIso8601String(),
+        "endDate": meeting.endDate.toUtc().toIso8601String(),
+        "id": id
+      }),
+    );
+  }
+
+  static Future<List<MeetingEntity>> loadMeetingsFromReferenceList(
+      List<dynamic> refs) async {
+    List<MeetingEntity> meetings = [];
+    for (DocumentReference documentReference in refs) {
+      final DocumentSnapshot temp = await documentReference.get();
+      // print(documentReference);
+      final Map<String, Object> data = temp.data();
+      MeetingEntity documentSnapshotTask =
+          MeetingEntity.fromJson(temp.data(), [], temp.id, documentReference);
+      meetings.add(documentSnapshotTask);
+    }
+    // print("Task: " + tasks.toString());
+    return meetings;
+  }
+
+  Future<void> deleteMeeting(Meeting meeting, String id) async {
+    await person.doc(id).update({
+      'meeting': FieldValue.arrayRemove([meeting.ref])
+    });
+    return ref.doc(meeting.id).delete();
   }
 }

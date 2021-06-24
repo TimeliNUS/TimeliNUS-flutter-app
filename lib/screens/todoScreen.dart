@@ -294,11 +294,6 @@ class _TodoItemState extends State<TodoItem> {
                                   setState(() => isChecked = (isChecked != null
                                       ? !isChecked
                                       : !widget.todo.complete));
-                                  print("Hellosasdas " +
-                                      state.todos
-                                          .firstWhere((element) =>
-                                              element.id == widget.todo.id)
-                                          .toString());
                                   context.read<TodoBloc>().add(UpdateTodo(state
                                       .todos
                                       .firstWhere((element) =>
