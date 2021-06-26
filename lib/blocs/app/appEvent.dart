@@ -29,3 +29,5 @@ class AppUserChanged extends AppEvent {
   @override
   List<Object> get props => [user];
 }
+
+class AppOnDashboard extends AppEvent {}

@@ -42,7 +42,7 @@ class _MeetingScreenState extends State<MeetingScreen> {
               appTheme.primaryColorLight,
               Scaffold(
                   backgroundColor: appTheme.primaryColorLight,
-                  bottomNavigationBar: BottomBar(2),
+                  bottomNavigationBar: BottomBar(3),
                   body: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [

@@ -11,7 +11,7 @@ List<Page> onGenerateAppViewPages(AppState state, List<Page<dynamic>> pages) {
   switch (state.status) {
     case AppStatus.authenticated:
       // return [LandingScreen.page()];
-      return [MeetingScreen.page()];
+      return [DashboardScreen.page()];
     case AppStatus.unauthenticated:
       return [LandingScreen.page()];
     case AppStatus.onTodo:

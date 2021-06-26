@@ -86,18 +86,15 @@ class TodoRepository {
     return tasks;
   }
 
-  // Future<List<TodoEntity>> todos() {
-  //   return ref.snapshots().map((snapshot) {
-  //     return TodoEntity(
-  //       snapshot['task'],
-  //       snapshot.documentID,
-  //       snapshot['note'] ?? '',
-  //       snapshot['complete'] ?? false,
-  //     );
-  //   }).toList();
-  // }
-
-  Future<void> updateTodo(TodoEntity todo) {
-    return ref.doc(todo.id).update(todo.toJson());
+  Future<void> updateTodo(TodoEntity oldTodo, TodoEntity newTodo) {
+    if (oldTodo.project.id != newTodo.project.id) {
+      project.doc(oldTodo.project.id).update({
+        'todos': FieldValue.arrayRemove([oldTodo.ref])
+      });
+      project.doc(newTodo.project.id).update({
+        'todos': FieldValue.arrayUnion([oldTodo.ref])
+      });
+    }
+    return ref.doc(newTodo.id).update(newTodo.toJson());
   }
 }

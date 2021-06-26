@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 class ProjectEntity extends Equatable {
   final String title;
+  final String moduleCode;
   final String id;
   final double progress;
   final Timestamp deadline;
@@ -12,14 +13,15 @@ class ProjectEntity extends Equatable {
   final List<User> groupmates;
   final DocumentReference ref;
 
-  ProjectEntity(this.title, this.id, this.progress, this.deadline,
-      this.groupmates, this.meetings, this.todos, this.ref);
+  ProjectEntity(this.title, this.moduleCode, this.id, this.progress,
+      this.deadline, this.groupmates, this.meetings, this.todos, this.ref);
 
   static ProjectEntity fromJson(Map<String, Object> json, List<Todo> todos,
       List<User> users, List<MeetingEntity> meetings,
       [String id, DocumentReference ref]) {
     return ProjectEntity(
         json['title'],
+        json['moduleCode'] ?? '',
         id != null ? id : json['id'] as String,
         json['progress'] != null
             ? double.parse(json['progress'].toString())
@@ -34,6 +36,7 @@ class ProjectEntity extends Equatable {
   Map<String, Object> toJson() {
     return {
       'id': id,
+      'moduleCode': moduleCode,
       'title': title,
       'progress': progress,
       'meetings': meetings,
@@ -45,10 +48,19 @@ class ProjectEntity extends Equatable {
 
   @override
   String toString() {
-    return 'ProjectEntity{title: $title, id: $id, progress: $progress, deadline: $deadline, ref: $ref, groupmates: $groupmates}';
+    return 'ProjectEntity{title: $title, moduleCode: $moduleCode, id: $id, progress: $progress, deadline: $deadline, ref: $ref, groupmates: $groupmates}';
   }
 
   @override
-  List<Object> get props =>
-      [title, progress, deadline, meetings, todos, ref, id, groupmates];
+  List<Object> get props => [
+        title,
+        progress,
+        moduleCode,
+        deadline,
+        meetings,
+        todos,
+        ref,
+        id,
+        groupmates
+      ];
 }

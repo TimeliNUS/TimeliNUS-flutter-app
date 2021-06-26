@@ -4,6 +4,7 @@ import 'package:TimeliNUS/blocs/app/blocObserver.dart';
 import 'package:TimeliNUS/blocs/app/routes/routes.dart';
 import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/repository/projectRepository.dart';
+import 'package:TimeliNUS/utils/constants.dart';
 import 'package:flutter/foundation.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,26 +12,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> main() async {
   Bloc.observer = AppBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
 
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
   // print('Is emulator: ${!androidInfo.isPhysicalDevice}');
   // IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
   // print('Is emulator: ${!iosDeviceInfo.isPhysicalDevice}');
   // IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
   await Firebase.initializeApp();
-  // if (!iosDeviceInfo.isPhysicalDevice) {
-  // String host = defaultTargetPlatform == TargetPlatform.android
-  //     ? '10.0.2.2:8080'
-  //     : 'localhost:8080';
-  // FirebaseFirestore.instance.settings = Settings(host: host, sslEnabled: false);
-  // }
+  await AppConstants.init();
   final authenticationRepository = AuthenticationRepository();
   final projectRepository = ProjectRepository();
   await authenticationRepository.user.first;

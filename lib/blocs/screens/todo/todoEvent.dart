@@ -78,3 +78,13 @@ class ToggleAll extends TodoEvent {
   @override
   String toString() => 'ToggleAll';
 }
+
+class TodayTodo extends TodoEvent {
+  final String id;
+  TodayTodo(this.id) : super([id]);
+  @override
+  String toString() => 'TodayTodo';
+
+  @override
+  List<Object> get props => [id];
+}

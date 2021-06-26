@@ -50,7 +50,7 @@ class AuthenticationRepository {
   ///
   /// Emits [User.empty] if the user is not authenticated.
   Stream<User> get user {
-    return _firebaseAuth.authStateChanges().map((firebaseUser) {
+    return _firebaseAuth.userChanges().map((firebaseUser) {
       final user = firebaseUser == null ? User.empty : firebaseUser.toUser;
       _currentUser = user;
       return user;
@@ -81,8 +81,15 @@ class AuthenticationRepository {
       promises.add(FirebaseFirestore.instance
           .collection('user')
           .doc(credential.user.uid)
-          .set({'name': name, 'email': email}));
+          .set({
+        'name': name,
+        'email': email,
+        'project': [],
+        'todo': [],
+        'meeting': []
+      }));
       Future.wait(promises);
+      // await _firebaseAuth.signOut();
       print(_firebaseAuth.currentUser);
     } on FirebaseAuth.FirebaseAuthException catch (err) {
       throw AuthenticationFailture(err.code);
@@ -141,7 +148,6 @@ class AuthenticationRepository {
   Future<void> saveTokenToDatabase(String token, String userId) async {
     // Assume user is logged in for this example
     // String userId = FirebaseAuth.FirebaseAuth.instance.currentUser.uid;
-
     await FirebaseFirestore.instance.collection('user').doc(userId).update({
       'tokens': FieldValue.arrayUnion([token]),
     });

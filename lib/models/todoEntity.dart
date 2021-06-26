@@ -26,7 +26,7 @@ class TodoEntity extends Equatable {
       'project': project != null
           ? {
               'id': project.id,
-              'name': project.title,
+              'title': project.title,
             }
           : null,
       'pic': pic.map((x) => x.ref).toList(),
@@ -52,11 +52,6 @@ class TodoEntity extends Equatable {
                 ProjectEntity.fromJson(json['project'], [], [], []))
             : null,
         users,
-        // json['pic'] != null
-        //     ? (json['pic'] as List)
-        //         .map((x) => User.fromJson(x as Map<String, dynamic>, x['id']))
-        //         .toList()
-        //     : [],
         ref);
   }
 

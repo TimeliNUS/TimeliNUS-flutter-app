@@ -1,6 +1,7 @@
 import 'package:TimeliNUS/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class MeetingEntity extends Equatable {
   final String title;
@@ -12,9 +13,19 @@ class MeetingEntity extends Equatable {
   final Project project;
   final String id;
   final DocumentReference ref;
+  final List<TimeRegion> timeslots;
 
-  MeetingEntity(this.title, this.id, this.timeLength, this.startDate,
-      this.endDate, this.groupmates, this.meetingVenue, this.ref, this.project);
+  MeetingEntity(
+      this.title,
+      this.id,
+      this.timeLength,
+      this.startDate,
+      this.endDate,
+      this.groupmates,
+      this.meetingVenue,
+      this.ref,
+      this.project,
+      this.timeslots);
 
   static MeetingEntity fromJson(Map<String, Object> json, List<User> groupmates,
       [String id, DocumentReference ref]) {
@@ -32,6 +43,14 @@ class MeetingEntity extends Equatable {
         json['project'] != null
             ? Project.fromEntity(
                 ProjectEntity.fromJson(json['project'], [], [], []))
+            : null,
+        json['timeslot'] != null
+            ? (json['timeslot'] as List)
+                .map((timeslot) => TimeRegion(
+                    startTime: (timeslot['start'] as Timestamp).toDate(),
+                    enablePointerInteraction: false,
+                    endTime: (timeslot['end'] as Timestamp).toDate()))
+                .toList()
             : null);
   }
 
@@ -49,7 +68,8 @@ class MeetingEntity extends Equatable {
             }
           : null,
       "startDate": startDate,
-      "endDate": endDate
+      "endDate": endDate,
+      // "interval" ??
     };
   }
 

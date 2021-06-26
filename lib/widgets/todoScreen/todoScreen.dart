@@ -10,15 +10,14 @@ import 'package:TimeliNUS/widgets/todoScreen/editTodoPopup.dart';
 import 'package:TimeliNUS/widgets/todoScreen/newTodoPopup.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart'; // import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-class TodoScreen extends StatelessWidget {
-  static Page page() => MaterialPage(child: TodoScreen());
+class ProjectTodoScreen extends StatelessWidget {
+  static Page page() => MaterialPage(child: ProjectTodoScreen());
 
   final _todoRepository = TodoRepository();
 
@@ -32,7 +31,7 @@ class TodoScreen extends StatelessWidget {
           return ColoredSafeArea(
               appTheme.primaryColorLight,
               Scaffold(
-                  bottomNavigationBar: BottomBar(2),
+                  bottomNavigationBar: BottomBar(0),
                   body: Container(
                       color: appTheme.primaryColorLight,
                       child: Column(

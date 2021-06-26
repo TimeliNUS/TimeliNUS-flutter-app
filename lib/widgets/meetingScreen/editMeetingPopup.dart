@@ -3,12 +3,15 @@ import 'dart:ui';
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/meeting/meetingBloc.dart';
 import 'package:TimeliNUS/models/models.dart';
+import 'package:TimeliNUS/utils/transitionBuilder.dart';
+import 'package:TimeliNUS/widgets/meetingScreen/timeslotView.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class EditMeetingPopup extends StatefulWidget {
   final Meeting meetingToEdit;
@@ -49,14 +52,24 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
                       TopBar(() => Navigator.pop(context), "Edit Meeting",
-                          rightWidget: IconButton(
-                              icon: Icon(Icons.delete, color: Colors.white),
-                              onPressed: () {
-                                widget.meetingBloc.add(DeleteMeeting(
-                                    widget.meetingToEdit,
-                                    context.read<AppBloc>().state.user.id));
-                                Navigator.pop(context);
-                              })),
+                          rightWidget: Row(children: [
+                            IconButton(
+                                icon: Icon(Icons.delete, color: Colors.white),
+                                onPressed: () {
+                                  widget.meetingBloc.add(DeleteMeeting(
+                                      widget.meetingToEdit,
+                                      context.read<AppBloc>().state.user.id));
+                                  Navigator.pop(context);
+                                }),
+                            OutlinedButton(
+                                onPressed: () => showDialog(
+                                    context: context,
+                                    builder: (context) => TimeslotView(
+                                        widget.meetingToEdit.timeslots,
+                                        widget.meetingToEdit.startDate,
+                                        widget.meetingToEdit.endDate)),
+                                child: Text('hi'))
+                          ])),
                       Expanded(
                           child: GestureDetector(
                               onTap: () =>

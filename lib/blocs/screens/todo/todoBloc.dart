@@ -44,6 +44,8 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       yield* _mapToggleAllToState();
     } else if (event is ClearCompleted) {
       yield* _mapClearCompletedToState();
+    } else if (event is TodayTodo) {
+      yield* _mapTodayTodoToState(event);
     }
   }
 
@@ -85,14 +87,21 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Stream<TodoState> _mapUpdateTodoToState(UpdateTodo event) async* {
     yield TodoLoading();
     print("Event: " + event.updatedTodo.toString());
+    Todo oldTodo;
     final updatedTodos = state.todos.map((todo) {
-      return todo.id == event.updatedTodo.id ? event.updatedTodo : todo;
+      if (todo.id == event.updatedTodo.id) {
+        oldTodo = todo;
+        return event.updatedTodo;
+      } else {
+        return todo;
+      }
     }).toList();
     yield TodoLoaded(
       calculateProgressPercentage(updatedTodos),
       updatedTodos,
     );
-    await todoRepository.updateTodo(event.updatedTodo.toEntity());
+    await todoRepository.updateTodo(
+        oldTodo.toEntity(), event.updatedTodo.toEntity());
   }
 
   Stream<TodoState> _mapDeleteTodoToState(DeleteTodo event) async* {
@@ -120,6 +129,23 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         calculateProgressPercentage(updatedTodos),
         updatedTodos,
       );
+    }
+  }
+
+  Stream<TodoState> _mapTodayTodoToState(TodayTodo event) async* {
+    try {
+      yield TodoLoading(isNull: true);
+      final todoEntities = await todoRepository.loadTodos(event.id);
+      final List<Todo> todos = todoEntities
+          .map((todo) => Todo.fromEntity(todo))
+          .where((todo) => todo.deadline.day == DateTime.now().day)
+          .toList();
+      yield TodoLoaded(
+        calculateProgressPercentage(todos),
+        todos,
+      );
+    } catch (err) {
+      yield TodoNotLoaded();
     }
   }
 

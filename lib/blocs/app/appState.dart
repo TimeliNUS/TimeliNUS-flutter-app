@@ -8,7 +8,8 @@ enum AppStatus {
   onTodo,
   onProject,
   onMeeting,
-  onInvitation
+  onInvitation,
+  onDashboard
 }
 
 class AppState extends Equatable {
@@ -28,6 +29,8 @@ class AppState extends Equatable {
   const AppState.onMeeting(User user)
       : this(status: AppStatus.onMeeting, user: user);
 
+  const AppState.onDashboard(User user)
+      : this(status: AppStatus.onDashboard, user: user);
   final AppStatus status;
   final User user;
   final dynamic data;

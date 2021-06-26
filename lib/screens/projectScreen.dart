@@ -1,4 +1,5 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
+import 'package:TimeliNUS/blocs/app/appEvent.dart';
 import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/todo.dart';
@@ -117,6 +118,9 @@ class ProjectCard extends StatelessWidget {
   const ProjectCard(this.project, this.todos);
   @override
   Widget build(BuildContext context) {
+    final double progress = (project.todos.length != 0
+        ? ((1 - todos.length) / project.todos.length)
+        : 1);
     return Column(verticalDirection: VerticalDirection.up, children: [
       Padding(padding: EdgeInsets.only(bottom: 15)),
       ProjectCardDetail(project.meetings.length, todos),
@@ -163,11 +167,11 @@ class ProjectCard extends StatelessWidget {
                     CircularPercentIndicator(
                       radius: 60.0,
                       lineWidth: 10,
-                      percent: project.progress,
+                      percent: progress,
                       animation: true,
                       animationDuration: 500,
                       center: new Text(
-                          (project.progress * 100).toInt().toString() + '%',
+                          (progress * 100).toInt().toString() + '%',
                           style: TextStyle(
                               color: appTheme.primaryColorLight,
                               fontSize: 14,
@@ -200,20 +204,24 @@ class ProjectCardDetail extends StatelessWidget {
                       elevation: 5,
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Icon(Icons.group, color: Colors.grey.shade500),
-                              Text(
-                                  ' ' +
-                                      meetingNumber.toString() +
-                                      ' Scheduled Meetings',
-                                  style: appTheme.textTheme.bodyText1),
-                              Expanded(
-                                  child: Text("View",
-                                      textAlign: TextAlign.right,
-                                      style: appTheme.textTheme.bodyText1))
-                            ],
-                          ),
+                          GestureDetector(
+                              onTap: () =>
+                                  context.read<AppBloc>().add(AppOnMeeting()),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.group,
+                                      color: Colors.grey.shade500),
+                                  Text(
+                                      ' ' +
+                                          meetingNumber.toString() +
+                                          ' Scheduled Meetings',
+                                      style: appTheme.textTheme.bodyText1),
+                                  Expanded(
+                                      child: Text("View",
+                                          textAlign: TextAlign.right,
+                                          style: appTheme.textTheme.bodyText1))
+                                ],
+                              )),
                           Divider(),
                           Row(children: [
                             Icon(Icons.check_box_rounded,

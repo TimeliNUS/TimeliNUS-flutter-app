@@ -14,7 +14,8 @@ abstract class TodoState extends Equatable {
 }
 
 class TodoLoading extends TodoState {
-  TodoLoading() : super([], 0.0);
+  final bool isNull;
+  TodoLoading({this.isNull = false}) : super((isNull ? null : []), 0.0);
   @override
   String toString() => 'TodoLoading';
 }
@@ -38,11 +39,3 @@ class TodoNotLoaded extends TodoState {
   @override
   String toString() => 'TodosNotLoaded';
 }
-
-// class TodoReordered extends TodoState {
-//   final List<Todo> todos;
-
-//   TodoReordered(this.todos) : super(todos, 0.0);
-//   @override
-//   String toString() => 'TodosReordered';
-// }

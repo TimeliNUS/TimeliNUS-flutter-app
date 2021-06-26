@@ -33,7 +33,7 @@ dependencies:
   bloc: ^7.0.0
   google_sign_in: "^5.0.2"
   provider: "^5.0.0"
-  device_info: "^2.0.0"
+  device_info_plus: "^2.0.1"
   carousel_slider: "^3.0.0"
   flow_builder: "^0.0.2"
   intl: "^0.17.0"
@@ -41,6 +41,8 @@ dependencies:
   cloud_functions: "^1.1.2"
   firebase_messaging: "^10.0.2"
   firebase_dynamic_links: "^2.0.6" 
+  collection: ^1.15.0
+  syncfusion_flutter_calendar: ^19.1.69
   # url_launcher: "^6.0.6"
 
 dev_dependencies:

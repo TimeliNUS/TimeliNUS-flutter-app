@@ -22,6 +22,9 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
   List<User> groupmates = [];
   DateTime deadlineValue = DateTime.now().stripTime();
   final TextEditingController textController = new TextEditingController();
+  final TextEditingController moduleCodeController =
+      new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     if (groupmates.isEmpty) {
@@ -59,9 +62,10 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
                                               errorMsg:
                                                   'Please enter your project title!'),
                                           customPadding(),
-                                          PopupDropdown(
-                                            dropdownLabel: 'Module Code',
-                                          ),
+                                          PopupInput(moduleCodeController,
+                                              inputLabel: 'Module Code',
+                                              errorMsg:
+                                                  'Please enter your module code!'),
                                           customPadding(),
                                           PersonInChargeChips(
                                               groupmates, "Groupmates",
@@ -114,6 +118,8 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
                                       widget.projectBloc.add(AddProject(
                                           Project(
                                             textController.text,
+                                            moduleCode:
+                                                moduleCodeController.text,
                                             deadline: deadlineValue,
                                             groupmates: groupmates,
                                           ),

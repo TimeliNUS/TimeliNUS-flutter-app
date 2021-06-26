@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:TimeliNUS/models/meeting.dart';
 import 'package:TimeliNUS/models/meetingEntity.dart';
 import 'package:TimeliNUS/models/projectEntity.dart';
+import 'package:TimeliNUS/utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:http/http.dart' as http;
@@ -27,9 +28,8 @@ class MeetingRepository {
     final newMeetingref = await ref.add(tempJson);
     final List<Future> promises = [];
     final updateTimeslot = http.post(
-      Uri.parse(
-          // 'http://localhost:5001/timelinus-2021/asia-east2/updateMeetingTimeslotByDateTime'),
-          'https://asia-east2-timelinus-2021.cloudfunctions.net/updateMeetingTimeslotByDateTime'),
+      Uri.parse(AppConstants.updateMeetingUrl),
+      // 'https://asia-east2-timelinus-2021.cloudfunctions.net/updateMeetingTimeslotByDateTime'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -90,10 +90,9 @@ class MeetingRepository {
       "endDate": meeting.endDate.toUtc().toIso8601String(),
       "id": id
     });
+    print(AppConstants.findCommonUrl);
     return http.post(
-      Uri.parse(
-          'https://asia-east2-timelinus-2021.cloudfunctions.net/findNusModsCommon'),
-      // 'http://localhost:5001/timelinus-2021/asia-east2/findNusModsCommon'),
+      Uri.parse(AppConstants.findCommonUrl),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

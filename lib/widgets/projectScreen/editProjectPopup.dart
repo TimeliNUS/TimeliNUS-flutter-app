@@ -22,11 +22,14 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
   DateTime deadlineValue;
   List<User> groupmates = [];
   TextEditingController textController = new TextEditingController();
+  TextEditingController moduleCodeController = new TextEditingController();
   @override
   void initState() {
     super.initState();
     textController =
         new TextEditingController(text: widget.projectToEdit.title);
+    moduleCodeController =
+        new TextEditingController(text: widget.projectToEdit.moduleCode);
   }
 
   @override
@@ -71,9 +74,10 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                               errorMsg:
                                                   'Please enter your project title!'),
                                           customPadding(),
-                                          PopupDropdown(
-                                            dropdownLabel: 'Module Code',
-                                          ),
+                                          PopupInput(moduleCodeController,
+                                              inputLabel: 'Module Code',
+                                              errorMsg:
+                                                  'Please enter your module code!'),
                                           customPadding(),
                                           PersonInChargeChips(
                                               widget.projectToEdit.groupmates,

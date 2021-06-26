@@ -100,6 +100,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       yield (AppState.onMeeting(state.user));
     } else if (event is AppOnInvitation) {
       yield (AppState.onInvitation(state.user, event.invitationId));
+    } else if (event is AppOnDashboard) {
+      yield (AppState.onDashboard(state.user));
     }
   }
 
