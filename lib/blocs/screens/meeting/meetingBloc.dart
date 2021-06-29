@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:TimeliNUS/models/meeting.dart';
 import 'package:TimeliNUS/repository/meetingRepository.dart';
+import 'package:TimeliNUS/screens/invitationScreen.dart';
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
@@ -31,12 +32,17 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
   Stream<MeetingState> _mapLoadMeetingsToState(LoadMeetings event) async* {
     try {
       yield MeetingLoading();
-      final projectEntities = await meetingRepository.loadMeetings(event.id);
-      print(projectEntities);
-      final List<Meeting> projects = projectEntities
-          .map((project) => Meeting.fromEntity(project))
+      final meetingEntities =
+          await meetingRepository.loadConfirmedMeetings(event.id);
+      final invitationEntities =
+          await meetingRepository.loadInvitation(event.id);
+      final List<Meeting> meetings = meetingEntities
+          .map((meeting) => Meeting.fromEntity(meeting))
           .toList();
-      yield MeetingLoaded(projects);
+      final List<Meeting> invitations = invitationEntities
+          .map((invitation) => Meeting.fromEntity(invitation))
+          .toList();
+      yield MeetingLoaded(meetings, invitations: invitations);
     } catch (err) {
       print(err);
       yield MeetingNotLoaded();

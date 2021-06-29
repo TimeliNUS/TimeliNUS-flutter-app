@@ -12,7 +12,7 @@ class BottomBar extends StatelessWidget {
     AppOnProject(),
     AppOnTodo(),
     AppOnMeeting(),
-    AppOnInvitation(invitationId: 'oOjoUqaQDEKTHhU7dKPJ')
+    // AppOnInvitation(invitationId: 'oOjoUqaQDEKTHhU7dKPJ')
     // AppOnInvitation(invitationId: '0hscA8lb0nAw4TcmRqv7')
   ];
 
@@ -41,10 +41,10 @@ class BottomBar extends StatelessWidget {
           icon: Icon(Icons.group),
           label: 'Meeting',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.email),
-          label: 'Invitation',
-        ),
+        // BottomNavigationBarItem(
+        //   icon: Icon(Icons.email),
+        //   label: 'Invitation',
+        // ),
       ],
       // currentIndex: _selectedIndex,
       selectedItemColor: Colors.amber[800],

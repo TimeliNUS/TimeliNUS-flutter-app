@@ -1,4 +1,5 @@
 import 'package:TimeliNUS/models/models.dart';
+import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/repository/meetingRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,23 +14,13 @@ class ProjectRepository {
 
   const ProjectRepository({this.firestore});
 
-  static Future<List<User>> findUsersByRef(List<dynamic> refs) async {
-    List<User> users = [];
-    for (DocumentReference documentReference in refs) {
-      final DocumentSnapshot temp = await documentReference.get();
-      // print(documentReference);
-      User documentSnapshotTask =
-          User.fromJson(temp.data(), temp.id, ref: temp.reference);
-      users.add(documentSnapshotTask);
-    }
-    // print("Task: " + tasks.toString());
-    return users;
-  }
-
   Future<DocumentReference> addNewProject(ProjectEntity todo, String id) async {
     Map<String, dynamic> tempJson = todo.toJson();
-    tempJson.addEntries(
-        [MapEntry("_createdAt", Timestamp.fromDate(DateTime.now()))]);
+    tempJson.addEntries([
+      MapEntry("_createdAt", Timestamp.fromDate(DateTime.now())),
+      MapEntry("todos", []),
+      MapEntry("meetings", [])
+    ]);
     final newTodoRef = await ref.add(tempJson);
     bool userTodosExist = await person
         .doc(id)
@@ -66,7 +57,8 @@ class ProjectRepository {
         await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
     List<Todo> todos =
         todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
-    List<User> users = await findUsersByRef(tempData['groupmates']);
+    List<User> users =
+        await AuthenticationRepository.findUsersByRef(tempData['groupmates']);
     List<MeetingEntity> meetings =
         await MeetingRepository.loadMeetingsFromReferenceList(
             tempData['meetings']);
@@ -90,7 +82,8 @@ class ProjectRepository {
       List<Todo> todos = todoEntities
           .map((todoEntity) => Todo.fromEntity(todoEntity))
           .toList();
-      List<User> users = await findUsersByRef(tempData['groupmates']);
+      List<User> users =
+          await AuthenticationRepository.findUsersByRef(tempData['groupmates']);
       List<MeetingEntity> meetings =
           await MeetingRepository.loadMeetingsFromReferenceList(
               tempData['meetings']);
@@ -100,6 +93,7 @@ class ProjectRepository {
       projects.add(documentSnapshotTask);
     }
     // print("Task: " + tasks.toString());
+    print("project: " + projects[0].meetings.length.toString());
     return projects;
   }
 

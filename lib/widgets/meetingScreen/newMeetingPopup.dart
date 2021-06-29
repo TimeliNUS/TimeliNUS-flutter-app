@@ -58,9 +58,9 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                         children: [
                                           // TopBar(),
                                           PopupInput(textController,
-                                              inputLabel: 'Project Title',
+                                              inputLabel: 'Meeting Title',
                                               errorMsg:
-                                                  'Please enter your project title!'),
+                                                  'Please enter your meeting title!'),
                                           customPadding(),
                                           PopupDropdown(
                                               dropdownLabel: 'Module Project',

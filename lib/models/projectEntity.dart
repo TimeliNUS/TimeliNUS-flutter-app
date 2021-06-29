@@ -39,9 +39,10 @@ class ProjectEntity extends Equatable {
       'moduleCode': moduleCode,
       'title': title,
       'progress': progress,
-      'meetings': meetings,
+      // 'meetings':
+      //     meetings.map((meeting) => meeting.toEntity().toJson()).toList(),
       'groupmates': groupmates.map((x) => x.ref).toList(),
-      'todos': todos,
+      // 'todos': todos,
       'deadline': deadline
     };
   }

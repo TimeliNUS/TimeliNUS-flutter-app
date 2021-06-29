@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:TimeliNUS/blocs/screens/invitation/invitationBloc.dart';
 import 'package:TimeliNUS/models/meeting.dart';
 import 'package:TimeliNUS/models/meetingEntity.dart';
 import 'package:TimeliNUS/models/projectEntity.dart';
+import 'package:TimeliNUS/models/userModel.dart';
+import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -44,6 +47,7 @@ class MeetingRepository {
     promises.add(person.doc(id).update({
       'meeting': FieldValue.arrayUnion([newMeetingref])
     }));
+
     promises.add(project.doc(meeting.project.id).update({
       'meetings': FieldValue.arrayUnion([newMeetingref])
     }));
@@ -60,10 +64,9 @@ class MeetingRepository {
     List<MeetingEntity> meetings = [];
     for (DocumentReference documentReference in list) {
       final DocumentSnapshot temp = await documentReference.get();
-      Map<String, Object> tempData = temp.data();
       // print(tempData);
-      MeetingEntity documentSnapshotTask =
-          MeetingEntity.fromJson(temp.data(), [], temp.id, documentReference);
+      MeetingEntity documentSnapshotTask = MeetingEntity.fromJson(
+          temp.data(), [], [], temp.id, documentReference);
       // print(documentSnapshotTask);
       meetings.add(documentSnapshotTask);
     }
@@ -74,7 +77,7 @@ class MeetingRepository {
   Future<MeetingEntity> loadMeetingById(String id) async {
     DocumentSnapshot snapshot = await ref.doc(id).get();
     return MeetingEntity.fromJson(
-        snapshot.data(), [], snapshot.id, snapshot.reference);
+        snapshot.data(), [], [], snapshot.id, snapshot.reference);
   }
 
   Future<void> updateMeeting(MeetingEntity meeting) {
@@ -83,15 +86,10 @@ class MeetingRepository {
     return ref.doc(meeting.id).update(meeting.toJson());
   }
 
-  Future<void> acceptInvitation(Meeting meeting, String id, String url) {
-    print({
-      "link": url,
-      "startDate": meeting.startDate.toUtc().toIso8601String(),
-      "endDate": meeting.endDate.toUtc().toIso8601String(),
-      "id": id
-    });
+  Future<void> acceptInvitation(
+      Meeting meeting, String id, String url, String user) async {
     print(AppConstants.findCommonUrl);
-    return http.post(
+    await http.post(
       Uri.parse(AppConstants.findCommonUrl),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -100,9 +98,11 @@ class MeetingRepository {
         "link": url,
         "startDate": meeting.startDate.toUtc().toIso8601String(),
         "endDate": meeting.endDate.toUtc().toIso8601String(),
-        "id": id
+        "id": id,
+        "user": user
       }),
     );
+    return;
   }
 
   static Future<List<MeetingEntity>> loadMeetingsFromReferenceList(
@@ -111,12 +111,80 @@ class MeetingRepository {
     for (DocumentReference documentReference in refs) {
       final DocumentSnapshot temp = await documentReference.get();
       // print(documentReference);
-      final Map<String, Object> data = temp.data();
-      MeetingEntity documentSnapshotTask =
-          MeetingEntity.fromJson(temp.data(), [], temp.id, documentReference);
+      // final Map<String, Object> data = temp.data();
+      print(temp.data());
+      MeetingEntity documentSnapshotTask = MeetingEntity.fromJson(
+          temp.data(), [], [], temp.id, documentReference);
       meetings.add(documentSnapshotTask);
     }
-    // print("Task: " + tasks.toString());
+    print("meetings: " + meetings.toString());
+    return meetings;
+  }
+
+  Future<List<MeetingEntity>> loadInvitation(String id) async {
+    DocumentReference documentReference = person.doc(id);
+    QuerySnapshot documentSnapshot =
+        await ref.where('invitations', arrayContains: documentReference).get();
+    final list = documentSnapshot.docs.toList();
+    print(list);
+    List<MeetingEntity> meetings = [];
+    for (QueryDocumentSnapshot documentReference in list) {
+      final DocumentSnapshot temp = documentReference;
+      MeetingEntity documentSnapshotTask = MeetingEntity.fromJson(
+          temp.data(), [], [], temp.id, documentReference.reference);
+      meetings.add(documentSnapshotTask);
+    }
+    return meetings;
+  }
+
+  Future<List<MeetingEntity>> loadConfirmedMeetings(String id) async {
+    DocumentReference documentReference = person.doc(id);
+    print('hi');
+    QuerySnapshot documentSnapshot =
+        await ref.where('author', isEqualTo: documentReference).get();
+    QuerySnapshot documentSnapshot2 = await ref
+        .where('confirmedInvitations', arrayContains: documentReference)
+        .where('author', isNotEqualTo: documentReference)
+        .get();
+    final list = documentSnapshot.docs.toList()
+      ..addAll(documentSnapshot2.docs.toList());
+    List<MeetingEntity> meetings = [];
+    for (QueryDocumentSnapshot documentReference in list) {
+      final DocumentSnapshot temp = documentReference;
+      List<Future<dynamic>> promises = [];
+      print(
+          ((temp.data() as Map<String, Object>)['invitations'] as List<dynamic>)
+              .map((x) => x as DocumentReference)
+              .toList()
+              .runtimeType);
+      List<DocumentReference> invitedUserRefs =
+          ((temp.data() as Map<String, Object>)['invitations'] as List<dynamic>)
+                  .isNotEmpty
+              ? ((temp.data() as Map<String, Object>)['invitations']
+                      as List<dynamic>)
+                  .map((x) => x as DocumentReference)
+                  .toList()
+              : [];
+      List<DocumentReference> acceptedUserRefs =
+          ((temp.data() as Map<String, Object>)['confirmedInvitations']
+                      as List<dynamic>)
+                  .isNotEmpty
+              ? ((temp.data() as Map<String, Object>)['confirmedInvitations']
+                      as List<dynamic>)
+                  .map((x) => x as DocumentReference)
+                  .toList()
+              : [];
+      List<User> invitedUsers;
+      List<User> confirmedUsers;
+      promises.add(AuthenticationRepository.findUsersByRef(invitedUserRefs)
+          .then((x) => invitedUsers = x));
+      promises.add(AuthenticationRepository.findUsersByRef(acceptedUserRefs)
+          .then((x) => confirmedUsers = x));
+      await Future.wait(promises);
+      MeetingEntity documentSnapshotTask = MeetingEntity.fromJson(temp.data(),
+          invitedUsers, confirmedUsers, temp.id, documentReference.reference);
+      meetings.add(documentSnapshotTask);
+    }
     return meetings;
   }
 

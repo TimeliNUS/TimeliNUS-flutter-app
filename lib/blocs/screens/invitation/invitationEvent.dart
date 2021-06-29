@@ -20,7 +20,9 @@ class LoadInvitation extends InvitationEvent {
 
 class AcceptInvitation extends InvitationEvent {
   final String url;
-  AcceptInvitation(this.url) : super();
+  final String userId;
+
+  AcceptInvitation(this.url, this.userId) : super();
 
   @override
   String toString() => 'AcceptInvitation';

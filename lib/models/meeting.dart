@@ -28,7 +28,10 @@ class Meeting extends Equatable {
   final DateTime startDate;
   final DateTime endDate;
   final double timeLength;
+  final DocumentReference author;
   final List<User> groupmates;
+  final List<User> confirmed;
+  final List<User> invited;
   final MeetingVenue meetingVenue;
   final Project project;
   final DocumentReference ref;
@@ -38,6 +41,9 @@ class Meeting extends Equatable {
       {this.id,
       this.startDate,
       this.endDate,
+      this.author,
+      this.confirmed,
+      this.invited,
       this.timeLength = 1,
       this.ref,
       this.timeslots = const []});
@@ -45,10 +51,15 @@ class Meeting extends Equatable {
   List<Object> get props => [title, groupmates, timeLength, startDate];
 
   static Meeting fromEntity(MeetingEntity entity) {
-    return Meeting(entity.title, [], entity.meetingVenue, entity.project,
+    return Meeting(entity.title, entity.groupmates ?? [], entity.meetingVenue,
+        entity.project,
         startDate: entity.startDate != null ? entity.startDate.toDate() : null,
         endDate: entity.endDate != null ? entity.endDate.toDate() : null,
+        author: entity.author ??
+            (entity.groupmates[0] != null ? entity.groupmates[0].ref : null),
         id: entity.id ?? null,
+        confirmed: entity.confirmed ?? null,
+        invited: entity.invited ?? null,
         timeLength: entity.timeLength,
         timeslots: entity.timeslots ?? []);
   }
@@ -60,7 +71,10 @@ class Meeting extends Equatable {
         timeLength,
         startDate != null ? Timestamp.fromDate(startDate.toUtc()) : null,
         endDate != null ? Timestamp.fromDate(endDate.toUtc()) : null,
+        groupmates[0].ref,
         groupmates,
+        invited,
+        confirmed,
         meetingVenue,
         ref,
         project,
@@ -73,7 +87,10 @@ class Meeting extends Equatable {
       DateTime startDate,
       DateTime endDate,
       double timeLength,
+      DocumentReference author,
       List<User> groupmates,
+      List<User> invited,
+      List<User> confirmed,
       MeetingVenue meetingVenue,
       Project project,
       DocumentReference ref,
@@ -81,8 +98,11 @@ class Meeting extends Equatable {
     return Meeting(title ?? this.title, groupmates ?? this.groupmates,
         meetingVenue ?? this.meetingVenue, project ?? this.project,
         id: id ?? this.id,
+        author: author ?? this.author,
         startDate: startDate ?? this.startDate,
         endDate: endDate ?? this.endDate,
+        invited: invited ?? this.invited,
+        confirmed: confirmed ?? this.confirmed,
         timeLength: timeLength ?? this.timeLength,
         ref: ref ?? this.ref,
         timeslots: timeslots ?? this.timeslots);

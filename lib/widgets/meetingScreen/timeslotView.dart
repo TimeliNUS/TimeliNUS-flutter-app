@@ -3,31 +3,15 @@ import 'package:TimeliNUS/widgets/style.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-// class AppointmentDataSource extends CalendarDataSource {
-//   AppointmentDataSource(List<Appointment> source) {
-//     appointments = source;
-//   }
-
-//   static AppointmentDataSource _getCalendarDataSource() {
-//   List<Appointment> appointments = <Appointment>[];
-//   appointments.add(Appointment(
-//     startTime: DateTime.now(),
-//     endTime: DateTime.now().add(Duration(minutes: 10)),
-//     subject: 'Meeting',
-//     color: Colors.blue,
-//     startTimeZone: '',
-//     endTimeZone: '',
-//   ));
-
-//   return AppointmentDataSource(appointments);
-// }
-// }
-
 class TimeslotView extends StatefulWidget {
   final List<TimeRegion> intervals;
   final DateTime startDate;
   final DateTime endDate;
-  TimeslotView(this.intervals, this.startDate, this.endDate, {Key key})
+  final bool isDialog;
+  final int meetingLength;
+  final Function callback;
+  TimeslotView(this.intervals, this.startDate, this.endDate,
+      {this.callback, this.isDialog = true, this.meetingLength = 1, Key key})
       : super(key: key);
 
   @override
@@ -35,6 +19,7 @@ class TimeslotView extends StatefulWidget {
 }
 
 class TimeslotViewState extends State<TimeslotView> {
+  DateTime selectedTime;
   @override
   void initState() {
     super.initState();
@@ -43,43 +28,57 @@ class TimeslotViewState extends State<TimeslotView> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-        // shape: RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.circular(35),
-        // ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        child: Column(children: [
-          OutlinedButton(
-            child: Text('test'),
-            onPressed: () => Navigator.pop(context),
-          ),
-          Expanded(
-            child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(35)),
-                padding: EdgeInsets.all(15),
-                child: SfCalendar(
-                    specialRegions: widget.intervals,
-                    timeSlotViewSettings: TimeSlotViewSettings(
-                      startHour: widget.startDate.minute != 0
-                          ? (widget.startDate.hour.toDouble())
-                          : widget.startDate.hour.toDouble(),
-                      endHour: widget.endDate.minute != 0
-                          ? (widget.endDate.hour.toDouble() + 1)
-                          : widget.endDate.hour.toDouble(),
-                      timeInterval: Duration(hours: 1),
-                      timeFormat: 'h:mm a',
-                      timeIntervalHeight: 45,
-                      // minimumAppointmentDuration: Duration(minutes: 30)
-                      // timeIntervalHeight: -1,
-                    ),
-                    view: CalendarView.week,
-                    firstDayOfWeek: widget.startDate.weekday,
-                    maxDate: widget.endDate,
-                    minDate: widget.startDate)),
-          )
-        ]));
+    final timetable = Column(children: [
+      widget.isDialog
+          ? ElevatedButton(
+              style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all(appTheme.primaryColorLight)),
+              child: Text('Confirm'),
+              onPressed: () {
+                widget.callback(selectedTime);
+                Navigator.pop(context);
+              })
+          : Container(),
+      Expanded(
+        child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(35)),
+            padding: EdgeInsets.all(15),
+            child: SfCalendar(
+              specialRegions: widget.intervals,
+              timeSlotViewSettings: TimeSlotViewSettings(
+                startHour: widget.startDate.minute != 0
+                    ? (widget.startDate.hour.toDouble())
+                    : widget.startDate.hour.toDouble(),
+                endHour: widget.endDate.minute != 0
+                    ? (widget.endDate.hour.toDouble() + 1)
+                    : widget.endDate.hour.toDouble(),
+                timeInterval: Duration(hours: widget.meetingLength),
+                timeFormat: 'h:mm a',
+                timeIntervalHeight: 45,
+                // minimumAppointmentDuration: Duration(minutes: 30)
+                // timeIntervalHeight: -1,
+              ),
+              view: CalendarView.week,
+              firstDayOfWeek: widget.startDate.weekday,
+              maxDate: widget.endDate,
+              minDate: widget.startDate,
+              onTap: (CalendarTapDetails details) {
+                setState(() => selectedTime = details.date);
+                print(selectedTime);
+              },
+            )),
+      )
+    ]);
+    return widget.isDialog
+        ? Dialog(
+            // shape: RoundedRectangleBorder(
+            //   borderRadius: BorderRadius.circular(35),
+            // ),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: timetable)
+        : timetable;
   }
 }

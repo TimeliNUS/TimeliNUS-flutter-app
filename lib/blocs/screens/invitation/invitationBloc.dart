@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:TimeliNUS/blocs/screens/meeting/meetingBloc.dart';
+import 'package:TimeliNUS/blocs/app/appBloc.dart';
+import 'package:TimeliNUS/blocs/app/appEvent.dart';
 import 'package:TimeliNUS/models/meeting.dart';
 import 'package:TimeliNUS/repository/meetingRepository.dart';
 import 'package:bloc/bloc.dart';
@@ -10,8 +11,9 @@ part 'invitationEvent.dart';
 part 'invitationState.dart';
 
 class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
+  final AppBloc app;
   final MeetingRepository meetingRepository;
-  InvitationBloc(this.meetingRepository) : super(InvitationInitial());
+  InvitationBloc(this.meetingRepository, this.app) : super(InvitationInitial());
 
   @override
   Stream<InvitationState> mapEventToState(
@@ -44,9 +46,10 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
       yield InvitationLoading();
       print(event.url);
       print(state.meeting);
-      meetingRepository.acceptInvitation(
-          state.meeting, state.meeting.id, event.url);
+      await meetingRepository.acceptInvitation(
+          state.meeting, state.meeting.id, event.url, event.userId);
       yield InvitationAccepted();
+      app.add(AppOnMeeting());
     } catch (err) {
       print(err);
       yield InvitationNotLoaded();

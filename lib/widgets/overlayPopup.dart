@@ -80,10 +80,16 @@ class PopupDropdownState extends State<PopupDropdown> {
     final returnedProjects = await context
         .read<ProjectRepository>()
         .loadProjects(id)
-        .then((x) => x.map((e) => Project.fromEntity(e)).toList());
+        .then((x) => x.map((e) {
+              // print(e);
+              return Project.fromEntity(e);
+            }).toList());
 
     setState(() {
+      // print('returned : ');
+      // print(returnedProjects);
       projects.addAll(returnedProjects);
+      // print(initial);
       if (initial != null) {
         selectedProject = projects.firstWhere((x) => x.id == initial.id);
       } else {

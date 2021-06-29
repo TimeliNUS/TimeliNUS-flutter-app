@@ -2,9 +2,11 @@ import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/app/appEvent.dart';
 import 'package:TimeliNUS/blocs/screens/invitation/invitationBloc.dart';
 import 'package:TimeliNUS/models/meeting.dart';
+import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/repository/meetingRepository.dart';
 import 'package:TimeliNUS/widgets/bottomNavigationBar.dart';
 import 'package:TimeliNUS/widgets/customCard.dart';
+import 'package:TimeliNUS/widgets/invitationDetail.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/material.dart';
@@ -22,19 +24,32 @@ class Invitation extends StatefulWidget {
 
 class _InvitationState extends State<Invitation> {
   final _meetingRepository = MeetingRepository();
+  String authorName = '';
+
   @override
   void initState() {
     super.initState();
-    print('Invitation page: ' + widget.meetingId);
+    // print('Invitation page: ' + widget.meetingId);
+  }
+
+  void findAuthorName(Meeting meeting) async {
+    if (meeting != null) {
+      String tempName =
+          await AuthenticationRepository.findUsersByRef([meeting.author])
+              .then((x) => x[0].name);
+      setState(() => authorName = tempName);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<InvitationBloc>(
-        create: (context) => InvitationBloc(_meetingRepository)
-          ..add(LoadInvitation(widget.meetingId)),
+        create: (context) =>
+            InvitationBloc(_meetingRepository, context.read<AppBloc>())
+              ..add(LoadInvitation(widget.meetingId)),
         child: BlocBuilder<InvitationBloc, InvitationState>(
             builder: (context, state) {
+          findAuthorName(state.meeting);
           return ColoredSafeArea(
               appTheme.primaryColorLight,
               Scaffold(
@@ -43,7 +58,8 @@ class _InvitationState extends State<Invitation> {
                   body: Column(
                       // crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        TopBar(() => Navigator.pop(context),
+                        TopBar(
+                            () => context.read<AppBloc>().add(AppOnMeeting()),
                             "Accept Meeting Invitation"),
                         Expanded(
                             child: CustomCard(
@@ -53,82 +69,12 @@ class _InvitationState extends State<Invitation> {
                                     topRight: Radius.circular(40)),
                                 child: ListView(
                                   children: [
-                                    InvitationDetail(state.meeting),
+                                    InvitationDetail(state.meeting, authorName),
                                     ImportCalendarWidget()
                                   ],
                                 )))
                       ])));
         }));
-  }
-}
-
-class InvitationDetail extends StatelessWidget {
-  final Meeting meeting;
-  const InvitationDetail(this.meeting, {Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(
-              Radius.circular(20),
-            ),
-            boxShadow: [
-              BoxShadow(
-                  color: appTheme.primaryColor,
-                  spreadRadius: 0.5,
-                  blurRadius: 0.5)
-            ],
-            color: Colors.white),
-        child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(meeting.title ?? ''),
-                customPadding(),
-                Text(meeting.project != null ? meeting.project.title : ''),
-                customPadding(),
-                Divider(
-                  color: appTheme.primaryColorLight,
-                  thickness: 1.25,
-                ),
-                customPadding(),
-                Text('Meeting created by: '),
-                customPadding(),
-                Text('Meeting is within:'),
-                customPadding(),
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today_outlined,
-                        size: 18, color: appTheme.primaryColorLight),
-                    Text(' ' +
-                        DateFormat('MMM dd, yyyy').format(meeting.startDate) +
-                        ' - ' +
-                        DateFormat('MMM dd, yyyy').format(meeting.endDate))
-                  ],
-                ),
-                Padding(padding: EdgeInsets.only(bottom: 7.5)),
-                Row(
-                  children: [
-                    Icon(Icons.av_timer_rounded,
-                        size: 18, color: appTheme.primaryColorLight),
-                    Text(' ' +
-                        DateFormat('kk:mm').format(meeting.startDate) +
-                        ' - ' +
-                        DateFormat('kk:mm').format(meeting.endDate)),
-                  ],
-                ),
-                Padding(padding: EdgeInsets.only(bottom: 7.5)),
-                Row(
-                  children: [
-                    Icon(Icons.location_pin,
-                        size: 18, color: appTheme.primaryColorLight),
-                    Text(' ' + meeting.meetingVenue.toString().split('.')[1]),
-                  ],
-                )
-              ],
-            )));
   }
 }
 
@@ -210,10 +156,10 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
                           (states) => appTheme.primaryColorLight)),
                   child: Text('Done'),
                   onPressed: () {
-                    context
-                        .read<InvitationBloc>()
-                        .add(AcceptInvitation(controller.text));
-                    context.read<AppBloc>().add(AppOnMeeting());
+                    context.read<InvitationBloc>().add(AcceptInvitation(
+                        controller.text,
+                        context.read<AppBloc>().state.user.id));
+                    // context.read<AppBloc>().add(AppOnMeeting());
                   }))
         ]));
   }

@@ -8,7 +8,10 @@ class MeetingEntity extends Equatable {
   final Timestamp startDate;
   final Timestamp endDate;
   final double timeLength;
+  final DocumentReference author;
   final List<User> groupmates;
+  final List<User> invited;
+  final List<User> confirmed;
   final MeetingVenue meetingVenue;
   final Project project;
   final String id;
@@ -21,13 +24,17 @@ class MeetingEntity extends Equatable {
       this.timeLength,
       this.startDate,
       this.endDate,
+      this.author,
       this.groupmates,
+      this.invited,
+      this.confirmed,
       this.meetingVenue,
       this.ref,
       this.project,
       this.timeslots);
 
-  static MeetingEntity fromJson(Map<String, Object> json, List<User> groupmates,
+  static MeetingEntity fromJson(
+      Map<String, Object> json, List<User> invited, List<User> confirmed,
       [String id, DocumentReference ref]) {
     return MeetingEntity(
         json['title'] ?? '',
@@ -37,7 +44,17 @@ class MeetingEntity extends Equatable {
             : 0,
         json['startDate'],
         json['endDate'],
+        // groupmates != null ? groupmates[0] : null,
+        (json['author'] as DocumentReference),
+        // User(
+        //     id: ((json['author'] as Map<String, Object>)['ref']
+        //             as DocumentReference)
+        //         .path
+        //         .split('/')[1],
+        //     name: (json['author'] as Map<String, Object>)['name']),
         [],
+        invited,
+        confirmed,
         convertMeetingVenue(json['meetingVenue']),
         ref,
         json['project'] != null
@@ -61,6 +78,7 @@ class MeetingEntity extends Equatable {
       'timeLength': timeLength,
       'meetingVenue': meetingVenue.toString().split('.')[1],
       'groupmates': groupmates.map((x) => x.ref).toList(),
+      'author': groupmates[0].ref,
       'project': project != null
           ? {
               'id': project.id,
@@ -75,7 +93,7 @@ class MeetingEntity extends Equatable {
 
   @override
   String toString() {
-    return 'MeetingEntity{title: $title, id: $id, timeLength: $timeLength, ref: $ref}';
+    return 'MeetingEntity{title: $title, id: $id, timeLength: $timeLength, ref: $ref, groupmates: $groupmates}';
   }
 
   @override

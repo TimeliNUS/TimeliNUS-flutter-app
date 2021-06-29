@@ -2,7 +2,8 @@ part of 'meetingBloc.dart';
 
 abstract class MeetingState extends Equatable {
   final List<Meeting> meetings;
-  const MeetingState(this.meetings);
+  final List<Meeting> invitations;
+  const MeetingState(this.meetings, {this.invitations = const []});
 
   @override
   List<Object> get props => [];
@@ -14,8 +15,10 @@ class MeetingInitial extends MeetingState {
 
 class MeetingLoaded extends MeetingState {
   final List<Meeting> meetings;
+  final List<Meeting> invitations;
 
-  MeetingLoaded(this.meetings) : super(meetings);
+  MeetingLoaded(this.meetings, {this.invitations = const []})
+      : super(meetings, invitations: invitations);
 
   @override
   String toString() => 'MeetingLoaded { projects: $meetings }';

@@ -11,6 +11,7 @@ import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class EditMeetingPopup extends StatefulWidget {
@@ -27,6 +28,7 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
   MeetingVenue meetingVenue;
   List<User> pics = [];
   Project selectedProject;
+  DateTime selectedTime;
   TextEditingController textController = new TextEditingController();
 
   @override
@@ -61,14 +63,18 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                       context.read<AppBloc>().state.user.id));
                                   Navigator.pop(context);
                                 }),
-                            OutlinedButton(
-                                onPressed: () => showDialog(
-                                    context: context,
-                                    builder: (context) => TimeslotView(
-                                        widget.meetingToEdit.timeslots,
-                                        widget.meetingToEdit.startDate,
-                                        widget.meetingToEdit.endDate)),
-                                child: Text('hi'))
+                            IconButton(
+                              icon:
+                                  Icon(Icons.access_time, color: Colors.white),
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (context) => TimeslotView(
+                                      widget.meetingToEdit.timeslots,
+                                      widget.meetingToEdit.startDate,
+                                      widget.meetingToEdit.endDate,
+                                      callback: (val) =>
+                                          setState(() => selectedTime = val))),
+                            )
                           ])),
                       Expanded(
                           child: GestureDetector(
@@ -87,9 +93,9 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                         children: [
                                           // TopBar(),
                                           PopupInput(textController,
-                                              inputLabel: 'Project Title',
+                                              inputLabel: 'Meeting Title',
                                               errorMsg:
-                                                  'Please enter your project title!'),
+                                                  'Please enter your meeting title!'),
                                           customPadding(),
                                           PopupDropdown(
                                               initialProject:
@@ -184,7 +190,14 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                                 },
                                               ),
                                             ],
-                                          )
+                                          ),
+                                          customPadding(),
+                                          Text('Selected datetime: \n' +
+                                              (selectedTime != null
+                                                  ? DateFormat.yMMMd()
+                                                      .add_jm()
+                                                      .format(selectedTime)
+                                                  : 'None'))
                                         ],
                                       ))))),
                       Container(

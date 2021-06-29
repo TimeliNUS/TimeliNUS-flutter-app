@@ -129,7 +129,9 @@ class DashboardProjects extends StatelessWidget {
                                 project,
                                 project.todos
                                     .where((todo) => todo.complete == false)
-                                    .toList()))
+                                    .toList()
+                                    .length,
+                                project.meetings.length))
                             .toList()))
               ],
             ),
@@ -140,15 +142,17 @@ class DashboardProjects extends StatelessWidget {
 
 class DashboardProjectCard extends StatelessWidget {
   final Project project;
-  final List<Todo> todos;
+  final int todosLength;
+  final int meetingLength;
 
-  const DashboardProjectCard(this.project, this.todos, {Key key})
+  const DashboardProjectCard(this.project, this.todosLength, this.meetingLength,
+      {Key key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final double progress = (project.todos.length != 0
-        ? ((1 - todos.length) / project.todos.length)
+        ? ((1 - todosLength) / project.todos.length)
         : 1);
     return CustomCard(
       padding: 15,
@@ -208,12 +212,12 @@ class DashboardProjectCard extends StatelessWidget {
               children: [
                 Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Icon(Icons.check_box_outlined, size: 15, color: Colors.grey),
-                  Text(' ' + todos.length.toString() + ' Incompleted',
+                  Text(' ' + todosLength.toString() + ' Incompleted',
                       style: TextStyle(fontSize: 12, color: Colors.grey)),
                 ]),
                 Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Icon(Icons.check_box_outlined, size: 15, color: Colors.grey),
-                  Text(' ' + todos.length.toString() + ' Meeting',
+                  Text(' ' + meetingLength.toString() + ' Meeting',
                       style: TextStyle(fontSize: 12, color: Colors.grey)),
                 ])
               ]),

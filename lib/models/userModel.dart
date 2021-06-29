@@ -36,9 +36,10 @@ class User extends Equatable {
 
   Map<String, Object> toJson() {
     return {
-      'id': id,
+      'ref': ref,
+      // 'id': id,
       'name': name,
-      'email': email,
+      // 'email': email,
     };
   }
 

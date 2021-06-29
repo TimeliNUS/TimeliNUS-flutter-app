@@ -1,4 +1,5 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
+import 'package:TimeliNUS/blocs/app/appEvent.dart';
 import 'package:TimeliNUS/blocs/screens/meeting/meetingBloc.dart';
 import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/models/meeting.dart';
@@ -6,6 +7,7 @@ import 'package:TimeliNUS/repository/meetingRepository.dart';
 import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/widgets/meetingScreen/editMeetingPopup.dart';
 import 'package:TimeliNUS/widgets/meetingScreen/newMeetingPopup.dart';
+import 'package:TimeliNUS/widgets/meetingScreen/viewMeetingPoup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -117,69 +119,92 @@ class _MeetingInvitatiosnState extends State<MeetingInvitations> {
   Widget build(BuildContext context) {
     return Container(
         color: ThemeColor.lightOrange,
-        child: Padding(
-            padding: EdgeInsets.all(25),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        padding: EdgeInsets.all(25),
+        child: SingleChildScrollView(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch,
+                // mainAxisSize: MainAxisSize.min,
+                // mainAxisAlignment: MainAxisAlignment.start,
+                children: [
               Text("Invitations",
                   textAlign: TextAlign.left,
                   style: TextStyle(fontSize: 16, color: appTheme.accentColor)),
-              Padding(padding: EdgeInsets.only(bottom: 20)),
-              IntrinsicHeight(
-                  child: Row(mainAxisSize: MainAxisSize.max, children: [
-                Expanded(
-                    child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                          ),
-                          color: Colors.white,
-                        ),
-                        // color: Colors.white,
-                        child: Padding(
-                            padding: EdgeInsets.all(25),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Invitation 1'),
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 5),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.location_pin,
-                                          size: 20,
-                                          color: appTheme.primaryColor),
-                                      Text('Zoom')
-                                    ],
-                                  )
-                                ])))),
-                Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
-                      ),
-                      color: appTheme.primaryColor,
-                    ),
-                    child: Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Import\nCalendar',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white))
-                            ])))
-              ]))
+              // Expanded(child: ListView()),
+              ...context
+                  .read<MeetingBloc>()
+                  .state
+                  .invitations
+                  .map((invitation) => GestureDetector(
+                      onTap: () => context
+                          .read<AppBloc>()
+                          .add(AppOnInvitation(invitationId: invitation.id)),
+                      child: Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: IntrinsicHeight(
+                              child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                Expanded(
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(20),
+                                            bottomLeft: Radius.circular(20),
+                                          ),
+                                          color: Colors.white,
+                                        ),
+                                        // color: Colors.white,
+                                        child: Padding(
+                                            padding: EdgeInsets.all(25),
+                                            child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(invitation.title),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 5),
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Icon(Icons.location_pin,
+                                                          size: 20,
+                                                          color: appTheme
+                                                              .primaryColor),
+                                                      Text(invitation
+                                                          .meetingVenue
+                                                          .toString()
+                                                          .split('.')[1])
+                                                    ],
+                                                  )
+                                                ])))),
+                                Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(20),
+                                        bottomRight: Radius.circular(20),
+                                      ),
+                                      color: appTheme.primaryColor,
+                                    ),
+                                    child: Padding(
+                                        padding: EdgeInsets.all(15),
+                                        child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text('Import\nCalendar',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      color: Colors.white))
+                                            ])))
+                              ])))))
+                  .toList()
             ])));
   }
 }
 
 class UpcomingMeetings extends StatefulWidget {
-  List<Meeting> meetings;
-  UpcomingMeetings(this.meetings, {Key key}) : super(key: key);
+  final List<Meeting> meetings;
+  const UpcomingMeetings(this.meetings, {Key key}) : super(key: key);
 
   @override
   _UpcomingMeetingsState createState() => _UpcomingMeetingsState();
@@ -193,11 +218,17 @@ class _UpcomingMeetingsState extends State<UpcomingMeetings> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           CustomPadding(),
           ...(widget.meetings.map((meeting) => GestureDetector(
-              onTap: () => Navigator.push(
-                  context,
-                  SlideRightRoute(
-                      page: EditMeetingPopup(
-                          context.read<MeetingBloc>(), meeting))),
+              onTap: () {
+                print(meeting);
+                Navigator.push(
+                    context,
+                    SlideRightRoute(
+                        page: (meeting.author ==
+                                context.read<AppBloc>().state.user.ref)
+                            ? EditMeetingPopup(
+                                context.read<MeetingBloc>(), meeting)
+                            : ViewMeetingPopup(meeting)));
+              },
               child: Padding(
                   padding: EdgeInsets.only(bottom: 15),
                   child: IntrinsicHeight(

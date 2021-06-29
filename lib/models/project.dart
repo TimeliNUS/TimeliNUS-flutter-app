@@ -85,19 +85,21 @@ class Project extends Equatable {
         todos
       ];
 
-  @override
-  String toString() {
-    return 'Project[' +
-        // this.title +
-        // ' ' + this.id != null
-        //     ? this.id
-        //     : '' +
-        // ' ' +
-        // this.progress.toString() +
-        // ' ' +
-        // this.deadline.toString() +
-        // ' ' +
-        // this.groupmates.toString() +
-        ']';
-  }
+  // @override
+  // String toString() {
+  //   return 'Project[' +
+  //               // this.title +
+  //               ' ' +
+  //               this.id !=
+  //           null
+  //       ? this.id
+  //       : '' +
+  //           // ' ' +
+  //           // this.progress.toString() +
+  //           // ' ' +
+  //           // this.deadline.toString() +
+  //           // ' ' +
+  //           // this.groupmates.toString() +
+  //           ']';
+  // }
 }

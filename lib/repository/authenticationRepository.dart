@@ -152,6 +152,19 @@ class AuthenticationRepository {
       'tokens': FieldValue.arrayUnion([token]),
     });
   }
+
+  static Future<List<User>> findUsersByRef(List<dynamic> refs) async {
+    List<User> users = [];
+    for (DocumentReference documentReference in refs) {
+      final DocumentSnapshot temp = await documentReference.get();
+      // print(documentReference);
+      User documentSnapshotTask =
+          User.fromJson(temp.data(), temp.id, ref: temp.reference);
+      users.add(documentSnapshotTask);
+    }
+    // print("Task: " + tasks.toString());
+    return users;
+  }
 }
 
 extension on FirebaseAuth.User {
