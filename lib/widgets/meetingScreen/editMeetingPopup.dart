@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/meeting/meetingBloc.dart';
 import 'package:TimeliNUS/models/models.dart';
-import 'package:TimeliNUS/utils/transitionBuilder.dart';
 import 'package:TimeliNUS/widgets/meetingScreen/timeslotView.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
@@ -12,7 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:TimeliNUS/utils/dateTimeExtension.dart';
 
 class EditMeetingPopup extends StatefulWidget {
   final Meeting meetingToEdit;
@@ -23,7 +22,7 @@ class EditMeetingPopup extends StatefulWidget {
 }
 
 class _EditMeetingPopupState extends State<EditMeetingPopup> {
-  DateTime startDateValue;
+  DateTime startDateValue = DateTime.now().stripTime();
   DateTime endDateValue;
   MeetingVenue meetingVenue;
   List<User> pics = [];
@@ -34,8 +33,7 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
   @override
   void initState() {
     super.initState();
-    textController =
-        new TextEditingController(text: widget.meetingToEdit.title);
+    textController = new TextEditingController(text: widget.meetingToEdit.title);
     meetingVenue = widget.meetingToEdit.meetingVenue;
   }
 
@@ -53,74 +51,61 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
-                      TopBar(() => Navigator.pop(context), "Edit Meeting",
+                      TopBar(widget.meetingToEdit.invited.isEmpty ? "Confirm Meeting" : "Edit Meeting",
+                          onPressedCallback: () => Navigator.pop(context),
                           rightWidget: Row(children: [
                             IconButton(
                                 icon: Icon(Icons.delete, color: Colors.white),
                                 onPressed: () {
-                                  widget.meetingBloc.add(DeleteMeeting(
-                                      widget.meetingToEdit,
-                                      context.read<AppBloc>().state.user.id));
+                                  widget.meetingBloc
+                                      .add(DeleteMeeting(widget.meetingToEdit, context.read<AppBloc>().state.user.id));
                                   Navigator.pop(context);
                                 }),
-                            IconButton(
-                              icon:
-                                  Icon(Icons.access_time, color: Colors.white),
-                              onPressed: () => showDialog(
-                                  context: context,
-                                  builder: (context) => TimeslotView(
-                                      widget.meetingToEdit.timeslots,
-                                      widget.meetingToEdit.startDate,
-                                      widget.meetingToEdit.endDate,
-                                      callback: (val) =>
-                                          setState(() => selectedTime = val))),
-                            )
+                            widget.meetingToEdit.invited.isEmpty
+                                ? IconButton(
+                                    icon: Icon(Icons.access_time, color: Colors.white),
+                                    onPressed: () => showDialog(
+                                        context: context,
+                                        builder: (context) => TimeslotView(widget.meetingToEdit.timeslots,
+                                            widget.meetingToEdit.startDate, widget.meetingToEdit.endDate,
+                                            callback: (val) => setState(() => selectedTime = val))),
+                                  )
+                                : Container()
                           ])),
                       Expanded(
                           child: GestureDetector(
-                              onTap: () =>
-                                  FocusManager.instance.primaryFocus?.unfocus(),
+                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                               child: Container(
                                   decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(40.0),
-                                          topLeft: Radius.circular(40.0))),
+                                          topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0))),
                                   child: Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 30, right: 30, top: 15),
+                                      padding: EdgeInsets.only(left: 30, right: 30, top: 15),
                                       child: ListView(
                                         children: [
                                           // TopBar(),
                                           PopupInput(textController,
                                               inputLabel: 'Meeting Title',
-                                              errorMsg:
-                                                  'Please enter your meeting title!'),
+                                              errorMsg: 'Please enter your meeting title!'),
                                           customPadding(),
                                           PopupDropdown(
-                                              initialProject:
-                                                  widget.meetingToEdit.project,
+                                              initialProject: widget.meetingToEdit.project,
                                               dropdownLabel: 'Module Project',
-                                              callback: (val) => {
-                                                    setState(() =>
-                                                        selectedProject = val)
-                                                  }),
+                                              callback: (val) => {setState(() => selectedProject = val)}),
                                           customPadding(),
-                                          PersonInChargeChips(
-                                              pics, "Person in Charge",
-                                              project: selectedProject,
+                                          PersonInChargeChips(pics, "Person in Charge", project: selectedProject,
                                               callback: (val) {
                                             setState(() => pics = val);
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           Text(
-                                            'Meeting must be within...',
+                                            'Meeting must be within...*',
                                           ),
                                           Row(
                                               mainAxisSize: MainAxisSize.max,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
+                                              crossAxisAlignment: CrossAxisAlignment.end,
                                               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 SizedBox(
@@ -131,12 +116,10 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                                     )),
                                                 Expanded(
                                                     child: DeadlineInput(
-                                                  (val) => setState(() =>
-                                                      startDateValue = val),
+                                                  (val) => setState(() => startDateValue = val),
                                                   false,
                                                   isNotMini: false,
-                                                  initialTime: widget
-                                                      .meetingToEdit.startDate,
+                                                  initialTime: widget.meetingToEdit.startDate,
                                                 )),
                                               ]),
                                           Row(
@@ -149,18 +132,16 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                                   )),
                                               Expanded(
                                                   child: DeadlineInput(
-                                                (val) => setState(
-                                                    () => endDateValue = val),
+                                                (val) => setState(() => endDateValue = val),
                                                 false,
                                                 isNotMini: false,
-                                                initialTime: widget
-                                                    .meetingToEdit.endDate,
+                                                initialTime: widget.meetingToEdit.endDate,
                                               )),
                                             ],
                                           ),
                                           customPadding(),
                                           Text(
-                                            'Meeting Venue',
+                                            'Meeting Venue*',
                                           ),
                                           Row(
                                             children: [
@@ -168,22 +149,18 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                               Radio<MeetingVenue>(
                                                 value: MeetingVenue.Zoom,
                                                 groupValue: meetingVenue,
-                                                onChanged:
-                                                    (MeetingVenue value) {
+                                                onChanged: (MeetingVenue value) {
                                                   setState(() {
                                                     meetingVenue = value;
                                                   });
                                                 },
                                               ),
-                                              Padding(
-                                                  padding: EdgeInsets.only(
-                                                      right: 30)),
+                                              Padding(padding: EdgeInsets.only(right: 30)),
                                               Text('Face to Face'),
                                               Radio<MeetingVenue>(
                                                 value: MeetingVenue.FaceToFace,
                                                 groupValue: meetingVenue,
-                                                onChanged:
-                                                    (MeetingVenue value) {
+                                                onChanged: (MeetingVenue value) {
                                                   setState(() {
                                                     meetingVenue = value;
                                                   });
@@ -194,9 +171,7 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                           customPadding(),
                                           Text('Selected datetime: \n' +
                                               (selectedTime != null
-                                                  ? DateFormat.yMMMd()
-                                                      .add_jm()
-                                                      .format(selectedTime)
+                                                  ? DateFormat.yMMMd().add_jm().format(selectedTime)
                                                   : 'None'))
                                         ],
                                       ))))),
@@ -204,32 +179,28 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                         color: Colors.white,
                         alignment: Alignment.bottomCenter,
                         child: Padding(
-                            padding: EdgeInsets.only(
-                                bottom: MediaQuery.of(context).padding.bottom),
+                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 ElevatedButton(
                                     style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                appTheme.primaryColorLight)),
+                                        backgroundColor: MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
                                     child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Text("Done",
-                                            style: appTheme.textTheme.bodyText2
-                                                .apply(color: Colors.white))),
+                                            style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
                                     onPressed: () {
                                       widget.meetingBloc.add(UpdateMeeting(
                                           widget.meetingToEdit.copyWith(
-                                            title: textController.text,
-                                            groupmates: pics,
-                                            meetingVenue: meetingVenue,
-                                            project: selectedProject,
-                                            startDate: startDateValue,
-                                            endDate: endDateValue,
-                                          ),
+                                              title: textController.text,
+                                              groupmates: pics,
+                                              meetingVenue: meetingVenue,
+                                              project: selectedProject,
+                                              startDate: startDateValue,
+                                              endDate: endDateValue,
+                                              isConfirmed: true,
+                                              selectedTimeStart: selectedTime),
                                           userId));
                                       Navigator.pop(context);
                                     })

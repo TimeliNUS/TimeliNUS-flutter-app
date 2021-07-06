@@ -59,28 +59,27 @@ class DashboardWelcomeBar extends StatelessWidget {
       padding: EdgeInsets.all(25),
       decoration: BoxDecoration(
           color: appTheme.primaryColorLight,
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(25),
-              bottomRight: Radius.circular(25))),
+          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(
-                "Hello, " + context.read<AppBloc>().getCurrentUser().name ??
-                    ' ' + "!",
+            Text("Hello, " + context.read<AppBloc>().getCurrentUser().name ?? ' ' + "!",
                 style: TextStyle(fontSize: 24, color: Colors.white)),
-            Text(DateFormat('EEE, M/d/y').format(DateTime.now()),
-                style: TextStyle(fontSize: 14, color: Colors.white))
+            Text(DateFormat('EEE, M/d/y').format(DateTime.now()), style: TextStyle(fontSize: 14, color: Colors.white))
           ]),
-          ClipRRect(
-              borderRadius: BorderRadius.circular(12.0),
-              child: Image.network(
-                'https://via.placeholder.com/350x150',
-                fit: BoxFit.cover,
-                width: 50,
-                height: 50,
-              ))
+          GestureDetector(
+              onTap: () => context.read<AppBloc>().add(AppOnProfile()),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0),
+                  child: Image.network(
+                    'https://via.placeholder.com/350x150',
+                    cacheWidth: 50,
+                    cacheHeight: 50,
+                    fit: BoxFit.cover,
+                    width: 50,
+                    height: 50,
+                  )))
         ],
       ),
     );
@@ -95,10 +94,8 @@ class DashboardProjects extends StatelessWidget {
   Widget build(BuildContext context) {
     final id = context.select((AppBloc bloc) => bloc.state.user.id);
     return BlocProvider<ProjectBloc>(
-        create: (context) => ProjectBloc(projectRepository: _projectRepository)
-          ..add(LoadProjects(id)),
-        child:
-            BlocBuilder<ProjectBloc, ProjectState>(builder: (context, state) {
+        create: (context) => ProjectBloc(projectRepository: _projectRepository)..add(LoadProjects(id)),
+        child: BlocBuilder<ProjectBloc, ProjectState>(builder: (context, state) {
           return Container(
             padding: EdgeInsets.only(top: 20),
             child: Column(
@@ -111,10 +108,8 @@ class DashboardProjects extends StatelessWidget {
                       children: [
                         Text('Projects', style: TextStyle(fontSize: 24)),
                         InkWell(
-                            child: Text('View All',
-                                style: TextStyle(color: Colors.grey)),
-                            onTap: () =>
-                                context.read<AppBloc>().add(AppOnProject()))
+                            child: Text('View All', style: TextStyle(color: Colors.grey)),
+                            onTap: () => context.read<AppBloc>().add(AppOnProject()))
                       ],
                     )),
                 SizedBox(
@@ -127,10 +122,7 @@ class DashboardProjects extends StatelessWidget {
                         children: state.projects
                             .map((project) => DashboardProjectCard(
                                 project,
-                                project.todos
-                                    .where((todo) => todo.complete == false)
-                                    .toList()
-                                    .length,
+                                project.todos.where((todo) => todo.complete == false).toList().length,
                                 project.meetings.length))
                             .toList()))
               ],
@@ -145,82 +137,65 @@ class DashboardProjectCard extends StatelessWidget {
   final int todosLength;
   final int meetingLength;
 
-  const DashboardProjectCard(this.project, this.todosLength, this.meetingLength,
-      {Key key})
-      : super(key: key);
+  const DashboardProjectCard(this.project, this.todosLength, this.meetingLength, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final double progress = (project.todos.length != 0
-        ? ((1 - todosLength) / project.todos.length)
-        : 1);
+    final double progress =
+        (project.todos.length != 0 ? ((project.todos.length - todosLength) / project.todos.length) : 1).abs();
     return CustomCard(
       padding: 15,
       elevation: 6,
       margin: EdgeInsets.only(left: 25, top: 15),
       child: IntrinsicWidth(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(project.title),
-                  Text("Software Engineering Project"),
-                  Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5),
-                      child: CircleAvatar(
-                        maxRadius: 10,
-                      )),
-                  Row(
-                    children: [
-                      Icon(Icons.calendar_today_outlined,
-                          size: 15, color: Colors.grey),
-                      Text(
-                          ' ' +
-                              ((project.deadline.hour != 0)
-                                  ? DateFormat('MMM dd, yyyy – kk:mm')
-                                      .format(project.deadline)
-                                  : DateFormat('MMM dd, yyyy')
-                                      .format(project.deadline)),
-                          style: TextStyle(fontSize: 12, color: Colors.grey)),
-                    ],
-                  ),
-                  CustomPadding(),
-                ]),
-                // Padding(padding: EdgeInsets.only(right: 30)),
-                CircularPercentIndicator(
-                  radius: 60.0,
-                  lineWidth: 10,
-                  percent: progress,
-                  animation: true,
-                  animationDuration: 500,
-                  center: new Text((progress * 100).toInt().toString() + '%',
-                      style: TextStyle(
-                          color: appTheme.primaryColorLight,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold)),
-                  progressColor: appTheme.primaryColorLight,
-                  animateFromLastPercent: true,
-                  circularStrokeCap: CircularStrokeCap.round,
-                  backgroundColor: HexColor.fromHex('FFD8B4'),
-                )
-              ]),
-          Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  Icon(Icons.check_box_outlined, size: 15, color: Colors.grey),
-                  Text(' ' + todosLength.toString() + ' Incompleted',
+          Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.start, children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(project.title),
+              Text("Software Engineering Project"),
+              Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: CircleAvatar(
+                    maxRadius: 10,
+                  )),
+              Row(
+                children: [
+                  Icon(Icons.calendar_today_outlined, size: 15, color: Colors.grey),
+                  Text(
+                      ' ' +
+                          ((project.deadline.hour != 0)
+                              ? DateFormat('MMM dd, yyyy – kk:mm').format(project.deadline)
+                              : DateFormat('MMM dd, yyyy').format(project.deadline)),
                       style: TextStyle(fontSize: 12, color: Colors.grey)),
-                ]),
-                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  Icon(Icons.check_box_outlined, size: 15, color: Colors.grey),
-                  Text(' ' + meetingLength.toString() + ' Meeting',
-                      style: TextStyle(fontSize: 12, color: Colors.grey)),
-                ])
-              ]),
+                ],
+              ),
+              CustomPadding(),
+            ]),
+            // Padding(padding: EdgeInsets.only(right: 30)),
+            CircularPercentIndicator(
+              radius: 60.0,
+              lineWidth: 10,
+              percent: progress,
+              animation: true,
+              animationDuration: 500,
+              center: new Text((progress * 100).toInt().toString() + '%',
+                  style: TextStyle(color: appTheme.primaryColorLight, fontSize: 14, fontWeight: FontWeight.bold)),
+              progressColor: appTheme.primaryColorLight,
+              animateFromLastPercent: true,
+              circularStrokeCap: CircularStrokeCap.round,
+              backgroundColor: HexColor.fromHex('FFD8B4'),
+            )
+          ]),
+          Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              Icon(Icons.check_box_outlined, size: 15, color: Colors.grey),
+              Text(' ' + todosLength.toString() + ' Incompleted', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ]),
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              Icon(Icons.check_box_outlined, size: 15, color: Colors.grey),
+              Text(' ' + meetingLength.toString() + ' Meeting', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ])
+          ]),
         ]),
       ),
     );
@@ -246,11 +221,8 @@ class DashboardMeetings extends StatelessWidget {
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(12)),
-                boxShadow: [
-                  BoxShadow(color: HexColor.fromHex('FFDCC8'), spreadRadius: 4)
-                ],
-                border:
-                    Border.all(color: appTheme.primaryColorLight, width: 2.5)),
+                boxShadow: [BoxShadow(color: HexColor.fromHex('FFDCC8'), spreadRadius: 4)],
+                border: Border.all(color: appTheme.primaryColorLight, width: 2.5)),
             child: null,
           ),
         ]));
@@ -270,112 +242,74 @@ class _DashboardTodosState extends State<DashboardTodos> {
     final id = context.select((AppBloc bloc) => bloc.state.user.id);
 
     return BlocProvider<TodoBloc>(
-        create: (context) => TodoBloc(todoRepository: widget._todoRepository)
-          ..add(TodayTodo(id)),
+        create: (context) => TodoBloc(todoRepository: widget._todoRepository)..add(TodayTodo(id)),
         child: BlocBuilder<TodoBloc, TodoState>(builder: (context, state) {
           return Container(
               margin: EdgeInsets.symmetric(horizontal: 25),
               child: state.todos != null
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                  ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                        Text(
+                          "Today's Todos",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        InkWell(
+                            child: Text('View All', style: TextStyle(color: Colors.grey)),
+                            onTap: () => context.read<AppBloc>().add(AppOnTodo()))
+                      ]),
+                      Container(
+                        margin: EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.all(25),
+                        decoration: BoxDecoration(
+                          color: appTheme.primaryColorLight,
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                              CircularPercentIndicator(
+                                radius: 80.0,
+                                lineWidth: 10,
+                                percent: state.todos.length != 0 ? state.progress : 1,
+                                animation: true,
+                                animationDuration: 500,
+                                center: new Text((state.progress * 100).toInt().toString() + '%',
+                                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                progressColor: Colors.white,
+                                animateFromLastPercent: true,
+                                circularStrokeCap: CircularStrokeCap.round,
+                                backgroundColor: HexColor.fromHex('FFD5A5'),
+                              ),
+                              Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 15),
+                                  height: 80,
+                                  child: VerticalDivider(
+                                    width: 3,
+                                    thickness: 3,
+                                    color: HexColor.fromHex('FFD5A5'),
+                                  )),
+                              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Text(
-                                  "Today's Todos",
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(fontSize: 24),
-                                ),
-                                InkWell(
-                                    child: Text('View All',
-                                        style: TextStyle(color: Colors.grey)),
-                                    onTap: () => context
-                                        .read<AppBloc>()
-                                        .add(AppOnTodo()))
+                                    state.todos.where((x) => x.complete).toList().length.toString() +
+                                        '/' +
+                                        state.todos.length.toString(),
+                                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
+                                Text('Completed', style: TextStyle(color: Colors.white))
                               ]),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            padding: EdgeInsets.all(25),
-                            decoration: BoxDecoration(
-                              color: appTheme.primaryColorLight,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(12)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      CircularPercentIndicator(
-                                        radius: 80.0,
-                                        lineWidth: 10,
-                                        percent: state.todos.length != 0
-                                            ? state.progress
-                                            : 1,
-                                        animation: true,
-                                        animationDuration: 500,
-                                        center: new Text(
-                                            (state.progress * 100)
-                                                    .toInt()
-                                                    .toString() +
-                                                '%',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold)),
-                                        progressColor: Colors.white,
-                                        animateFromLastPercent: true,
-                                        circularStrokeCap:
-                                            CircularStrokeCap.round,
-                                        backgroundColor:
-                                            HexColor.fromHex('FFD5A5'),
-                                      ),
-                                      Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 15),
-                                          height: 80,
-                                          child: VerticalDivider(
-                                            width: 3,
-                                            thickness: 3,
-                                            color: HexColor.fromHex('FFD5A5'),
-                                          )),
-                                      Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                                state.todos
-                                                        .where(
-                                                            (x) => x.complete)
-                                                        .toList()
-                                                        .length
-                                                        .toString() +
-                                                    '/' +
-                                                    state.todos.length
-                                                        .toString(),
-                                                style: TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white)),
-                                            Text('Completed',
-                                                style: TextStyle(
-                                                    color: Colors.white))
-                                          ]),
-                                    ]),
-                                // ...(state.todos
-                                //     .map((todo) => ProjectTodoCard(todo))
-                                //     .toList()),
-                                ...(groupBy(state.todos,
-                                        (Todo todo) => todo.project.id)
-                                    .values
-                                    .map((value) => ProjectTodoCard(value))
-                                    .toList())
-                              ],
-                            ),
-                          ),
-                        ])
+                            ]),
+                            // ...(state.todos
+                            //     .map((todo) => ProjectTodoCard(todo))
+                            //     .toList()),
+                            ...(groupBy(state.todos, (Todo todo) => todo.project.id)
+                                .values
+                                .map((value) => ProjectTodoCard(value))
+                                .toList())
+                          ],
+                        ),
+                      ),
+                    ])
                   : Container());
         }));
   }
@@ -429,9 +363,7 @@ class __ProjectTodoCardItemState extends State<_ProjectTodoCardItem> {
                     materialTapTargetSize: MaterialTapTargetSize.padded,
                     value: isChecked ?? widget.todo.complete,
                     onChanged: (boolean) {
-                      setState(() => isChecked = (isChecked != null
-                          ? !isChecked
-                          : !widget.todo.complete));
+                      setState(() => isChecked = (isChecked != null ? !isChecked : !widget.todo.complete));
                       context.read<TodoBloc>().add(UpdateTodo(context
                           .read<TodoBloc>()
                           .state

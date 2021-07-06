@@ -10,7 +10,7 @@ import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
+import 'package:TimeliNUS/utils/dateTimeExtension.dart';
 
 class NewMeetingPopup extends StatefulWidget {
   final MeetingBloc projectBloc;
@@ -20,7 +20,7 @@ class NewMeetingPopup extends StatefulWidget {
 }
 
 class _NewMeetingPopupState extends State<NewMeetingPopup> {
-  DateTime startDateValue;
+  DateTime startDateValue = DateTime.now().stripTime();
   DateTime endDateValue;
   MeetingVenue meetingVenue = MeetingVenue.Zoom;
   List<User> pics = [];
@@ -40,50 +40,43 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
-                      TopBar(() => Navigator.pop(context), "Create Meeting"),
+                      TopBar(
+                        "Create Meeting",
+                        onPressedCallback: () => Navigator.pop(context),
+                      ),
                       Expanded(
                           child: GestureDetector(
-                              onTap: () =>
-                                  FocusManager.instance.primaryFocus?.unfocus(),
+                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                               child: Container(
                                   decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(40.0),
-                                          topLeft: Radius.circular(40.0))),
+                                          topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0))),
                                   child: Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 30, right: 30, top: 15),
+                                      padding: EdgeInsets.only(left: 30, right: 30, top: 15),
                                       child: ListView(
                                         children: [
                                           // TopBar(),
                                           PopupInput(textController,
                                               inputLabel: 'Meeting Title',
-                                              errorMsg:
-                                                  'Please enter your meeting title!'),
+                                              errorMsg: 'Please enter your meeting title!'),
                                           customPadding(),
                                           PopupDropdown(
                                               dropdownLabel: 'Module Project',
-                                              callback: (val) => {
-                                                    setState(() =>
-                                                        selectedProject = val)
-                                                  }),
+                                              callback: (val) => {setState(() => selectedProject = val)}),
                                           customPadding(),
-                                          PersonInChargeChips(
-                                              pics, "Person in Charge",
-                                              project: selectedProject,
+                                          PersonInChargeChips(pics, "Person in Charge", project: selectedProject,
                                               callback: (val) {
                                             setState(() => pics = val);
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           Text(
-                                            'Meeting must be within...',
+                                            'Meeting must be within...*',
                                           ),
                                           Row(
                                               mainAxisSize: MainAxisSize.max,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
+                                              crossAxisAlignment: CrossAxisAlignment.end,
                                               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 SizedBox(
@@ -94,8 +87,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                                     )),
                                                 Expanded(
                                                     child: DeadlineInput(
-                                                  (val) => setState(() =>
-                                                      startDateValue = val),
+                                                  (val) => setState(() => startDateValue = val),
                                                   false,
                                                   isNotMini: false,
                                                 )),
@@ -110,8 +102,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                                   )),
                                               Expanded(
                                                   child: DeadlineInput(
-                                                (val) => setState(
-                                                    () => endDateValue = val),
+                                                (val) => setState(() => endDateValue = val),
                                                 false,
                                                 isNotMini: false,
                                               )),
@@ -119,7 +110,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                           ),
                                           customPadding(),
                                           Text(
-                                            'Meeting Venue',
+                                            'Meeting Venue*',
                                           ),
                                           Row(
                                             children: [
@@ -127,22 +118,18 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                               Radio<MeetingVenue>(
                                                 value: MeetingVenue.Zoom,
                                                 groupValue: meetingVenue,
-                                                onChanged:
-                                                    (MeetingVenue value) {
+                                                onChanged: (MeetingVenue value) {
                                                   setState(() {
                                                     meetingVenue = value;
                                                   });
                                                 },
                                               ),
-                                              Padding(
-                                                  padding: EdgeInsets.only(
-                                                      right: 30)),
+                                              Padding(padding: EdgeInsets.only(right: 30)),
                                               Text('Face to Face'),
                                               Radio<MeetingVenue>(
                                                 value: MeetingVenue.FaceToFace,
                                                 groupValue: meetingVenue,
-                                                onChanged:
-                                                    (MeetingVenue value) {
+                                                onChanged: (MeetingVenue value) {
                                                   setState(() {
                                                     meetingVenue = value;
                                                   });
@@ -156,33 +143,24 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                         color: Colors.white,
                         alignment: Alignment.bottomCenter,
                         child: Padding(
-                            padding: EdgeInsets.only(
-                                bottom: MediaQuery.of(context).padding.bottom),
+                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 ElevatedButton(
                                     style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                appTheme.primaryColorLight)),
+                                        backgroundColor: MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
                                     child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Text("Done",
-                                            style: appTheme.textTheme.bodyText2
-                                                .apply(color: Colors.white))),
+                                            style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
                                     onPressed: () {
-                                      widget.projectBloc.add(AddMeeting(
-                                          Meeting(
-                                            textController.text,
-                                            pics,
-                                            meetingVenue,
-                                            selectedProject,
-                                            startDate: startDateValue,
-                                            endDate: endDateValue,
-                                          ),
-                                          userId));
+                                      widget.projectBloc
+                                        ..add(AddMeeting(
+                                            Meeting(textController.text, pics, meetingVenue, selectedProject,
+                                                startDate: startDateValue, endDate: endDateValue, isConfirmed: false),
+                                            userId))
+                                        ..add(LoadMeetings(context.read<AppBloc>().state.user.id));
                                       Navigator.pop(context);
                                     })
                               ],

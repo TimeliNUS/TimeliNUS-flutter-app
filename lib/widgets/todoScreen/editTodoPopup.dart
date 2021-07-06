@@ -48,27 +48,24 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
-                      TopBar(() => Navigator.pop(context), "Todo Details",
+                      TopBar("Todo Details",
+                          onPressedCallback: () => Navigator.pop(context),
                           rightWidget: IconButton(
                               icon: Icon(Icons.delete, color: Colors.white),
                               onPressed: () {
-                                widget.todosBloc
-                                    .add(DeleteTodo(widget.todoToEdit, userId));
+                                widget.todosBloc.add(DeleteTodo(widget.todoToEdit, userId));
                                 Navigator.pop(context);
                               })),
                       Expanded(
                           child: GestureDetector(
-                              onTap: () =>
-                                  FocusManager.instance.primaryFocus?.unfocus(),
+                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                               child: Container(
                                   decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(40.0),
-                                          topLeft: Radius.circular(40.0))),
+                                          topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0))),
                                   child: Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 30, right: 30, top: 15),
+                                      padding: EdgeInsets.only(left: 30, right: 30, top: 15),
                                       child: ListView(
                                         children: [
                                           // TopBar(),
@@ -76,28 +73,19 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                           customPadding(),
                                           PopupDropdown(
                                               dropdownLabel: 'Module Project',
-                                              initialProject:
-                                                  widget.todoToEdit.project,
-                                              callback: (val) => {
-                                                    setState(() =>
-                                                        selectedProject = val)
-                                                  }),
+                                              initialProject: widget.todoToEdit.project,
+                                              callback: (val) => {setState(() => selectedProject = val)}),
                                           customPadding(),
-                                          PersonInChargeChips(
-                                              widget.todoToEdit.pic,
-                                              "Person in Charge",
-                                              project: selectedProject,
-                                              callback: (val) {
+                                          PersonInChargeChips(widget.todoToEdit.pic, "Person in Charge",
+                                              project: selectedProject, callback: (val) {
                                             setState(() => pics = val);
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
                                           DeadlineInput(
-                                            (val) => setState(
-                                                () => deadlineValue = val),
+                                            (val) => setState(() => deadlineValue = val),
                                             true,
-                                            initialTime:
-                                                widget.todoToEdit.deadline,
+                                            initialTime: widget.todoToEdit.deadline,
                                           ),
                                           customPadding(),
                                           NotesInput(noteController),
@@ -107,25 +95,19 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                         color: Colors.white,
                         alignment: Alignment.bottomCenter,
                         child: Padding(
-                            padding: EdgeInsets.only(
-                                bottom: MediaQuery.of(context).padding.bottom),
+                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 ElevatedButton(
                                     style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                appTheme.primaryColorLight)),
+                                        backgroundColor: MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
                                     child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Text("Update",
-                                            style: appTheme.textTheme.bodyText2
-                                                .apply(color: Colors.white))),
+                                            style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
                                     onPressed: () {
-                                      widget.todosBloc.add(UpdateTodo(Todo(
-                                          textController.text,
+                                      widget.todosBloc.add(UpdateTodo(Todo(textController.text,
                                           id: widget.todoToEdit.id,
                                           note: noteController.text,
                                           project: selectedProject,

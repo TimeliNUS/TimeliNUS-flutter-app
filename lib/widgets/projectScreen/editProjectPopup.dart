@@ -26,10 +26,8 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
   @override
   void initState() {
     super.initState();
-    textController =
-        new TextEditingController(text: widget.projectToEdit.title);
-    moduleCodeController =
-        new TextEditingController(text: widget.projectToEdit.moduleCode);
+    textController = new TextEditingController(text: widget.projectToEdit.title);
+    moduleCodeController = new TextEditingController(text: widget.projectToEdit.moduleCode);
   }
 
   @override
@@ -44,86 +42,67 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
-                      TopBar(() => Navigator.pop(context), "Edit Project",
+                      TopBar("Edit Project",
+                          onPressedCallback: () => Navigator.pop(context),
                           rightWidget: IconButton(
                               icon: Icon(Icons.delete, color: Colors.white),
                               onPressed: () {
-                                widget.projectBloc.add(DeleteProject(
-                                    widget.projectToEdit,
-                                    context.read<AppBloc>().state.user.id));
+                                widget.projectBloc
+                                    .add(DeleteProject(widget.projectToEdit, context.read<AppBloc>().state.user.id));
                                 Navigator.pop(context);
                               })),
                       Expanded(
                           child: GestureDetector(
-                              onTap: () =>
-                                  FocusManager.instance.primaryFocus?.unfocus(),
+                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                               child: Container(
                                   decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(40.0),
-                                          topLeft: Radius.circular(40.0))),
+                                          topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0))),
                                   child: Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 30, right: 30, top: 15),
+                                      padding: EdgeInsets.only(left: 30, right: 30, top: 15),
                                       child: ListView(
                                         children: [
                                           // TopBar(),
                                           PopupInput(textController,
                                               inputLabel: 'Project Title',
-                                              errorMsg:
-                                                  'Please enter your project title!'),
+                                              errorMsg: 'Please enter your project title!'),
                                           customPadding(),
                                           PopupInput(moduleCodeController,
-                                              inputLabel: 'Module Code',
-                                              errorMsg:
-                                                  'Please enter your module code!'),
+                                              inputLabel: 'Module Code', errorMsg: 'Please enter your module code!'),
                                           customPadding(),
-                                          PersonInChargeChips(
-                                              widget.projectToEdit.groupmates,
-                                              "Groupmates", callback: (val) {
+                                          PersonInChargeChips(widget.projectToEdit.groupmates, "Groupmates",
+                                              callback: (val) {
                                             setState(() => groupmates = val);
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
-                                          DeadlineInput(
-                                              (val) => setState(
-                                                  () => deadlineValue = val),
-                                              false,
-                                              initialTime: widget
-                                                  .projectToEdit.deadline),
+                                          DeadlineInput((val) => setState(() => deadlineValue = val), false,
+                                              initialTime: widget.projectToEdit.deadline),
                                         ],
                                       ))))),
                       Container(
                         color: Colors.white,
                         alignment: Alignment.bottomCenter,
                         child: Padding(
-                            padding: EdgeInsets.only(
-                                bottom: MediaQuery.of(context).padding.bottom),
+                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 ElevatedButton(
                                     style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                appTheme.primaryColorLight)),
+                                        backgroundColor: MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
                                     child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Text("Done",
-                                            style: appTheme.textTheme.bodyText2
-                                                .apply(color: Colors.white))),
+                                            style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
                                     onPressed: () {
                                       widget.projectBloc.add(UpdateProject(
                                           widget.projectToEdit.copyWith(
                                               title: textController.text,
                                               deadline: deadlineValue,
                                               groupmates: groupmates),
-                                          context
-                                              .read<AppBloc>()
-                                              .getCurrentUser()
-                                              .id));
+                                          context.read<AppBloc>().getCurrentUser().id));
                                       Navigator.pop(context);
                                     })
                               ],

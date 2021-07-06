@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:TimeliNUS/models/models.dart';
 import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:bloc/bloc.dart';
@@ -35,11 +36,15 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Stream<ProjectState> _mapLoadProjectsToState(LoadProjects event) async* {
     try {
       yield ProjectLoading();
-      final projectEntities = await projectRepository.loadProjects(event.id);
-      final List<Project> projects = projectEntities
-          .map((project) => Project.fromEntity(project))
-          .toList();
-      yield ProjectLoaded(projects);
+      List<Future> futures = [];
+      List<ProjectEntity> projectEntities;
+      List<ProjectEntity> invitationEntities;
+      futures.add(projectRepository.loadProjects(event.id).then((x) => projectEntities = x));
+      futures.add(projectRepository.loadProjectInvitations(event.id).then((x) => invitationEntities = x));
+      await Future.wait(futures);
+      final List<Project> projects = projectEntities.map((project) => Project.fromEntity(project)).toList();
+      final List<Project> invitations = invitationEntities.map((project) => Project.fromEntity(project)).toList();
+      yield ProjectLoaded(projects, invitations);
     } catch (err) {
       yield ProjectNotLoaded();
     }
@@ -48,33 +53,25 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   Stream<ProjectState> _mapAddProjectToState(AddProject event) async* {
     List<Project> currentProjects = state.projects;
     yield ProjectLoading();
-    DocumentReference newTodoRef = await projectRepository.addNewProject(
-        event.project.toEntity(), event.id);
-    final updatedProjects = currentProjects
-      ..add(event.project.copyWith(ref: newTodoRef, id: newTodoRef.id));
-    yield ProjectLoaded(updatedProjects);
+    DocumentReference newTodoRef = await projectRepository.addNewProject(event.project.toEntity(), event.id);
+    final updatedProjects = currentProjects..add(event.project.copyWith(ref: newTodoRef, id: newTodoRef.id));
+    yield ProjectLoaded(updatedProjects, state.invitations);
   }
 
   Stream<ProjectState> _mapUpdateProjectToState(UpdateProject event) async* {
     yield ProjectLoading();
     final updatedProjects = state.projects.map((project) {
-      return project.id == event.updatedProject.id
-          ? event.updatedProject
-          : project;
+      return project.id == event.updatedProject.id ? event.updatedProject : project;
     }).toList();
-    yield ProjectLoaded(updatedProjects);
+    yield ProjectLoaded(updatedProjects, state.invitations);
     await projectRepository.updateProject(event.updatedProject.toEntity());
   }
 
   Stream<ProjectState> _mapDeleteProjectToState(DeleteProject event) async* {
     // if (state is TodoLoaded) {
     yield ProjectLoading();
-    final updatedProjects = state.projects
-        .where((project) => project.id != event.project.id)
-        .toList();
-    yield ProjectLoaded(
-      updatedProjects,
-    );
+    final updatedProjects = state.projects.where((project) => project.id != event.project.id).toList();
+    yield ProjectLoaded(updatedProjects, state.invitations);
     // }
     await projectRepository.deleteTodo(event.project, event.userId);
   }

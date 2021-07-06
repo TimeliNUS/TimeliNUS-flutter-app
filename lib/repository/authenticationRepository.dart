@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:TimeliNUS/models/userModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
+import 'package:flutter/widgets.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meta/meta.dart';
@@ -66,13 +67,9 @@ class AuthenticationRepository {
   /// Creates a new user with the provided [email] and [password].
   ///
   /// Throws a [SignUpFailure] if an exception occurs.
-  Future<void> signUp(
-      {@required String email,
-      @required String password,
-      @required String name}) async {
+  Future<void> signUp({@required String email, @required String password, @required String name}) async {
     try {
-      FirebaseAuth.UserCredential credential =
-          await _firebaseAuth.createUserWithEmailAndPassword(
+      FirebaseAuth.UserCredential credential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -81,13 +78,7 @@ class AuthenticationRepository {
       promises.add(FirebaseFirestore.instance
           .collection('user')
           .doc(credential.user.uid)
-          .set({
-        'name': name,
-        'email': email,
-        'project': [],
-        'todo': [],
-        'meeting': []
-      }));
+          .set({'name': name, 'email': email, 'project': [], 'todo': [], 'meeting': []}));
       Future.wait(promises);
       // await _firebaseAuth.signOut();
       print(_firebaseAuth.currentUser);
@@ -158,12 +149,17 @@ class AuthenticationRepository {
     for (DocumentReference documentReference in refs) {
       final DocumentSnapshot temp = await documentReference.get();
       // print(documentReference);
-      User documentSnapshotTask =
-          User.fromJson(temp.data(), temp.id, ref: temp.reference);
+      User documentSnapshotTask = User.fromJson(temp.data(), temp.id, ref: temp.reference);
       users.add(documentSnapshotTask);
     }
     // print("Task: " + tasks.toString());
     return users;
+  }
+
+  Future<void> updateProfilePicture(String url) async {
+    // Assume user is logged in for this example
+    // String userId = FirebaseAuth.FirebaseAuth.instance.currentUser.uid;
+    await _firebaseAuth.currentUser.updateProfile(photoURL: url);
   }
 }
 
@@ -173,6 +169,7 @@ extension on FirebaseAuth.User {
         id: uid,
         email: email,
         name: displayName,
-        ref: FirebaseFirestore.instance.collection('user').doc(uid));
+        ref: FirebaseFirestore.instance.collection('user').doc(uid),
+        profilePicture: (photoURL ?? 'https://via.placeholder.com/500x500'));
   }
 }

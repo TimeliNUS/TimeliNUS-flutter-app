@@ -17,6 +17,8 @@ class MeetingEntity extends Equatable {
   final String id;
   final DocumentReference ref;
   final List<TimeRegion> timeslots;
+  final Timestamp selectedDate;
+  final bool isConfirmed;
 
   MeetingEntity(
       this.title,
@@ -31,21 +33,20 @@ class MeetingEntity extends Equatable {
       this.meetingVenue,
       this.ref,
       this.project,
-      this.timeslots);
+      this.timeslots,
+      this.selectedDate,
+      this.isConfirmed);
 
-  static MeetingEntity fromJson(
-      Map<String, Object> json, List<User> invited, List<User> confirmed,
+  static MeetingEntity fromJson(Map<String, Object> json, List<User> invited, List<User> confirmed,
       [String id, DocumentReference ref]) {
     return MeetingEntity(
         json['title'] ?? '',
         id != null ? id : (json['id'] as String),
-        json['timeLength'] != null
-            ? double.parse(json['timeLength'].toString())
-            : 0,
+        json['timeLength'] != null ? double.parse(json['timeLength'].toString()) : 0,
         json['startDate'],
         json['endDate'],
         // groupmates != null ? groupmates[0] : null,
-        (json['author'] as DocumentReference),
+        json['author'],
         // User(
         //     id: ((json['author'] as Map<String, Object>)['ref']
         //             as DocumentReference)
@@ -57,10 +58,7 @@ class MeetingEntity extends Equatable {
         confirmed,
         convertMeetingVenue(json['meetingVenue']),
         ref,
-        json['project'] != null
-            ? Project.fromEntity(
-                ProjectEntity.fromJson(json['project'], [], [], []))
-            : null,
+        json['project'] != null ? Project.fromEntity(ProjectEntity.fromJson(json['project'], [], [], [])) : null,
         json['timeslot'] != null
             ? (json['timeslot'] as List)
                 .map((timeslot) => TimeRegion(
@@ -68,7 +66,9 @@ class MeetingEntity extends Equatable {
                     enablePointerInteraction: false,
                     endTime: (timeslot['end'] as Timestamp).toDate()))
                 .toList()
-            : null);
+            : null,
+        json['selectedDate'],
+        json['isConfirmed'] ?? false);
   }
 
   Map<String, Object> toJson() {
@@ -87,6 +87,8 @@ class MeetingEntity extends Equatable {
           : null,
       "startDate": startDate,
       "endDate": endDate,
+      "selectedDate": selectedDate,
+      "isConfirmed": isConfirmed
       // "interval" ??
     };
   }
@@ -97,6 +99,5 @@ class MeetingEntity extends Equatable {
   }
 
   @override
-  List<Object> get props =>
-      [title, project, meetingVenue, timeLength, ref, id, groupmates];
+  List<Object> get props => [title, project, meetingVenue, timeLength, ref, id, groupmates, selectedDate, isConfirmed];
 }

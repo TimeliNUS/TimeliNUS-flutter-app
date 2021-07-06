@@ -10,8 +10,15 @@ class TimeslotView extends StatefulWidget {
   final bool isDialog;
   final int meetingLength;
   final Function callback;
+  final bool isConfirmed;
+  final DateTime selectedDate;
   TimeslotView(this.intervals, this.startDate, this.endDate,
-      {this.callback, this.isDialog = true, this.meetingLength = 1, Key key})
+      {this.callback,
+      this.isDialog = true,
+      this.meetingLength = 1,
+      this.isConfirmed = false,
+      this.selectedDate,
+      Key key})
       : super(key: key);
 
   @override
@@ -23,7 +30,7 @@ class TimeslotViewState extends State<TimeslotView> {
   @override
   void initState() {
     super.initState();
-    print(widget.intervals);
+    print(widget.isConfirmed);
   }
 
   @override
@@ -31,9 +38,7 @@ class TimeslotViewState extends State<TimeslotView> {
     final timetable = Column(children: [
       widget.isDialog
           ? ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(appTheme.primaryColorLight)),
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.all(appTheme.primaryColorLight)),
               child: Text('Confirm'),
               onPressed: () {
                 widget.callback(selectedTime);
@@ -42,18 +47,25 @@ class TimeslotViewState extends State<TimeslotView> {
           : Container(),
       Expanded(
         child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(35)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(35)),
             padding: EdgeInsets.all(15),
             child: SfCalendar(
-              specialRegions: widget.intervals,
+              initialSelectedDate: widget.isConfirmed ? widget.selectedDate : null,
+              initialDisplayDate: widget.isConfirmed ? widget.selectedDate : null,
+              specialRegions: widget.isConfirmed
+                  ? (widget.intervals
+                    ..add(TimeRegion(
+                        startTime: widget.startDate,
+                        endTime: widget.endDate,
+                        enablePointerInteraction: false,
+                        color: Colors.grey.withOpacity(0))))
+                  : widget.intervals,
               timeSlotViewSettings: TimeSlotViewSettings(
                 startHour: widget.startDate.minute != 0
                     ? (widget.startDate.hour.toDouble())
                     : widget.startDate.hour.toDouble(),
-                endHour: widget.endDate.minute != 0
-                    ? (widget.endDate.hour.toDouble() + 1)
-                    : widget.endDate.hour.toDouble(),
+                endHour:
+                    widget.endDate.minute != 0 ? (widget.endDate.hour.toDouble() + 1) : widget.endDate.hour.toDouble(),
                 timeInterval: Duration(hours: widget.meetingLength),
                 timeFormat: 'h:mm a',
                 timeIntervalHeight: 45,

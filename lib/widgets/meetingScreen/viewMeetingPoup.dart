@@ -1,4 +1,5 @@
 import 'package:TimeliNUS/models/meeting.dart';
+import 'package:TimeliNUS/models/userModel.dart';
 import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/widgets/invitationDetail.dart';
 import 'package:TimeliNUS/widgets/meetingScreen/timeslotView.dart';
@@ -24,10 +25,8 @@ class ViewMeetingPopupState extends State<ViewMeetingPopup> {
   }
 
   void findAuthorName() async {
-    String tempName =
-        await AuthenticationRepository.findUsersByRef([widget.meeting.author])
-            .then((x) => x[0].name);
-    setState(() => authorName = tempName);
+    List<User> temp = await AuthenticationRepository.findUsersByRef([widget.meeting.author]);
+    setState(() => authorName = temp[0].name);
   }
 
   @override
@@ -38,39 +37,40 @@ class ViewMeetingPopupState extends State<ViewMeetingPopup> {
             body: Container(
                 color: appTheme.primaryColorLight,
                 child: Column(children: [
-                  TopBar(() => Navigator.pop(context), "View Meeting"),
+                  TopBar(
+                    "View Meeting",
+                    onPressedCallback: () => Navigator.pop(context),
+                  ),
                   Expanded(
                       child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 25, horizontal: 30),
+                          padding: EdgeInsets.symmetric(vertical: 25, horizontal: 30),
                           // width: double.infinity,
                           // height: double.infinity,
                           decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(40.0),
-                                  topLeft: Radius.circular(40.0))),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Expanded(
-                                //     // height: 100,
-                                //     child:
-                                InvitationDetail(
-                                  widget.meeting,
-                                  authorName,
-                                  isAccepted: true,
-                                ),
-                                Padding(padding: EdgeInsets.only(bottom: 5)),
-                                Expanded(
-                                    child: TimeslotView(
-                                  widget.meeting.timeslots,
-                                  widget.meeting.startDate,
-                                  widget.meeting.endDate,
-                                  isDialog: false,
-                                ))
-                                // )
-                              ])))
+                              borderRadius:
+                                  BorderRadius.only(topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0))),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            // Expanded(
+                            //     // height: 100,
+                            //     child:
+                            InvitationDetail(
+                              widget.meeting,
+                              authorName,
+                              isAccepted: true,
+                            ),
+                            Padding(padding: EdgeInsets.only(bottom: 5)),
+                            Expanded(
+                                child: TimeslotView(
+                              widget.meeting.timeslots,
+                              widget.meeting.startDate,
+                              widget.meeting.endDate,
+                              isDialog: false,
+                              isConfirmed: widget.meeting.isConfirmed,
+                              selectedDate: widget.meeting.selectedTimeStart,
+                            ))
+                            // )
+                          ])))
                 ]))));
   }
 }

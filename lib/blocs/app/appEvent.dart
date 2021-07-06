@@ -14,7 +14,16 @@ class AppOnTodo extends AppEvent {}
 
 class AppOnProject extends AppEvent {}
 
-class AppOnMeeting extends AppEvent {}
+class AppOnMeeting extends AppEvent {
+  final String projectId;
+  final String projectTitle;
+  const AppOnMeeting({this.projectId, this.projectTitle});
+
+  @override
+  String toString() {
+    return "AppOnMeeting($projectId)";
+  }
+}
 
 class AppOnInvitation extends AppEvent {
   final String invitationId;
@@ -31,3 +40,5 @@ class AppUserChanged extends AppEvent {
 }
 
 class AppOnDashboard extends AppEvent {}
+
+class AppOnProfile extends AppEvent {}

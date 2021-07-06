@@ -34,9 +34,7 @@ class _InvitationState extends State<Invitation> {
 
   void findAuthorName(Meeting meeting) async {
     if (meeting != null) {
-      String tempName =
-          await AuthenticationRepository.findUsersByRef([meeting.author])
-              .then((x) => x[0].name);
+      String tempName = await AuthenticationRepository.findUsersByRef([meeting.author]).then((x) => x[0].name);
       setState(() => authorName = tempName);
     }
   }
@@ -45,10 +43,8 @@ class _InvitationState extends State<Invitation> {
   Widget build(BuildContext context) {
     return BlocProvider<InvitationBloc>(
         create: (context) =>
-            InvitationBloc(_meetingRepository, context.read<AppBloc>())
-              ..add(LoadInvitation(widget.meetingId)),
-        child: BlocBuilder<InvitationBloc, InvitationState>(
-            builder: (context, state) {
+            InvitationBloc(_meetingRepository, context.read<AppBloc>())..add(LoadInvitation(widget.meetingId)),
+        child: BlocBuilder<InvitationBloc, InvitationState>(builder: (context, state) {
           findAuthorName(state.meeting);
           return ColoredSafeArea(
               appTheme.primaryColorLight,
@@ -59,19 +55,15 @@ class _InvitationState extends State<Invitation> {
                       // crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         TopBar(
-                            () => context.read<AppBloc>().add(AppOnMeeting()),
-                            "Accept Meeting Invitation"),
+                          "Accept Meeting Invitation",
+                          onPressedCallback: () => context.read<AppBloc>().add(AppOnMeeting()),
+                        ),
                         Expanded(
                             child: CustomCard(
                                 padding: 30,
-                                radius: BorderRadius.only(
-                                    topLeft: Radius.circular(40),
-                                    topRight: Radius.circular(40)),
+                                radius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
                                 child: ListView(
-                                  children: [
-                                    InvitationDetail(state.meeting, authorName),
-                                    ImportCalendarWidget()
-                                  ],
+                                  children: [InvitationDetail(state.meeting, authorName), ImportCalendarWidget()],
                                 )))
                       ])));
         }));
@@ -141,24 +133,22 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
               Text('Google Calendar: '),
               OutlinedButton(
                   style: ButtonStyle(
-                      side: MaterialStateProperty.resolveWith((states) =>
-                          BorderSide(color: appTheme.primaryColorLight))),
+                      side:
+                          MaterialStateProperty.resolveWith((states) => BorderSide(color: appTheme.primaryColorLight))),
                   onPressed: () => {},
-                  child: Text('Login to Google',
-                      style: TextStyle(color: appTheme.primaryColorLight)))
+                  child: Text('Login to Google', style: TextStyle(color: appTheme.primaryColorLight)))
             ],
           ),
           Align(
               alignment: Alignment.bottomCenter,
               child: ElevatedButton(
                   style: ButtonStyle(
-                      backgroundColor: MaterialStateColor.resolveWith(
-                          (states) => appTheme.primaryColorLight)),
+                      backgroundColor: MaterialStateColor.resolveWith((states) => appTheme.primaryColorLight)),
                   child: Text('Done'),
                   onPressed: () {
-                    context.read<InvitationBloc>().add(AcceptInvitation(
-                        controller.text,
-                        context.read<AppBloc>().state.user.id));
+                    context
+                        .read<InvitationBloc>()
+                        .add(AcceptInvitation(controller.text, context.read<AppBloc>().state.user.id));
                     // context.read<AppBloc>().add(AppOnMeeting());
                   }))
         ]));
@@ -178,44 +168,33 @@ class _CalendarImportFieldState extends State<CalendarImportField> {
   Widget build(BuildContext context) {
     return SizedBox(
         height: 45,
-        child: Row(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                  child: Container(
-                      child: TextField(
-                controller: widget.controller,
-                textAlignVertical: TextAlignVertical.center,
-                style: TextStyle(fontSize: 12),
-                maxLines: 1,
-                decoration: InputDecoration(
-                  isDense: true,
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: appTheme.primaryColorLight),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          bottomLeft: Radius.circular(8))),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: appTheme.primaryColorLight),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          bottomLeft: Radius.circular(8))),
-                ),
-              ))),
-              Container(
-                  alignment: Alignment.center,
-                  constraints: BoxConstraints(minHeight: double.infinity),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: appTheme.primaryColorLight,
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(8),
-                          bottomRight: Radius.circular(8))),
-                  child: Text('Paste',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white)))
-            ]));
+        child: Row(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Expanded(
+              child: Container(
+                  child: TextField(
+            controller: widget.controller,
+            textAlignVertical: TextAlignVertical.center,
+            style: TextStyle(fontSize: 12),
+            maxLines: 1,
+            decoration: InputDecoration(
+              isDense: true,
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: appTheme.primaryColorLight),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(8), bottomLeft: Radius.circular(8))),
+              focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: appTheme.primaryColorLight),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(8), bottomLeft: Radius.circular(8))),
+            ),
+          ))),
+          Container(
+              alignment: Alignment.center,
+              constraints: BoxConstraints(minHeight: double.infinity),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: appTheme.primaryColorLight,
+                  borderRadius: BorderRadius.only(topRight: Radius.circular(8), bottomRight: Radius.circular(8))),
+              child: Text('Paste', textAlign: TextAlign.center, style: TextStyle(color: Colors.white)))
+        ]));
   }
 }
 

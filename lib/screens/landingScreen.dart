@@ -53,111 +53,80 @@ class _LandingScreenState extends State<LandingScreen> {
                 body: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(
-                            "assets/images/loginScreen/background.png"),
+                        image: AssetImage("assets/images/loginScreen/background.png"),
                         alignment: Alignment.topCenter,
                         fit: BoxFit.fitWidth,
                       ),
                     ),
                     child: Center(
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                          Padding(
-                            padding:
-                                EdgeInsets.only(top: screenHeight * 0.0275),
-                            child: Text(
-                              action == AuthenticationAction.login
-                                  ? 'Login'
-                                  : 'Welcome',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6
-                                  .apply(color: Colors.white),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Expanded(
-                              child: ListView(children: [
-                            LandingScreenGroupSwitcher(),
-                          ])),
-                          // Spacer(),
-                          Container(
-                              alignment: Alignment.bottomCenter,
-                              child: Column(children: [
-                                Row(children: <Widget>[
-                                  Expanded(
-                                    flex: 1,
-                                    child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 5, horizontal: 40),
-                                        child: Row(
-                                          children: <Widget>[
-                                            Expanded(child: Divider()),
-                                            Padding(
-                                                padding: EdgeInsets.all(
-                                                    screenHeight * 0.01),
-                                                child: Text("OR",
-                                                    style: TextStyle(
-                                                        color:
-                                                            Colors.black12))),
-                                            Expanded(child: Divider()),
-                                          ],
-                                        )),
-                                  )
-                                ]),
-                                Row(children: <Widget>[
-                                  new Expanded(
-                                    flex: 1,
-                                    child: Column(
+                        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(top: screenHeight * 0.0275),
+                        child: Text(
+                          action == AuthenticationAction.login ? 'Login' : 'Welcome',
+                          style: Theme.of(context).textTheme.headline6.apply(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                          child: ListView(children: [
+                        LandingScreenGroupSwitcher(),
+                      ])),
+                      // Spacer(),
+                      Container(
+                          alignment: Alignment.bottomCenter,
+                          child: Column(children: [
+                            Row(children: <Widget>[
+                              Expanded(
+                                flex: 1,
+                                child: Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 40),
+                                    child: Row(
                                       children: <Widget>[
+                                        Expanded(child: Divider()),
                                         Padding(
-                                            padding: EdgeInsets.only(
-                                                left: 50.0, right: 20.0),
-                                            child: GoogleSignInButton()),
+                                            padding: EdgeInsets.all(screenHeight * 0.01),
+                                            child: Text("OR", style: TextStyle(color: Colors.black12))),
+                                        Expanded(child: Divider()),
                                       ],
-                                    ),
-                                  ),
-                                  new Expanded(
-                                      flex: 1,
-                                      child: Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 20.0, right: 50.0),
-                                          child: new ConstrainedBox(
-                                            constraints: BoxConstraints(
-                                                maxHeight: 45,
-                                                minHeight: 45,
-                                                maxWidth: 40),
-                                            child: OutlinedButton(
-                                                style: ButtonStyle(
-                                                  shape:
-                                                      MaterialStateProperty.all(
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                    ),
-                                                  ),
+                                    )),
+                              )
+                            ]),
+                            Row(children: <Widget>[
+                              new Expanded(
+                                flex: 1,
+                                child: Column(
+                                  children: <Widget>[
+                                    Padding(
+                                        padding: EdgeInsets.only(left: 50.0, right: 20.0), child: GoogleSignInButton()),
+                                  ],
+                                ),
+                              ),
+                              new Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                      padding: EdgeInsets.only(left: 20.0, right: 50.0),
+                                      child: new ConstrainedBox(
+                                        constraints: BoxConstraints(maxHeight: 45, minHeight: 45, maxWidth: 40),
+                                        child: OutlinedButton(
+                                            style: ButtonStyle(
+                                              shape: MaterialStateProperty.all(
+                                                RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
-                                                onPressed: () {},
-                                                child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 10,
-                                                            bottom: 10),
-                                                    child: Text(
-                                                      "NUS Email",
-                                                    ))),
-                                          )))
-                                ]),
-                                Padding(
-                                    padding: EdgeInsets.only(
-                                        bottom: MediaQuery.of(context)
-                                                .padding
-                                                .bottom +
-                                            15))
-                              ]))
-                        ]))))));
+                                              ),
+                                            ),
+                                            onPressed: () {},
+                                            child: Padding(
+                                                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                                child: Text(
+                                                  "NUS Email",
+                                                ))),
+                                      )))
+                            ]),
+                            Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 15))
+                          ]))
+                    ]))))));
   }
 }
 

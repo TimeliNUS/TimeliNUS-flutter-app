@@ -36,6 +36,8 @@ class Meeting extends Equatable {
   final Project project;
   final DocumentReference ref;
   final List<TimeRegion> timeslots;
+  final DateTime selectedTimeStart;
+  final bool isConfirmed;
 
   const Meeting(this.title, this.groupmates, this.meetingVenue, this.project,
       {this.id,
@@ -46,39 +48,44 @@ class Meeting extends Equatable {
       this.invited,
       this.timeLength = 1,
       this.ref,
-      this.timeslots = const []});
+      this.timeslots = const [],
+      this.selectedTimeStart,
+      this.isConfirmed});
   @override
   List<Object> get props => [title, groupmates, timeLength, startDate];
 
   static Meeting fromEntity(MeetingEntity entity) {
-    return Meeting(entity.title, entity.groupmates ?? [], entity.meetingVenue,
-        entity.project,
+    return Meeting(entity.title, entity.groupmates ?? [], entity.meetingVenue, entity.project,
         startDate: entity.startDate != null ? entity.startDate.toDate() : null,
         endDate: entity.endDate != null ? entity.endDate.toDate() : null,
-        author: entity.author ??
-            (entity.groupmates[0] != null ? entity.groupmates[0].ref : null),
+        author: entity.author ?? (entity.groupmates[0] != null ? entity.groupmates[0].ref : null),
         id: entity.id ?? null,
         confirmed: entity.confirmed ?? null,
         invited: entity.invited ?? null,
         timeLength: entity.timeLength,
-        timeslots: entity.timeslots ?? []);
+        timeslots: entity.timeslots ?? [],
+        selectedTimeStart: entity.selectedDate != null ? entity.selectedDate.toDate() : null,
+        isConfirmed: entity.isConfirmed ?? false);
   }
 
   MeetingEntity toEntity() {
     return MeetingEntity(
-        title,
-        id,
-        timeLength,
-        startDate != null ? Timestamp.fromDate(startDate.toUtc()) : null,
-        endDate != null ? Timestamp.fromDate(endDate.toUtc()) : null,
-        groupmates[0].ref,
-        groupmates,
-        invited,
-        confirmed,
-        meetingVenue,
-        ref,
-        project,
-        timeslots ?? []);
+      title,
+      id,
+      timeLength,
+      startDate != null ? Timestamp.fromDate(startDate.toUtc()) : null,
+      endDate != null ? Timestamp.fromDate(endDate.toUtc()) : null,
+      groupmates[0].ref,
+      groupmates,
+      invited,
+      confirmed,
+      meetingVenue,
+      ref,
+      project,
+      timeslots ?? [],
+      selectedTimeStart != null ? Timestamp.fromDate(selectedTimeStart.toUtc()) : null,
+      isConfirmed ?? false,
+    );
   }
 
   Meeting copyWith(
@@ -94,9 +101,11 @@ class Meeting extends Equatable {
       MeetingVenue meetingVenue,
       Project project,
       DocumentReference ref,
-      List<TimeRegion> timeslots}) {
-    return Meeting(title ?? this.title, groupmates ?? this.groupmates,
-        meetingVenue ?? this.meetingVenue, project ?? this.project,
+      List<TimeRegion> timeslots,
+      DateTime selectedTimeStart,
+      bool isConfirmed}) {
+    return Meeting(
+        title ?? this.title, groupmates ?? this.groupmates, meetingVenue ?? this.meetingVenue, project ?? this.project,
         id: id ?? this.id,
         author: author ?? this.author,
         startDate: startDate ?? this.startDate,
@@ -105,7 +114,9 @@ class Meeting extends Equatable {
         confirmed: confirmed ?? this.confirmed,
         timeLength: timeLength ?? this.timeLength,
         ref: ref ?? this.ref,
-        timeslots: timeslots ?? this.timeslots);
+        timeslots: timeslots ?? this.timeslots,
+        isConfirmed: isConfirmed ?? this.isConfirmed,
+        selectedTimeStart: selectedTimeStart ?? this.selectedTimeStart);
   }
 
   // @override

@@ -22,8 +22,7 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
   List<User> groupmates = [];
   DateTime deadlineValue = DateTime.now().stripTime();
   final TextEditingController textController = new TextEditingController();
-  final TextEditingController moduleCodeController =
-      new TextEditingController();
+  final TextEditingController moduleCodeController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -40,52 +39,43 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
                 body: Container(
                     color: appTheme.primaryColorLight,
                     child: Column(children: [
-                      TopBar(() => Navigator.pop(context), "Create Project"),
+                      TopBar(
+                        "Create Project",
+                        onPressedCallback: () => Navigator.pop(context),
+                      ),
                       Expanded(
                           child: GestureDetector(
-                              onTap: () =>
-                                  FocusManager.instance.primaryFocus?.unfocus(),
+                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                               child: Container(
                                   decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(40.0),
-                                          topLeft: Radius.circular(40.0))),
+                                          topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0))),
                                   child: Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 30, right: 30, top: 15),
+                                      padding: EdgeInsets.only(left: 30, right: 30, top: 15),
                                       child: ListView(
                                         children: [
                                           // TopBar(),
                                           PopupInput(textController,
                                               inputLabel: 'Project Title',
-                                              errorMsg:
-                                                  'Please enter your project title!'),
+                                              errorMsg: 'Please enter your project title!'),
                                           customPadding(),
                                           PopupInput(moduleCodeController,
-                                              inputLabel: 'Module Code',
-                                              errorMsg:
-                                                  'Please enter your module code!'),
+                                              inputLabel: 'Module Code', errorMsg: 'Please enter your module code!'),
                                           customPadding(),
-                                          PersonInChargeChips(
-                                              groupmates, "Groupmates",
-                                              callback: (val) {
+                                          PersonInChargeChips(groupmates, "Groupmates", callback: (val) {
                                             setState(() => groupmates = val);
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
-                                          DeadlineInput(
-                                              (val) => setState(
-                                                  () => deadlineValue = val),
-                                              false),
+                                          DeadlineInput((val) => setState(() => deadlineValue = val), false),
                                         ],
                                       ))))),
                       Container(
                         color: Colors.white,
                         alignment: Alignment.bottomCenter,
                         child: Padding(
-                            padding: EdgeInsets.only(
-                                bottom: MediaQuery.of(context).padding.bottom),
+                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -105,28 +95,20 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
                                 //     }),
                                 ElevatedButton(
                                     style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                appTheme.primaryColorLight)),
+                                        backgroundColor: MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
                                     child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 10),
+                                        padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Text("Done",
-                                            style: appTheme.textTheme.bodyText2
-                                                .apply(color: Colors.white))),
+                                            style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
                                     onPressed: () {
                                       widget.projectBloc.add(AddProject(
                                           Project(
                                             textController.text,
-                                            moduleCode:
-                                                moduleCodeController.text,
+                                            moduleCode: moduleCodeController.text,
                                             deadline: deadlineValue,
                                             groupmates: groupmates,
                                           ),
-                                          context
-                                              .read<AppBloc>()
-                                              .getCurrentUser()
-                                              .id));
+                                          context.read<AppBloc>().getCurrentUser().id));
                                       Navigator.pop(context);
                                     })
                               ],

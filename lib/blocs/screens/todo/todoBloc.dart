@@ -53,8 +53,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
     try {
       yield TodoLoading();
       final todoEntities = await todoRepository.loadTodos(event.id);
-      final List<Todo> todos =
-          todoEntities.map((todo) => Todo.fromEntity(todo)).toList();
+      final List<Todo> todos = todoEntities.map((todo) => Todo.fromEntity(todo)).toList();
       yield TodoLoaded(
         calculateProgressPercentage(todos),
         todos,
@@ -66,18 +65,15 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
   Stream<TodoState> _mapReorderTodosToState(ReorderTodos event) async* {
     yield TodoLoading();
-    await todoRepository.reorderTodo(
-        event.todos.map((item) => item.ref).toList(), event.id);
+    await todoRepository.reorderTodo(event.todos.map((item) => item.ref).toList(), event.id);
     yield TodoLoaded(state.progress, event.todos);
   }
 
   Stream<TodoState> _mapAddTodoToState(AddTodo event) async* {
     List<Todo> currentTodos = state.todos;
     yield TodoLoading();
-    DocumentReference newTodoRef =
-        await todoRepository.addNewTodo(event.todo.toEntity(), event.id);
-    final updatedTodos = currentTodos
-      ..add(event.todo.copyWith(ref: newTodoRef, id: newTodoRef.id));
+    DocumentReference newTodoRef = await todoRepository.addNewTodo(event.todo.toEntity(), event.id);
+    final updatedTodos = currentTodos..add(event.todo.copyWith(ref: newTodoRef, id: newTodoRef.id));
     yield TodoLoaded(
       calculateProgressPercentage(updatedTodos),
       updatedTodos,
@@ -100,15 +96,13 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       calculateProgressPercentage(updatedTodos),
       updatedTodos,
     );
-    await todoRepository.updateTodo(
-        oldTodo.toEntity(), event.updatedTodo.toEntity());
+    await todoRepository.updateTodo(oldTodo.toEntity(), event.updatedTodo.toEntity());
   }
 
   Stream<TodoState> _mapDeleteTodoToState(DeleteTodo event) async* {
     // if (state is TodoLoaded) {
     yield TodoLoading();
-    final updatedTodos =
-        state.todos.where((todo) => todo.id != event.todo.id).toList();
+    final updatedTodos = state.todos.where((todo) => todo.id != event.todo.id).toList();
     yield TodoLoaded(
       calculateProgressPercentage(updatedTodos),
       updatedTodos,
@@ -119,12 +113,8 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
   Stream<TodoState> _mapToggleAllToState() async* {
     if (state is TodoLoaded) {
-      final allComplete =
-          (state as TodoLoaded).todos.every((todo) => todo.complete);
-      final updatedTodos = (state as TodoLoaded)
-          .todos
-          .map((todo) => todo.copyWith(complete: !allComplete))
-          .toList();
+      final allComplete = (state as TodoLoaded).todos.every((todo) => todo.complete);
+      final updatedTodos = (state as TodoLoaded).todos.map((todo) => todo.copyWith(complete: !allComplete)).toList();
       yield TodoLoaded(
         calculateProgressPercentage(updatedTodos),
         updatedTodos,
@@ -138,7 +128,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
       final todoEntities = await todoRepository.loadTodos(event.id);
       final List<Todo> todos = todoEntities
           .map((todo) => Todo.fromEntity(todo))
-          .where((todo) => todo.deadline.day == DateTime.now().day)
+          .where((todo) => todo.deadline.day == DateTime.now().day && todo.deadline.month == DateTime.now().month)
           .toList();
       yield TodoLoaded(
         calculateProgressPercentage(todos),
@@ -151,8 +141,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
   Stream<TodoState> _mapClearCompletedToState() async* {
     if (state is TodoLoaded) {
-      final updatedTodos =
-          (state as TodoLoaded).todos.where((todo) => !todo.complete).toList();
+      final updatedTodos = (state as TodoLoaded).todos.where((todo) => !todo.complete).toList();
       yield TodoLoaded(
         calculateProgressPercentage(updatedTodos),
         updatedTodos,
@@ -161,10 +150,7 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   }
 
   double calculateProgressPercentage(List<Todo> todos) {
-    double progress = (todos.length == 0
-        ? 0
-        : (todos.where((todo) => todo.complete).toList().length /
-            todos.length));
+    double progress = (todos.length == 0 ? 0 : (todos.where((todo) => todo.complete).toList().length / todos.length));
     return progress;
   }
 

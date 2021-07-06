@@ -9,7 +9,8 @@ abstract class MeetingEvent extends Equatable {
 
 class LoadMeetings extends MeetingEvent {
   final String id;
-  LoadMeetings(this.id) : super();
+  final bool isSearchByProject;
+  LoadMeetings(this.id, {this.isSearchByProject = false}) : super();
 
   @override
   String toString() => 'LoadMeetings';

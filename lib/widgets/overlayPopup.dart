@@ -16,9 +16,7 @@ class PopupInput extends StatefulWidget {
   final String inputLabel;
   final String errorMsg;
   const PopupInput(this.controller,
-      {Key key,
-      this.inputLabel = 'Todo Title',
-      this.errorMsg = 'Please enter your task!'})
+      {Key key, this.inputLabel = 'Todo Title', this.errorMsg = 'Please enter your task!'})
       : super(key: key);
 
   @override
@@ -36,16 +34,17 @@ class _PopupInputState extends State<PopupInput> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       key: const Key('todoTitle_textField'),
       controller: widget.controller,
       onChanged: (value) => setState(() => currentText = value),
       decoration: InputDecoration(
-        labelText: widget.inputLabel,
+        labelText: (widget.inputLabel + '*'),
         labelStyle: TextStyle(color: appTheme.accentColor, fontSize: 18),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         errorText: currentText.length < 3 ? widget.errorMsg : null,
       ),
+      validator: (val) => (val.isEmpty) ? 'This field is required' : val,
     );
   }
 }
@@ -54,12 +53,7 @@ class PopupDropdown extends StatefulWidget {
   final String dropdownLabel;
   final Function callback;
   final Project initialProject;
-  const PopupDropdown(
-      {@required this.dropdownLabel,
-      this.callback,
-      this.initialProject,
-      Key key})
-      : super(key: key);
+  const PopupDropdown({@required this.dropdownLabel, this.callback, this.initialProject, Key key}) : super(key: key);
 
   @override
   State<PopupDropdown> createState() => PopupDropdownState();
@@ -72,18 +66,14 @@ class PopupDropdownState extends State<PopupDropdown> {
   @override
   void initState() {
     super.initState();
-    loadProjects(
-        BlocProvider.of<AppBloc>(context).state.user.id, widget.initialProject);
+    loadProjects(BlocProvider.of<AppBloc>(context).state.user.id, widget.initialProject);
   }
 
   void loadProjects(String id, Project initial) async {
-    final returnedProjects = await context
-        .read<ProjectRepository>()
-        .loadProjects(id)
-        .then((x) => x.map((e) {
-              // print(e);
-              return Project.fromEntity(e);
-            }).toList());
+    final returnedProjects = await context.read<ProjectRepository>().loadProjects(id).then((x) => x.map((e) {
+          // print(e);
+          return Project.fromEntity(e);
+        }).toList());
 
     setState(() {
       // print('returned : ');
@@ -101,7 +91,7 @@ class PopupDropdownState extends State<PopupDropdown> {
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(widget.dropdownLabel),
+      Text(widget.dropdownLabel + '*'),
       ButtonTheme(
           // alignedDropdown: true,
           child: DropdownButton<Project>(
@@ -139,8 +129,7 @@ class PersonInChargeChips extends StatefulWidget {
   final List<User> chipInput;
   final Project project;
   final Function callback;
-  const PersonInChargeChips(this.chipInput, this.chipsLabel,
-      {this.callback, this.project});
+  const PersonInChargeChips(this.chipInput, this.chipsLabel, {this.callback, this.project});
   @override
   State<PersonInChargeChips> createState() => _PersonInChargeChipsState();
 }
@@ -150,10 +139,8 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
   List<User> usersAvailableToChoose = [];
 
   void loadProjects(String id) async {
-    final List<User> returnedProject = await context
-        .read<ProjectRepository>()
-        .loadProjectById(id)
-        .then((x) => Project.fromEntity(x).groupmates);
+    final List<User> returnedProject =
+        await context.read<ProjectRepository>().loadProjectById(id).then((x) => Project.fromEntity(x).groupmates);
     if (mounted) {
       setState(() {
         usersAvailableToChoose = returnedProject;
@@ -163,20 +150,16 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 
   @override
   void initState() {
-    chipInputState = widget.chipInput.isNotEmpty
-        ? Map.fromIterable(widget.chipInput, key: (e) => e, value: (e) => true)
-        : new Map();
+    chipInputState =
+        widget.chipInput.isNotEmpty ? Map.fromIterable(widget.chipInput, key: (e) => e, value: (e) => true) : new Map();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.project != null) loadProjects(widget.project.id);
-    // chipInputState = Map.fromIterable(widget.chipInput,
-    //     key: (e) => e.toString(),
-    //     value: (e) => true); // <<< ADDING THIS HERE IS THE FIX
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(widget.chipsLabel, style: appTheme.textTheme.bodyText2),
+      Text((widget.chipsLabel + '*'), style: appTheme.textTheme.bodyText2),
       Wrap(
         spacing: 8.0, // gap between adjacent chips
         runSpacing: 4.0, // gap between lines
@@ -186,25 +169,19 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
                   avatar: CircleAvatar(
                     backgroundColor: Colors.grey.shade800,
                   ),
-                  shape: StadiumBorder(
-                      side: BorderSide(color: appTheme.primaryColorLight)),
+                  shape: StadiumBorder(side: BorderSide(color: appTheme.primaryColorLight)),
                   backgroundColor: Colors.transparent,
                   selectedColor: appTheme.primaryColorLight,
                   selected: e.value,
                   onPressed: () {
-                    setState(() => chipInputState = chipInputState
-                      ..update(e.key, (value) => !e.value));
+                    setState(() => chipInputState = chipInputState..update(e.key, (value) => !e.value));
                   },
-                  label: Text(e.key.name,
-                      style: TextStyle(
-                          color: e.value
-                              ? Colors.white
-                              : appTheme.primaryColorLight))))
+                  label:
+                      Text(e.key.name, style: TextStyle(color: e.value ? Colors.white : appTheme.primaryColorLight))))
               .toList()),
           ActionChip(
             label: Icon(Icons.add, color: appTheme.primaryColorLight),
-            shape: StadiumBorder(
-                side: BorderSide(color: appTheme.primaryColorLight)),
+            shape: StadiumBorder(side: BorderSide(color: appTheme.primaryColorLight)),
             backgroundColor: Colors.transparent,
             onPressed: () => Navigator.push(
                 context,
@@ -227,8 +204,7 @@ class DeadlineInput extends StatefulWidget {
   final bool isNotMini;
   final Function(DateTime date) callback;
   DateTime initialTime;
-  DeadlineInput(this.callback, this.isOptional,
-      {this.initialTime, this.isNotMini = true});
+  DeadlineInput(this.callback, this.isOptional, {this.initialTime, this.isNotMini = true});
   @override
   State<DeadlineInput> createState() => _DeadlineInputState();
 }
@@ -240,11 +216,8 @@ class _DeadlineInputState extends State<DeadlineInput> {
   @override
   void initState() {
     super.initState();
-    isWithTime =
-        (widget.initialTime != null ? widget.initialTime.hour != 0 : false) ||
-            !widget.isNotMini;
-    chosenDateTime =
-        widget.initialTime ?? (widget.isOptional ? null : now.stripTime());
+    isWithTime = (widget.initialTime != null ? widget.initialTime.hour != 0 : false) || !widget.isNotMini;
+    chosenDateTime = widget.initialTime ?? (widget.isOptional ? null : now.stripTime());
   }
 
   void _showDatePicker(ctx, bool isWithTime) {
@@ -258,9 +231,7 @@ class _DeadlineInputState extends State<DeadlineInput> {
                   Container(
                     height: 300,
                     child: CupertinoDatePicker(
-                        mode: isWithTime
-                            ? CupertinoDatePickerMode.dateAndTime
-                            : CupertinoDatePickerMode.date,
+                        mode: isWithTime ? CupertinoDatePickerMode.dateAndTime : CupertinoDatePickerMode.date,
                         initialDateTime: chosenDateTime,
                         onDateTimeChanged: (val) {
                           setState(() {
@@ -295,46 +266,28 @@ class _DeadlineInputState extends State<DeadlineInput> {
         // mainAxisSize: widget.isNotMini ? MainAxisSize.max : MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          widget.isNotMini
-              ? Text("Deadline" + (widget.isOptional ? "(Optional)" : ""))
-              : Container(),
+          widget.isNotMini ? Text("Deadline" + (widget.isOptional ? "(Optional)" : "")) : Container(),
           Expanded(
               flex: widget.isNotMini ? 0 : 1,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    InkWell(
-                        onTap: () => _showDatePicker(context, isWithTime),
-                        child: new Padding(
-                            padding: new EdgeInsets.only(top: 10.0),
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                      chosenDateTime != null
-                                          ? DateFormat.yMMMd()
-                                              .format(chosenDateTime)
-                                          : "No deadline set",
-                                      style: appTheme.textTheme.bodyText2),
-                                  Padding(
-                                      padding: EdgeInsets.all(5),
-                                      child: Icon(Icons.calendar_today,
-                                          size: 24,
-                                          color: appTheme.accentColor))
-                                ]))),
-                    ClipPath(
-                        clipper: ShapeBorderClipper(
-                            shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)))),
-                        child: Container(
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(
-                                        color: appTheme.accentColor,
-                                        width: 1.0))))),
-                  ])),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                InkWell(
+                    onTap: () => _showDatePicker(context, isWithTime),
+                    child: new Padding(
+                        padding: new EdgeInsets.only(top: 10.0),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                          Text(chosenDateTime != null ? DateFormat.yMMMd().format(chosenDateTime) : "No deadline set",
+                              style: appTheme.textTheme.bodyText2),
+                          Padding(
+                              padding: EdgeInsets.all(5),
+                              child: Icon(Icons.calendar_today, size: 24, color: appTheme.accentColor))
+                        ]))),
+                ClipPath(
+                    clipper: ShapeBorderClipper(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10)))),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            border: Border(bottom: BorderSide(color: appTheme.accentColor, width: 1.0))))),
+              ])),
           widget.isNotMini
               ? Row(children: [
                   Expanded(
@@ -343,8 +296,7 @@ class _DeadlineInputState extends State<DeadlineInput> {
                     Switch(
                       value: isWithTime,
                       activeColor: appTheme.accentColor,
-                      onChanged: (bool) =>
-                          setState(() => isWithTime = !isWithTime),
+                      onChanged: (bool) => setState(() => isWithTime = !isWithTime),
                     ),
                   ])),
                   Container(
@@ -352,27 +304,15 @@ class _DeadlineInputState extends State<DeadlineInput> {
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
                         boxShadow: [
-                          BoxShadow(
-                              color: appTheme.primaryColorLight,
-                              spreadRadius: 1,
-                              blurRadius: 1),
+                          BoxShadow(color: appTheme.primaryColorLight, spreadRadius: 1, blurRadius: 1),
                         ],
                       ),
                       child: Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                           child: Text(
-                              (chosenDateTime != null
-                                      ? chosenDateTime.hour
-                                          .toString()
-                                          .padLeft(2, '0')
-                                      : "00") +
+                              (chosenDateTime != null ? chosenDateTime.hour.toString().padLeft(2, '0') : "00") +
                                   " : " +
-                                  (chosenDateTime != null
-                                      ? chosenDateTime.minute
-                                          .toString()
-                                          .padLeft(2, '0')
-                                      : "00"),
+                                  (chosenDateTime != null ? chosenDateTime.minute.toString().padLeft(2, '0') : "00"),
                               textAlign: TextAlign.end)))
                 ])
               : Container(
@@ -382,27 +322,15 @@ class _DeadlineInputState extends State<DeadlineInput> {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                     boxShadow: [
-                      BoxShadow(
-                          color: appTheme.primaryColorLight,
-                          spreadRadius: 1,
-                          blurRadius: 1),
+                      BoxShadow(color: appTheme.primaryColorLight, spreadRadius: 1, blurRadius: 1),
                     ],
                   ),
                   child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                       child: Text(
-                          (chosenDateTime != null
-                                  ? chosenDateTime.hour
-                                      .toString()
-                                      .padLeft(2, '0')
-                                  : "00") +
+                          (chosenDateTime != null ? chosenDateTime.hour.toString().padLeft(2, '0') : "00") +
                               " : " +
-                              (chosenDateTime != null
-                                  ? chosenDateTime.minute
-                                      .toString()
-                                      .padLeft(2, '0')
-                                  : "00"),
+                              (chosenDateTime != null ? chosenDateTime.minute.toString().padLeft(2, '0') : "00"),
                           textAlign: TextAlign.center)))
         ]);
   }
@@ -422,9 +350,8 @@ class NotesInput extends StatelessWidget {
           controller: controller,
           keyboardType: TextInputType.multiline,
           maxLines: null,
-          decoration: new InputDecoration.collapsed(
-              hintText: 'Type your notes here',
-              hintStyle: appTheme.textTheme.bodyText2),
+          decoration:
+              new InputDecoration.collapsed(hintText: 'Type your notes here', hintStyle: appTheme.textTheme.bodyText2),
         )
       ],
     );
