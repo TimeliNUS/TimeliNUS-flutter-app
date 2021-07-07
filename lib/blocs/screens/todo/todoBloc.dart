@@ -52,7 +52,13 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   Stream<TodoState> _mapLoadTodosToState(LoadTodos event) async* {
     try {
       yield TodoLoading();
-      final todoEntities = await todoRepository.loadTodos(event.id);
+      List<TodoEntity> todoEntities;
+      if (event.isSearchByProject) {
+        print(event.id);
+        todoEntities = await todoRepository.loadProjectTodos(event.id);
+      } else {
+        todoEntities = await todoRepository.loadTodos(event.id);
+      }
       final List<Todo> todos = todoEntities.map((todo) => Todo.fromEntity(todo)).toList();
       yield TodoLoaded(
         calculateProgressPercentage(todos),

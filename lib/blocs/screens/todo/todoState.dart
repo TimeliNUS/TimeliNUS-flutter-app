@@ -22,13 +22,12 @@ class TodoLoading extends TodoState {
 
 class TodoLoaded extends TodoState {
   final List<Todo> todos;
-
   final double progress;
 
   TodoLoaded(this.progress, this.todos) : super(todos, progress);
 
   @override
-  String toString() => 'TodosLoaded { progress: $progress, todos: $todos }';
+  String toString() => 'TodosLoaded { progress: $progress }';
 
   @override
   List<Object> get props => [todos, progress];

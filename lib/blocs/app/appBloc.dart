@@ -89,7 +89,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       _authenticationRepository.logOut();
       yield (AppState.unauthenticated());
     } else if (event is AppOnTodo) {
-      yield (AppState.onTodo(state.user));
+      yield (AppState.onTodo(state.user, projectId: event.projectId, projectTitle: event.projectTitle));
     } else if (event is AppOnProject) {
       yield (AppState.onProject(state.user));
     } else if (event is AppOnProfile) {

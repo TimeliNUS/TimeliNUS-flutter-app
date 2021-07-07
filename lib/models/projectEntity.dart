@@ -8,25 +8,24 @@ class ProjectEntity extends Equatable {
   final String id;
   final double progress;
   final Timestamp deadline;
-  final List<Meeting> meetings;
+  final int noOfMeetings;
   final List<Todo> todos;
   final List<User> groupmates;
   final DocumentReference ref;
 
-  ProjectEntity(this.title, this.moduleCode, this.id, this.progress, this.deadline, this.groupmates, this.meetings,
+  ProjectEntity(this.title, this.moduleCode, this.id, this.progress, this.deadline, this.groupmates, this.noOfMeetings,
       this.todos, this.ref);
 
-  static ProjectEntity fromJson(
-      Map<String, Object> json, List<Todo> todos, List<User> users, List<MeetingEntity> meetings,
+  static ProjectEntity fromJson(Map<String, Object> json, List<Todo> todos, List<User> users,
       [String id, DocumentReference ref]) {
     return ProjectEntity(
         json['title'],
         json['moduleCode'] ?? '',
         id != null ? id : json['id'] as String,
         json['progress'] != null ? double.parse(json['progress'].toString()) : 0,
-        json['deadline'],
+        json['deadline'] ?? null,
         users,
-        meetings.map((x) => Meeting.fromEntity(x)).toList(),
+        json['meetings'] != null ? (json['meetings'] as List).length : 0,
         todos,
         ref);
   }
@@ -53,5 +52,5 @@ class ProjectEntity extends Equatable {
   }
 
   @override
-  List<Object> get props => [title, progress, moduleCode, deadline, meetings, todos, ref, id, groupmates];
+  List<Object> get props => [title, progress, moduleCode, deadline, noOfMeetings, todos, ref, id, groupmates];
 }

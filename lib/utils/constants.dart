@@ -10,10 +10,8 @@ class AppConstants {
   static const String PROD_UPDATEMEETING =
       'https://asia-east2-timelinus-2021.cloudfunctions.net/updateMeetingTimeslotByDateTime';
 
-  static const String DEV_FINDCOMMON =
-      'http://localhost:5001/timelinus-2021/asia-east2/findNusModsCommon';
-  static const String PROD_FINDCOMMON =
-      'https://asia-east2-timelinus-2021.cloudfunctions.net/findNusModsCommon';
+  static const String DEV_FINDCOMMON = 'http://localhost:5001/timelinus-2021/asia-east2/findNusModsCommon';
+  static const String PROD_FINDCOMMON = 'https://asia-east2-timelinus-2021.cloudfunctions.net/findNusModsCommon';
 
   static bool isSimulator = false;
 
@@ -27,17 +25,12 @@ class AppConstants {
       isSimulator = !androidDeviceInfo.isPhysicalDevice;
     }
     if (isSimulator) {
-      String host = defaultTargetPlatform == TargetPlatform.android
-          ? '10.0.2.2:8080'
-          : 'localhost:8080';
-      FirebaseFirestore.instance.settings =
-          Settings(host: host, sslEnabled: false);
+      String host = defaultTargetPlatform == TargetPlatform.android ? '10.0.2.2:8080' : 'localhost:8080';
+      FirebaseFirestore.instance.settings = Settings(host: host, sslEnabled: false);
     }
   }
 
-  static String updateMeetingUrl =
-      (isSimulator) ? DEV_UPDATEMEETING : PROD_UPDATEMEETING;
+  static String updateMeetingUrl = (isSimulator) ? DEV_UPDATEMEETING : PROD_UPDATEMEETING;
 
-  static String findCommonUrl =
-      (isSimulator) ? DEV_FINDCOMMON : PROD_FINDCOMMON;
+  static String findCommonUrl = (isSimulator) ? DEV_FINDCOMMON : PROD_FINDCOMMON;
 }

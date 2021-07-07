@@ -16,16 +16,24 @@ import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart'; // import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-class TodoScreen extends StatelessWidget {
-  static Page page() => MaterialPage(child: TodoScreen());
+class TodoScreen extends StatefulWidget {
+  final String projectId;
+  final String projectTitle;
+  final TodoRepository _todoRepository = const TodoRepository();
+  static Page page(String projectId, String projectTitle) =>
+      MaterialPage(child: TodoScreen(projectId: projectId, projectTitle: projectTitle));
+  const TodoScreen({this.projectId, this.projectTitle, Key key}) : super(key: key);
+  @override
+  _TodoScreenState createState() => _TodoScreenState();
+}
 
-  final _todoRepository = TodoRepository();
-
+class _TodoScreenState extends State<TodoScreen> {
   @override
   Widget build(BuildContext context) {
     final id = context.select((AppBloc bloc) => bloc.state.user.id);
     return BlocProvider<TodoBloc>(
-        create: (context) => TodoBloc(todoRepository: _todoRepository)..add(LoadTodos(id)),
+        create: (context) => TodoBloc(todoRepository: widget._todoRepository)
+          ..add(LoadTodos(widget.projectId ?? id, isSearchByProject: widget.projectId != null)),
         child: BlocBuilder<TodoBloc, TodoState>(builder: (context, state) {
           return ColoredSafeArea(
               appTheme.primaryColorLight,
@@ -34,7 +42,8 @@ class TodoScreen extends StatelessWidget {
                   body: Container(
                       color: appTheme.primaryColorLight,
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        TopBar("My Todos",
+                        TopBar(widget.projectTitle ?? "My Todos",
+                            subtitle: widget.projectTitle != null ? "Project Todos " : null,
                             // subtitle: "Example Project",
                             onPressedCallback: () => context.read<AppBloc>().add(AppLogoutRequested()),
                             rightWidget: CircularProgress()),

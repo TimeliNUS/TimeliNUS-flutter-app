@@ -54,12 +54,31 @@ class TodoRepository {
   }
 
   Future<List<TodoEntity>> loadTodos(String id) async {
-    DocumentSnapshot documentSnapshot = await person.doc(id).get();
-    if (!documentSnapshot.exists) {
-      print('Document exists on the database: ' + documentSnapshot.data());
+    DocumentReference documentReference = person.doc(id);
+    QuerySnapshot documentSnapshot = await ref.where('pic', arrayContains: documentReference).get();
+    List<TodoEntity> tasks = [];
+    for (QueryDocumentSnapshot temp in documentSnapshot.docs.toList()) {
+      final Map<String, Object> data = temp.data();
+      final List<User> users = await AuthenticationRepository.findUsersByRef(data['pic']);
+      TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, temp.reference);
+      tasks.add(documentSnapshotTask);
     }
-    final list = documentSnapshot.get("todo");
-    return await loadTodosFromReferenceList(list);
+    tasks.sort((x, y) => y.complete ? -1 : 1);
+    return tasks;
+  }
+
+  Future<List<TodoEntity>> loadProjectTodos(String projectId) async {
+    // DocumentReference documentReference = person.doc(id);
+    QuerySnapshot documentSnapshot = await ref.where('project.id', isEqualTo: projectId).get();
+    List<TodoEntity> tasks = [];
+    for (QueryDocumentSnapshot temp in documentSnapshot.docs.toList()) {
+      final Map<String, Object> data = temp.data();
+      final List<User> users = await AuthenticationRepository.findUsersByRef(data['pic']);
+      TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, temp.reference);
+      tasks.add(documentSnapshotTask);
+    }
+    // print(tasks);
+    return tasks;
   }
 
   static Future<List<TodoEntity>> loadTodosFromReferenceList(List<dynamic> refs) async {
@@ -72,7 +91,6 @@ class TodoRepository {
       TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, documentReference);
       tasks.add(documentSnapshotTask);
     }
-    // print("Task: " + tasks.toString());
     return tasks;
   }
 

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/app/appEvent.dart';
-import 'package:TimeliNUS/blocs/screens/profile/profileBloc.dart';
 import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/utils/services/uplodaFile.dart';
 import 'package:TimeliNUS/widgets/customCard.dart';
@@ -10,6 +9,7 @@ import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -23,26 +23,22 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ProfileBloc>(
-        create: (context) => ProfileBloc(),
-        child: BlocBuilder<ProfileBloc, ProfileState>(builder: (context, state) {
-          return ColoredSafeArea(
-              appTheme.primaryColorLight,
-              Scaffold(
-                  backgroundColor: appTheme.primaryColorLight,
-                  body: Column(
-                    children: [
-                      TopBar(
-                        'Settings',
-                        onPressedCallback: () => context.read<AppBloc>().add(AppOnDashboard()),
-                      ),
-                      ProfileDetails(),
-                      // Divider(height: 30)
-                      NotificationSettings(),
-                      HelpBlock()
-                    ],
-                  )));
-        }));
+    return ColoredSafeArea(
+        appTheme.primaryColorLight,
+        Scaffold(
+            backgroundColor: appTheme.primaryColorLight,
+            body: Column(
+              children: [
+                TopBar(
+                  'Settings',
+                  onPressedCallback: () => context.read<AppBloc>().add(AppOnDashboard()),
+                ),
+                ProfileDetails(),
+                // Divider(height: 30)
+                NotificationSettings(),
+                HelpBlock()
+              ],
+            )));
   }
 }
 
@@ -113,7 +109,22 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                                       _imageFile = File(pickedFile.path);
                                     });
                                     print(_imageFile.path);
-                                    final url = await uploadImageToFirebase(_imageFile);
+                                    File croppedFile = await ImageCropper.cropImage(
+                                        compressQuality: 50,
+                                        sourcePath: _imageFile.path,
+                                        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+                                        androidUiSettings: AndroidUiSettings(
+                                            toolbarTitle: 'Crop Image',
+                                            toolbarColor: Colors.deepOrange,
+                                            toolbarWidgetColor: Colors.white,
+                                            initAspectRatio: CropAspectRatioPreset.square,
+                                            lockAspectRatio: true),
+                                        iosUiSettings: IOSUiSettings(
+                                            minimumAspectRatio: 1.0,
+                                            aspectRatioLockEnabled: true,
+                                            resetAspectRatioEnabled: false,
+                                            rotateButtonsHidden: true));
+                                    final url = await uploadImageToFirebase(croppedFile);
                                     context.read<AuthenticationRepository>().updateProfilePicture(url);
                                     Navigator.pop(context);
                                   },

@@ -53,33 +53,25 @@ class ProjectRepository {
     List<TodoEntity> todoEntities = await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
     List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
     List<User> users = await AuthenticationRepository.findUsersByRef(tempData['groupmates']);
-    List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
-    ProjectEntity documentSnapshotTask =
-        ProjectEntity.fromJson(tempData, todos, users, meetings, id, documentSnapshot.reference);
+    // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
+    ProjectEntity documentSnapshotTask = ProjectEntity.fromJson(tempData, todos, users, id, documentSnapshot.reference);
     return documentSnapshotTask;
   }
 
   Future<List<ProjectEntity>> loadProjects(String id) async {
-    DocumentSnapshot documentSnapshot = await person.doc(id).get();
-    // if (!documentSnapshot.exists) {
-    //   print('Document exists on the database: ' + documentSnapshot.data());
-    // }
-    final list = documentSnapshot.get("project");
+    DocumentReference personRef = person.doc(id);
+    final querySnapshot = await ref.where('groupmates', arrayContains: personRef).get();
     List<ProjectEntity> projects = [];
-    for (DocumentReference documentReference in list) {
-      final DocumentSnapshot temp = await documentReference.get();
+    for (QueryDocumentSnapshot temp in querySnapshot.docs.toList()) {
       Map<String, Object> tempData = temp.data();
+      print(tempData);
       List<TodoEntity> todoEntities = await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
       List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
       List<User> users = await AuthenticationRepository.findUsersByRef(tempData['groupmates']);
-      List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
-      // print(users);
-      ProjectEntity documentSnapshotTask =
-          ProjectEntity.fromJson(temp.data(), todos, users, meetings, temp.id, documentReference);
+      // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
+      ProjectEntity documentSnapshotTask = ProjectEntity.fromJson(temp.data(), todos, users, temp.id, temp.reference);
       projects.add(documentSnapshotTask);
     }
-    // print("Task: " + tasks.toString());
-    // print("project: " + projects[0].meetings.length.toString());
     return projects;
   }
 
@@ -87,19 +79,17 @@ class ProjectRepository {
     DocumentReference personRef = person.doc(id);
     final querySnapshot = await ref.where('invitations', arrayContains: personRef).get();
     List<ProjectEntity> projects = [];
-    for (QueryDocumentSnapshot doc in querySnapshot.docs.toList()) {
-      final DocumentSnapshot temp = doc;
+    for (QueryDocumentSnapshot temp in querySnapshot.docs.toList()) {
       Map<String, Object> tempData = temp.data();
       List<TodoEntity> todoEntities = await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
       List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
       List<User> users = await AuthenticationRepository.findUsersByRef(tempData['groupmates']);
-      List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
+      // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
       print(users);
-      ProjectEntity documentSnapshotTask =
-          ProjectEntity.fromJson(temp.data(), todos, users, meetings, temp.id, doc.reference);
+      ProjectEntity documentSnapshotTask = ProjectEntity.fromJson(temp.data(), todos, users, temp.id, temp.reference);
       projects.add(documentSnapshotTask);
     }
-    print('invitations: ' + projects.length.toString());
+    // print('invitations: ' + projects.length.toString());
     return projects;
   }
 

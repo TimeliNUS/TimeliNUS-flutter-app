@@ -58,7 +58,7 @@ class MeetingEntity extends Equatable {
         confirmed,
         convertMeetingVenue(json['meetingVenue']),
         ref,
-        json['project'] != null ? Project.fromEntity(ProjectEntity.fromJson(json['project'], [], [], [])) : null,
+        json['project'] != null ? Project.fromEntity(ProjectEntity.fromJson(json['project'], [], [])) : null,
         json['timeslot'] != null
             ? (json['timeslot'] as List)
                 .map((timeslot) => TimeRegion(

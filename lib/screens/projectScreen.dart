@@ -99,10 +99,10 @@ class ProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double progress =
-        (project.todos.length != 0 ? ((project.todos.length - todos.length) / project.todos.length) : 1);
+        (project.todos.length != 0 ? ((project.todos.length - todos.length) / project.todos.length) : 0);
     return Column(verticalDirection: VerticalDirection.up, children: [
       Padding(padding: EdgeInsets.only(bottom: 15)),
-      ProjectCardDetail(project.meetings.length, todos, project.id, project.title),
+      ProjectCardDetail(project.noOfMeetings, todos, project.id, project.title),
       Row(children: [
         Expanded(
             child: GestureDetector(
@@ -115,7 +115,10 @@ class ProjectCard extends StatelessWidget {
                 Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(project.title),
-                  Text("Software Engineering Project"),
+                  Text(project.moduleCode),
+                  Padding(
+                    padding: EdgeInsets.only(top: 5),
+                  ),
                   Row(
                     children: [
                       Icon(Icons.calendar_today_outlined, size: 18, color: appTheme.primaryColorLight),
@@ -126,9 +129,23 @@ class ProjectCard extends StatelessWidget {
                       Expanded(
                           child: Container(
                               alignment: Alignment.centerRight,
-                              child: CircleAvatar(
-                                maxRadius: 12,
-                              )))
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: project.groupmates
+                                      .map((groupmate) => CircleAvatar(
+                                            backgroundImage: Image.network(groupmate.profilePicture).image,
+                                            maxRadius: 12,
+                                          ))
+                                      .take(4)
+                                      .toList()
+                                        ..add(project.groupmates.length > 4
+                                            ? CircleAvatar(
+                                                maxRadius: 12,
+                                                child: Text('+' + (project.groupmates.length - 4).toString(),
+                                                    style: TextStyle(fontSize: 10)))
+                                            : CircleAvatar(
+                                                radius: 0,
+                                              )))))
                     ],
                   )
                 ])),
@@ -186,13 +203,18 @@ class ProjectCardDetail extends StatelessWidget {
                                 ],
                               )),
                           Divider(),
-                          Row(children: [
-                            Icon(Icons.check_box_rounded, color: Colors.grey.shade500),
-                            Text(' ' + todos.length.toString() + ' Incompleted Todos',
-                                style: appTheme.textTheme.bodyText1),
-                            Expanded(
-                                child: Text("View", textAlign: TextAlign.right, style: appTheme.textTheme.bodyText1))
-                          ]),
+                          GestureDetector(
+                              onTap: () => context
+                                  .read<AppBloc>()
+                                  .add(AppOnTodo(projectId: projectId, projectTitle: projectTitle)),
+                              child: Row(children: [
+                                Icon(Icons.check_box_rounded, color: Colors.grey.shade500),
+                                Text(' ' + todos.length.toString() + ' Incompleted Todos',
+                                    style: appTheme.textTheme.bodyText1),
+                                Expanded(
+                                    child:
+                                        Text("View", textAlign: TextAlign.right, style: appTheme.textTheme.bodyText1))
+                              ])),
                           Padding(
                               padding: EdgeInsets.only(left: 25, top: 10),
                               child: Column(

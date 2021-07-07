@@ -15,13 +15,7 @@ class Todo extends Equatable {
   final DocumentReference ref;
 
   const Todo(this.title,
-      {this.id,
-      this.complete = false,
-      this.note = '',
-      this.deadline,
-      this.project,
-      this.pic,
-      this.ref});
+      {this.id, this.complete = false, this.note = '', this.deadline, this.project, this.pic, this.ref});
 
   Todo copyWith(
       {String title,
@@ -44,19 +38,12 @@ class Todo extends Equatable {
 
   @override
   String toString() {
-    return 'Todo { complete: $complete, title: $title, note: $note, id: $id, deadline: $deadline, ref: $ref, pic: $pic}';
+    return 'Todo { complete: $complete, title: $title, note: $note, id: $id, deadline: $deadline, ref: $ref, pic: $pic, project: ${project.id}}';
   }
 
   TodoEntity toEntity() {
     return TodoEntity(
-        title,
-        id,
-        note,
-        complete,
-        deadline != null ? Timestamp.fromDate(deadline) : null,
-        project,
-        pic,
-        ref);
+        title, id, note, complete, deadline != null ? Timestamp.fromDate(deadline) : null, project, pic, ref);
   }
 
   static Todo fromEntity(TodoEntity entity) {
@@ -71,6 +58,5 @@ class Todo extends Equatable {
   }
 
   @override
-  List<Object> get props =>
-      [complete, id, note, title, pic, deadline, project, ref];
+  List<Object> get props => [complete, id, note, title, pic, deadline, project, ref];
 }

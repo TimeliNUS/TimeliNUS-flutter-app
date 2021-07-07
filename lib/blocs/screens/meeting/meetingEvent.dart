@@ -31,6 +31,17 @@ class AddMeeting extends MeetingEvent {
   List<Object> get props => [meeting, id];
 }
 
+class TodayMeeting extends MeetingEvent {
+  final String id;
+  TodayMeeting(this.id) : super();
+
+  @override
+  String toString() => 'TodayMeeting';
+
+  @override
+  List<Object> get props => [id];
+}
+
 class DeleteMeeting extends MeetingEvent {
   final Meeting meeting;
   final String userId;

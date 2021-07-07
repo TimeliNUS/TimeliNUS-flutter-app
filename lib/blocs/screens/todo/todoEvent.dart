@@ -12,7 +12,8 @@ abstract class TodoEvent extends Equatable {
 
 class LoadTodos extends TodoEvent {
   final String id;
-  LoadTodos(this.id) : super([id]);
+  final bool isSearchByProject;
+  LoadTodos(this.id, {this.isSearchByProject = false}) : super([id]);
   @override
   String toString() => 'LoadTodos';
 

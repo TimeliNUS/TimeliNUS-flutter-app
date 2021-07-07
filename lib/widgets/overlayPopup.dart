@@ -106,9 +106,9 @@ class PopupDropdownState extends State<PopupDropdown> {
           color: appTheme.accentColor,
         ),
         onChanged: (Project newValue) {
-          if (newValue != projects[0]) {
-            widget.callback(newValue);
-          }
+          // if (newValue != projects[0]) {
+          widget.callback(newValue);
+          // }
           setState(() {
             selectedProject = newValue;
           });

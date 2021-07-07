@@ -32,7 +32,12 @@ class User extends Equatable {
   List<Object> get props => [email, id, name];
 
   static User fromJson(Map<String, dynamic> json, String id, {DocumentReference ref}) {
-    return new User(id: id, name: json['name'], email: json['email'], ref: ref);
+    return new User(
+        id: id,
+        name: json['name'],
+        email: json['email'],
+        ref: ref,
+        profilePicture: json['photoURL'] ?? 'https://via.placeholder.com/500x500');
   }
 
   Map<String, Object> toJson() {

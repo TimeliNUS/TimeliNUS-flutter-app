@@ -148,11 +148,9 @@ class AuthenticationRepository {
     List<User> users = [];
     for (DocumentReference documentReference in refs) {
       final DocumentSnapshot temp = await documentReference.get();
-      // print(documentReference);
       User documentSnapshotTask = User.fromJson(temp.data(), temp.id, ref: temp.reference);
       users.add(documentSnapshotTask);
     }
-    // print("Task: " + tasks.toString());
     return users;
   }
 
@@ -160,6 +158,9 @@ class AuthenticationRepository {
     // Assume user is logged in for this example
     // String userId = FirebaseAuth.FirebaseAuth.instance.currentUser.uid;
     await _firebaseAuth.currentUser.updateProfile(photoURL: url);
+    await FirebaseFirestore.instance.collection('user').doc(_firebaseAuth.currentUser.uid).update({
+      'photoURL': url,
+    });
   }
 }
 

@@ -16,7 +16,7 @@ List<Page> onGenerateAppViewPages(AppState state, List<Page<dynamic>> pages) {
     case AppStatus.unauthenticated:
       return [LandingScreen.page()];
     case AppStatus.onTodo:
-      return [TodoScreen.page()];
+      return [TodoScreen.page(state.data['projectId'], state.data['projectTitle'])];
     case AppStatus.onProject:
       return [ProjectScreen.page()];
     case AppStatus.onProfile:

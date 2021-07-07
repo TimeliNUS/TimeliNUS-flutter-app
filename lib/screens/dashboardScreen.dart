@@ -1,11 +1,13 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/app/appEvent.dart';
+import 'package:TimeliNUS/blocs/screens/meeting/meetingBloc.dart';
 import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todoBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todoEvent.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todoState.dart';
 import 'package:TimeliNUS/models/models.dart';
 import 'package:TimeliNUS/models/project.dart';
+import 'package:TimeliNUS/repository/meetingRepository.dart';
 import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:TimeliNUS/widgets/bottomNavigationBar.dart';
@@ -18,6 +20,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class DashboardScreen extends StatefulWidget {
   static Page page() => MaterialPage(child: DashboardScreen());
@@ -73,7 +76,7 @@ class DashboardWelcomeBar extends StatelessWidget {
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),
                   child: Image.network(
-                    'https://via.placeholder.com/350x150',
+                    context.read<AppBloc>().state.user.profilePicture,
                     cacheWidth: 50,
                     cacheHeight: 50,
                     fit: BoxFit.cover,
@@ -123,7 +126,7 @@ class DashboardProjects extends StatelessWidget {
                             .map((project) => DashboardProjectCard(
                                 project,
                                 project.todos.where((todo) => todo.complete == false).toList().length,
-                                project.meetings.length))
+                                project.noOfMeetings))
                             .toList()))
               ],
             ),
@@ -142,22 +145,35 @@ class DashboardProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double progress =
-        (project.todos.length != 0 ? ((project.todos.length - todosLength) / project.todos.length) : 1).abs();
+        (project.todos.length != 0 ? ((project.todos.length - todosLength) / project.todos.length) : 0);
     return CustomCard(
       padding: 15,
       elevation: 6,
       margin: EdgeInsets.only(left: 25, top: 15),
       child: IntrinsicWidth(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.start, children: [
+          Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(project.title),
-              Text("Software Engineering Project"),
+              Text(project.moduleCode),
               Padding(
                   padding: EdgeInsets.symmetric(vertical: 5),
-                  child: CircleAvatar(
-                    maxRadius: 10,
-                  )),
+                  child: Row(
+                      children: project.groupmates
+                          .map((groupmate) => CircleAvatar(
+                                backgroundImage: Image.network(groupmate.profilePicture).image,
+                                maxRadius: 10,
+                              ))
+                          .take(4)
+                          .toList()
+                            ..add(project.groupmates.length > 4
+                                ? CircleAvatar(
+                                    maxRadius: 10,
+                                    child: Text('+' + (project.groupmates.length - 4).toString(),
+                                        style: TextStyle(fontSize: 10)))
+                                : CircleAvatar(
+                                    radius: 0,
+                                  )))),
               Row(
                 children: [
                   Icon(Icons.calendar_today_outlined, size: 15, color: Colors.grey),
@@ -191,6 +207,7 @@ class DashboardProjectCard extends StatelessWidget {
               Icon(Icons.check_box_outlined, size: 15, color: Colors.grey),
               Text(' ' + todosLength.toString() + ' Incompleted', style: TextStyle(fontSize: 12, color: Colors.grey)),
             ]),
+            Padding(padding: EdgeInsets.only(right: 10)),
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               Icon(Icons.check_box_outlined, size: 15, color: Colors.grey),
               Text(' ' + meetingLength.toString() + ' Meeting', style: TextStyle(fontSize: 12, color: Colors.grey)),
@@ -204,6 +221,7 @@ class DashboardProjectCard extends StatelessWidget {
 
 class DashboardMeetings extends StatelessWidget {
   const DashboardMeetings({Key key}) : super(key: key);
+  final _meetingRepository = const MeetingRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -217,15 +235,73 @@ class DashboardMeetings extends StatelessWidget {
           ),
           Container(
             margin: EdgeInsets.only(top: 10),
+            width: double.infinity,
             padding: EdgeInsets.all(25),
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(12)),
                 boxShadow: [BoxShadow(color: HexColor.fromHex('FFDCC8'), spreadRadius: 4)],
                 border: Border.all(color: appTheme.primaryColorLight, width: 2.5)),
-            child: null,
+            child: BlocProvider<MeetingBloc>(
+                create: (context) =>
+                    MeetingBloc(_meetingRepository)..add(TodayMeeting(context.read<AppBloc>().state.user.id)),
+                child: BlocBuilder<MeetingBloc, MeetingState>(builder: (context, state) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:
+                        state.meetings.mapIndexed((index, meeting) => DashboardMeetingItem(meeting, index)).toList(),
+                  );
+                })),
           ),
         ]));
+  }
+}
+
+class DashboardMeetingItem extends StatelessWidget {
+  final Meeting meeting;
+  final int index;
+  const DashboardMeetingItem(this.meeting, this.index);
+  @override
+  Widget build(BuildContext context) {
+    int diff = meeting.selectedTimeStart.difference(DateTime.now()).inHours;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      index != 0 ? Divider(color: appTheme.primaryColor.withOpacity(0.75), height: 40) : Container(),
+      Text(meeting.title),
+      Text(DateFormat.jm().format(meeting.selectedTimeStart).toLowerCase() +
+          ' - ' +
+          DateFormat.jm()
+              .format(meeting.selectedTimeStart.add(Duration(hours: meeting.timeLength.toInt())))
+              .toLowerCase()),
+      Padding(
+          padding: EdgeInsets.only(top: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(children: [
+                Icon(Icons.alarm, size: 20, color: appTheme.primaryColor),
+                Text(diff < -(meeting.timeLength)
+                    ? ' Earlier today'
+                    : (diff < 0
+                        ? ' Now'
+                        : ' In ' + timeago.format(meeting.selectedTimeStart, allowFromNow: true, locale: 'en_short'))),
+                Padding(padding: EdgeInsets.only(right: 10)),
+                Icon(Icons.location_pin, size: 20, color: appTheme.primaryColor),
+                Text(' ' + meeting.meetingVenue.toString().split('.')[1]),
+              ]),
+              diff.abs() < meeting.timeLength
+                  ? ElevatedButton(
+                      onPressed: () => {},
+                      child: Text('Join Now'),
+                      style: ButtonStyle(
+                          elevation: MaterialStateProperty.all(0),
+                          backgroundColor: MaterialStateProperty.all<Color>(appTheme.primaryColorLight),
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)))))
+                  : Container()
+            ],
+          ))
+    ]);
+    // }));
   }
 }
 

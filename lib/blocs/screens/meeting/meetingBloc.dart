@@ -26,6 +26,8 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
       yield* _mapUpdateMeetingToState(event);
     } else if (event is DeleteMeeting) {
       yield* _mapDeleteMeetingtToState(event);
+    } else if (event is TodayMeeting) {
+      yield* _mapTodayMeetingToState(event);
     }
   }
 
@@ -43,6 +45,26 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
       final List<Meeting> meetings = meetingEntities.map((meeting) => Meeting.fromEntity(meeting)).toList();
       final List<Meeting> invitations = invitationEntities.map((invitation) => Meeting.fromEntity(invitation)).toList();
       yield MeetingLoaded(meetings, invitations: invitations);
+      return;
+    } catch (err) {
+      print(err);
+      yield MeetingNotLoaded();
+    }
+  }
+
+  Stream<MeetingState> _mapTodayMeetingToState(TodayMeeting event) async* {
+    try {
+      yield MeetingLoading();
+      final meetingEntities = await meetingRepository.loadConfirmedMeetings(event.id);
+      final List<Meeting> meetings = meetingEntities
+          .map((meeting) => Meeting.fromEntity(meeting))
+          .where(
+              (x) => x.selectedTimeStart.day == DateTime.now().day && x.selectedTimeStart.month == DateTime.now().month)
+          // .where((x) =>
+          //     x.selectedTimeStart.add(Duration(hours: x.timeLength.toInt())).difference(DateTime.now()) >
+          //     Duration(minutes: 10))
+          .toList();
+      yield MeetingLoaded(meetings);
       return;
     } catch (err) {
       print(err);

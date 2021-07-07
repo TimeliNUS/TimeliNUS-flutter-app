@@ -10,7 +10,11 @@ abstract class AppEvent extends Equatable {
 
 class AppLogoutRequested extends AppEvent {}
 
-class AppOnTodo extends AppEvent {}
+class AppOnTodo extends AppEvent {
+  final String projectId;
+  final String projectTitle;
+  const AppOnTodo({this.projectId, this.projectTitle});
+}
 
 class AppOnProject extends AppEvent {}
 
