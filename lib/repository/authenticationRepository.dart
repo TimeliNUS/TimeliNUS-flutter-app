@@ -40,7 +40,13 @@ class AuthenticationRepository {
     FirebaseAuth.FirebaseAuth firebaseAuth,
     GoogleSignIn googleSignIn,
   })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn.standard();
+        _googleSignIn = googleSignIn ??
+            GoogleSignIn(
+              scopes: [
+                'email',
+                'https://www.googleapis.com/auth/calendar',
+              ],
+            );
 
   final FirebaseAuth.FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;

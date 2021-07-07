@@ -14,6 +14,7 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import "package:googleapis_auth/auth_io.dart";
 
 Future<void> main() async {
   Bloc.observer = AppBlocObserver();
@@ -27,17 +28,28 @@ Future<void> main() async {
   // IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
   await Firebase.initializeApp();
   await AppConstants.init();
+
+  var id = ClientId("....apps.googleusercontent.com", "...");
+  var scopes = ['https://www.googleapis.com/auth/calendar'];
+
+  clientViaUserConsent(id, scopes, prompt).then((AuthClient client) {
+    client.close();
+  });
+
   final authenticationRepository = AuthenticationRepository();
   final projectRepository = ProjectRepository();
   await authenticationRepository.user.first;
   FirebaseMessaging.instance.onTokenRefresh.listen((token) {
-    authenticationRepository.saveTokenToDatabase(
-        token, authenticationRepository.currentUser.id);
+    authenticationRepository.saveTokenToDatabase(token, authenticationRepository.currentUser.id);
   });
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(App(
-      authenticationRepository: authenticationRepository,
-      projectRepository: projectRepository));
+  runApp(App(authenticationRepository: authenticationRepository, projectRepository: projectRepository));
+}
+
+void prompt(String url) {
+  print("Please go to the following URL and grant access:");
+  print("  => $url");
+  print("");
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
