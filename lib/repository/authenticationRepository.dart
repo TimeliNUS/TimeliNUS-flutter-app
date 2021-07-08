@@ -4,10 +4,9 @@ import 'package:TimeliNUS/models/userModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/widgets.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meta/meta.dart';
-
 // Thrown if during the sign up process if a failure occurs.
 
 class AuthenticationFailture implements Exception {
@@ -39,17 +38,22 @@ class AuthenticationRepository {
   AuthenticationRepository({
     FirebaseAuth.FirebaseAuth firebaseAuth,
     GoogleSignIn googleSignIn,
-  })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ??
-            GoogleSignIn(
-              scopes: [
-                'email',
-                'https://www.googleapis.com/auth/calendar',
-              ],
-            );
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.FirebaseAuth.instance;
+  // _googleSignIn = googleSignIn ??
+  //     GoogleSignIn(
+  //       scopes: [
+  //         'email',
+  //         'https://www.googleapis.com/auth/calendar',
+  //       ],
+  // );
 
   final FirebaseAuth.FirebaseAuth _firebaseAuth;
-  final GoogleSignIn _googleSignIn;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/calendar',
+    ],
+  );
   User _currentUser;
 
   /// Stream of [User] which will emit the current user when
@@ -98,13 +102,21 @@ class AuthenticationRepository {
   /// Throws a [logInWithGoogle] if an exception occurs.
   Future<void> logInWithGoogle() async {
     try {
+      final storage = new FlutterSecureStorage();
+      print('scopes : ' + _googleSignIn.scopes.toString());
       final googleUser = await _googleSignIn.signIn();
       final googleAuth = await googleUser.authentication;
       final credential = FirebaseAuth.GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-      await _firebaseAuth.signInWithCredential(credential);
+      print('writing access: ' + credential.accessToken);
+      await storage.write(key: 'accessToken', value: credential.accessToken);
+      FirebaseAuth.UserCredential cred = await _firebaseAuth.signInWithCredential(credential);
+      await (FirebaseFirestore.instance
+          .collection('user')
+          .doc(cred.user.uid)
+          .set({'name': cred.user.displayName, 'email': cred.user.email, 'project': [], 'todo': [], 'meeting': []}));
     } on FirebaseAuth.FirebaseAuthException catch (err) {
       throw AuthenticationFailture(err.code);
     }
@@ -133,10 +145,7 @@ class AuthenticationRepository {
   /// Throws a [LogOutFailure] if an exception occurs.
   Future<void> logOut() async {
     try {
-      await Future.wait([
-        _firebaseAuth.signOut(),
-        _googleSignIn.signOut(),
-      ]);
+      await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut(), _googleSignIn.disconnect()]);
     } on Exception {
       throw LogOutFailure();
     }

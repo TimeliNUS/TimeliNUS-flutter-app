@@ -135,7 +135,7 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
                   style: ButtonStyle(
                       side:
                           MaterialStateProperty.resolveWith((states) => BorderSide(color: appTheme.primaryColorLight))),
-                  onPressed: () => {},
+                  onPressed: () => context.read<InvitationBloc>().add(AcceptGoogle()),
                   child: Text('Login to Google', style: TextStyle(color: appTheme.primaryColorLight)))
             ],
           ),

@@ -30,3 +30,10 @@ class AcceptInvitation extends InvitationEvent {
   @override
   List<Object> get props => [url];
 }
+
+class AcceptGoogle extends InvitationEvent {
+  AcceptGoogle() : super();
+
+  @override
+  String toString() => 'AcceptGoogle';
+}

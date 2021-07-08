@@ -10,6 +10,7 @@ class AppConstants {
   static const String PROD_UPDATEMEETING =
       'https://asia-east2-timelinus-2021.cloudfunctions.net/updateMeetingTimeslotByDateTime';
 
+  static const String DEV_FINDGOOGLECOMMON = "http://localhost:5001/timelinus-2021/asia-east2/findcommon";
   static const String DEV_FINDCOMMON = 'http://localhost:5001/timelinus-2021/asia-east2/findNusModsCommon';
   static const String PROD_FINDCOMMON = 'https://asia-east2-timelinus-2021.cloudfunctions.net/findNusModsCommon';
 
@@ -33,4 +34,6 @@ class AppConstants {
   static String updateMeetingUrl = (isSimulator) ? DEV_UPDATEMEETING : PROD_UPDATEMEETING;
 
   static String findCommonUrl = (isSimulator) ? DEV_FINDCOMMON : PROD_FINDCOMMON;
+
+  static String findGoogleCommonUrl = (isSimulator) ? DEV_FINDGOOGLECOMMON : DEV_FINDGOOGLECOMMON;
 }

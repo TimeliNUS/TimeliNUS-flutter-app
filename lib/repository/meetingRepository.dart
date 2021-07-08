@@ -5,6 +5,7 @@ import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class MeetingRepository {
   static CollectionReference ref = FirebaseFirestore.instance.collection('meeting');
@@ -151,6 +152,22 @@ class MeetingRepository {
       meetings.add(documentSnapshotTask);
     }
     return meetings;
+  }
+
+  Future<void> syncGoogleCalendar(
+      String meetingId, String accessToken, String timeMin, String timeMax, String userId) async {
+    print('accessToken ' + accessToken);
+    final resp = await http.post(
+      Uri.parse(AppConstants.findGoogleCommonUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'google-token': accessToken,
+      },
+      body: jsonEncode(<String, String>{"timeMin": timeMin, "timeMax": timeMax, "id": meetingId, "user": userId}),
+    );
+    print('response ');
+    print(resp.body);
+    return;
   }
 
   Future<void> deleteMeeting(Meeting meeting, String id) async {
