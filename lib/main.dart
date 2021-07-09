@@ -29,7 +29,8 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await AppConstants.init();
 
-  var id = ClientId("....apps.googleusercontent.com", "...");
+  var id =
+      ClientId("114066663509-j11htpbtn3u1p7dulr22bpjldopg3d11.apps.googleusercontent.com", "Zk7QGcCR6Ym_PxztseumHQfM");
   var scopes = ['https://www.googleapis.com/auth/calendar'];
 
   clientViaUserConsent(id, scopes, prompt).then((AuthClient client) {

@@ -50,7 +50,7 @@ void main() {
   // });
 
   AppBloc appBloc;
-  setupCloudFirestoreMocks();
+  // setupCloudFirestoreMocks();
 
   // setUp(() async {
   //   TestWidgetsFlutterBinding.ensureInitialized();

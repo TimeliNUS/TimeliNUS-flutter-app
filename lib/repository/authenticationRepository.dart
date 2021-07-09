@@ -177,6 +177,24 @@ class AuthenticationRepository {
       'photoURL': url,
     });
   }
+
+  Future<void> refreshToken() async {
+    print("Token Refresh");
+    final storage = new FlutterSecureStorage();
+    final GoogleSignInAccount googleSignInAccount = await _googleSignIn.signInSilently();
+    final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+    print('refreshToken: ' + googleSignInAuthentication.serverAuthCode);
+    print('accessToken: ' + googleSignInAuthentication.accessToken);
+
+    final FirebaseAuth.AuthCredential credential = FirebaseAuth.GoogleAuthProvider.credential(
+      accessToken: googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken,
+    );
+    FirebaseAuth.UserCredential cred = await _firebaseAuth.signInWithCredential(credential);
+    await storage.write(key: 'accessToken', value: googleSignInAuthentication.accessToken);
+    // return googleSignInAuthentication.accessToken; // New refreshed token
+    return;
+  }
 }
 
 extension on FirebaseAuth.User {

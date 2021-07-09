@@ -101,6 +101,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     } else if (event is AppOnDashboard) {
       yield (AppState.onDashboard(state.user));
     }
+    // else if (event is AppRefreshToken) {
+    //   _authenticationRepository.refreshToken();
+    //   yield AppState.authenticated(state.user);
+    // }
   }
 
   Stream<AppState> _mapUserChangedToState(AppUserChanged event, AppState state) async* {

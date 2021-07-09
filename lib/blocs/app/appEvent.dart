@@ -8,6 +8,8 @@ abstract class AppEvent extends Equatable {
   List<Object> get props => [];
 }
 
+// class AppRefreshToken extends AppEvent {}
+
 class AppLogoutRequested extends AppEvent {}
 
 class AppOnTodo extends AppEvent {
