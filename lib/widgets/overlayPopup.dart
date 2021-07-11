@@ -53,7 +53,10 @@ class PopupDropdown extends StatefulWidget {
   final String dropdownLabel;
   final Function callback;
   final Project initialProject;
-  const PopupDropdown({@required this.dropdownLabel, this.callback, this.initialProject, Key key}) : super(key: key);
+  final bool isDisabled;
+  const PopupDropdown(
+      {@required this.dropdownLabel, this.callback, this.initialProject, this.isDisabled = false, Key key})
+      : super(key: key);
 
   @override
   State<PopupDropdown> createState() => PopupDropdownState();
@@ -105,14 +108,17 @@ class PopupDropdownState extends State<PopupDropdown> {
           height: 2,
           color: appTheme.accentColor,
         ),
-        onChanged: (Project newValue) {
-          // if (newValue != projects[0]) {
-          widget.callback(newValue);
-          // }
-          setState(() {
-            selectedProject = newValue;
-          });
-        },
+        // onTap: widget.isDisabled ? null : () => {},
+        onChanged: widget.isDisabled
+            ? null
+            : (Project newValue) {
+                // if (newValue != projects[0]) {
+                widget.callback(newValue);
+                // }
+                setState(() {
+                  selectedProject = newValue;
+                });
+              },
         items: projects.map<DropdownMenuItem<Project>>((Project proj) {
           return DropdownMenuItem<Project>(
             value: proj,
@@ -202,9 +208,10 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 class DeadlineInput extends StatefulWidget {
   final bool isOptional;
   final bool isNotMini;
+  final bool isDisabled;
   final Function(DateTime date) callback;
   DateTime initialTime;
-  DeadlineInput(this.callback, this.isOptional, {this.initialTime, this.isNotMini = true});
+  DeadlineInput(this.callback, this.isOptional, {this.initialTime, this.isNotMini = true, this.isDisabled = false});
   @override
   State<DeadlineInput> createState() => _DeadlineInputState();
 }
@@ -271,12 +278,12 @@ class _DeadlineInputState extends State<DeadlineInput> {
               flex: widget.isNotMini ? 0 : 1,
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 InkWell(
-                    onTap: () => _showDatePicker(context, isWithTime),
+                    onTap: widget.isDisabled ? null : () => _showDatePicker(context, isWithTime),
                     child: new Padding(
                         padding: new EdgeInsets.only(top: 10.0),
                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                           Text(chosenDateTime != null ? DateFormat.yMMMd().format(chosenDateTime) : "No deadline set",
-                              style: appTheme.textTheme.bodyText2),
+                              style: appTheme.textTheme.bodyText2.apply(color: Colors.black38)),
                           Padding(
                               padding: EdgeInsets.all(5),
                               child: Icon(Icons.calendar_today, size: 24, color: appTheme.accentColor))

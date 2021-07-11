@@ -27,7 +27,7 @@ class Meeting extends Equatable {
   final String id;
   final DateTime startDate;
   final DateTime endDate;
-  final double timeLength;
+  final int timeLength;
   final DocumentReference author;
   final List<User> groupmates;
   final List<User> confirmed;
@@ -46,7 +46,7 @@ class Meeting extends Equatable {
       this.author,
       this.confirmed,
       this.invited,
-      this.timeLength = 1,
+      this.timeLength = 60,
       this.ref,
       this.timeslots = const [],
       this.selectedTimeStart,
@@ -93,7 +93,7 @@ class Meeting extends Equatable {
       String id,
       DateTime startDate,
       DateTime endDate,
-      double timeLength,
+      int timeLength,
       DocumentReference author,
       List<User> groupmates,
       List<User> invited,

@@ -31,12 +31,12 @@ dependencies:
   cloud_firestore: "^2.1.0"
   equatable: ^2.0.0
   bloc: ^7.0.0
-  google_sign_in:
-    git:
-      url: https://github.com/serverpod/plugins.git
-      path: packages/google_sign_in/google_sign_in
-      ref: serverAuthCode-fix2
-  # google_sign_in: "^5.0.4"
+  # google_sign_in:
+  #   git:
+  #     url: https://github.com/serverpod/plugins.git
+  #     path: packages/google_sign_in/google_sign_in
+  #     ref: serverAuthCode-fix2
+  google_sign_in: "^5.0.4"
   # google_sign_in:
   #     git:
   #       url: https://github.com/fbcouch/plugins.git
@@ -59,7 +59,8 @@ dependencies:
   image_cropper: ^1.4.1 
   googleapis_auth: ^1.1.0
   flutter_secure_storage: ^4.2.0
-  # url_launcher: "^6.0.6"
+  extension_google_sign_in_as_googleapis_auth: ^2.0.2
+  url_launcher: "^6.0.6"
 
 # dependency_overrides:
 #   google_sign_in_platform_interface:
@@ -68,12 +69,12 @@ dependencies:
 #       path: packages/google_sign_in/google_sign_in_platform_interface
 #       ref: force-code-for-refresh-token
 
-dependency_overrides:
-  google_sign_in_platform_interface:
-    git:
-      url: https://github.com/serverpod/plugins.git
-      path: packages/google_sign_in/google_sign_in_platform_interface
-      ref: serverAuthCode-fix2
+# dependency_overrides:
+#   google_sign_in_platform_interface:
+#     git:
+#       url: https://github.com/serverpod/plugins.git
+#       path: packages/google_sign_in/google_sign_in_platform_interface
+#       ref: serverAuthCode-fix2
 
 dev_dependencies:
   flutter_test:

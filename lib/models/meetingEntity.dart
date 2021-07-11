@@ -7,7 +7,7 @@ class MeetingEntity extends Equatable {
   final String title;
   final Timestamp startDate;
   final Timestamp endDate;
-  final double timeLength;
+  final int timeLength;
   final DocumentReference author;
   final List<User> groupmates;
   final List<User> invited;
@@ -42,7 +42,7 @@ class MeetingEntity extends Equatable {
     return MeetingEntity(
         json['title'] ?? '',
         id != null ? id : (json['id'] as String),
-        json['timeLength'] != null ? double.parse(json['timeLength'].toString()) : 0,
+        json['timeLength'] != null ? int.parse(json['timeLength'].toString()) : 0,
         json['startDate'],
         json['endDate'],
         // groupmates != null ? groupmates[0] : null,

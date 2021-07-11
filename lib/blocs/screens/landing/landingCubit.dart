@@ -65,8 +65,7 @@ class LandingCubit extends Cubit<LandingState> {
   }
 
   void changeLandingState(LandingStatus status) {
-    emit(state.copyWith(
-        landingStatus: status, email: Email.pure(), password: Password.pure()));
+    emit(state.copyWith(landingStatus: status, email: Email.pure(), password: Password.pure()));
   }
 
   Future<void> signUpFormSubmitted() async {
@@ -80,8 +79,7 @@ class LandingCubit extends Cubit<LandingState> {
       );
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
     } catch (err) {
-      emit(state.copyWith(
-          status: FormzStatus.submissionFailure, errMsg: err.toString()));
+      emit(state.copyWith(status: FormzStatus.submissionFailure, errMsg: err.toString()));
     }
   }
 
@@ -95,8 +93,7 @@ class LandingCubit extends Cubit<LandingState> {
       );
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
     } catch (err) {
-      emit(state.copyWith(
-          status: FormzStatus.submissionFailure, errMsg: err.toString()));
+      emit(state.copyWith(status: FormzStatus.submissionFailure, errMsg: err.toString()));
     }
   }
 
@@ -106,8 +103,7 @@ class LandingCubit extends Cubit<LandingState> {
       await _authenticationRepository.logInWithGoogle();
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
     } on Exception catch (err) {
-      emit(state.copyWith(
-          status: FormzStatus.submissionFailure, errMsg: err.toString()));
+      emit(state.copyWith(status: FormzStatus.submissionFailure, errMsg: err.toString()));
     } on NoSuchMethodError {
       emit(state.copyWith(status: FormzStatus.pure));
     }

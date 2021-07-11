@@ -263,14 +263,14 @@ class DashboardMeetingItem extends StatelessWidget {
   const DashboardMeetingItem(this.meeting, this.index);
   @override
   Widget build(BuildContext context) {
-    int diff = meeting.selectedTimeStart.difference(DateTime.now()).inHours;
+    int diff = meeting.selectedTimeStart.difference(DateTime.now()).inMinutes;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       index != 0 ? Divider(color: appTheme.primaryColor.withOpacity(0.75), height: 40) : Container(),
       Text(meeting.title),
       Text(DateFormat.jm().format(meeting.selectedTimeStart).toLowerCase() +
           ' - ' +
           DateFormat.jm()
-              .format(meeting.selectedTimeStart.add(Duration(hours: meeting.timeLength.toInt())))
+              .format(meeting.selectedTimeStart.add(Duration(minutes: meeting.timeLength.toInt())))
               .toLowerCase()),
       Padding(
           padding: EdgeInsets.only(top: 10),

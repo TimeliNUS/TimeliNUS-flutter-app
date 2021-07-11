@@ -58,8 +58,9 @@ class DeleteMeeting extends MeetingEvent {
 class UpdateMeeting extends MeetingEvent {
   final Meeting updatedMeeting;
   final String id;
+  final bool createZoomMeeting;
 
-  UpdateMeeting(this.updatedMeeting, this.id) : super();
+  UpdateMeeting(this.updatedMeeting, this.id, {this.createZoomMeeting = false}) : super();
 
   @override
   String toString() => 'UpdateMeeting { updatedMeeting: $updatedMeeting }';

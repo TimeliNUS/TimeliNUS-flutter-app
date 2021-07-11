@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   static Page page() => MaterialPage(child: ProfileScreen());
@@ -28,15 +29,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Scaffold(
             backgroundColor: appTheme.primaryColorLight,
             body: Column(
+              mainAxisSize: MainAxisSize.max,
               children: [
-                TopBar(
-                  'Settings',
-                  onPressedCallback: () => context.read<AppBloc>().add(AppOnDashboard()),
-                ),
+                TopBar('Settings',
+                    onPressedCallback: () => context.read<AppBloc>().add(AppOnDashboard()),
+                    rightWidget: IconButton(
+                      iconSize: 30,
+                      icon: Icon(Icons.exit_to_app_outlined),
+                      onPressed: () => context.read<AppBloc>().add(AppLogoutRequested()),
+                    )),
                 ProfileDetails(),
                 // Divider(height: 30)
                 NotificationSettings(),
-                HelpBlock()
+                HelpBlock(),
+                // Expanded(
+                //     child: Container(
+                //         alignment: Alignment.bottomCenter,
+                //         margin: EdgeInsets.only(bottom: 15),
+                //         child: E))
               ],
             )));
   }
@@ -53,6 +63,9 @@ class _ProfileDetailsState extends State<ProfileDetails> {
   File _imageFile;
   @override
   Widget build(BuildContext context) {
+    bool isLinkedToGoogle = AuthenticationRepository.checkLinkedToGoogle(context.read<AppBloc>().state.user.id) != null;
+    bool isLinkedToZoom = AuthenticationRepository.checkLinkedToZoom(context.read<AppBloc>().state.user.id) != null;
+
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 25),
         child: Column(children: [
@@ -76,75 +89,108 @@ class _ProfileDetailsState extends State<ProfileDetails> {
           Padding(padding: EdgeInsets.only(top: 15)),
           CustomCard(
               // elevation: 3,
-              child: Row(children: [
+              child: Column(children: [
+            Row(children: [
+              Container(
+                padding: EdgeInsets.only(right: 20),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12.0),
+                    // borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                    child: InkWell(
+                        onTap: () => showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  ListTile(
+                                    leading: new Icon(Icons.photo),
+                                    title: new Text('View Profile Picture'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                              content:
+                                                  Image.network(context.read<AppBloc>().state.user.profilePicture)));
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: new Icon(Icons.add_a_photo),
+                                    title: new Text('Upload new profile picture'),
+                                    onTap: () async {
+                                      final picker = ImagePicker();
+                                      final PickedFile pickedFile = await picker.getImage(source: ImageSource.gallery);
+                                      setState(() {
+                                        _imageFile = File(pickedFile.path);
+                                      });
+                                      print(_imageFile.path);
+                                      File croppedFile = await ImageCropper.cropImage(
+                                          compressQuality: 50,
+                                          sourcePath: _imageFile.path,
+                                          aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+                                          androidUiSettings: AndroidUiSettings(
+                                              toolbarTitle: 'Crop Image',
+                                              toolbarColor: Colors.deepOrange,
+                                              toolbarWidgetColor: Colors.white,
+                                              initAspectRatio: CropAspectRatioPreset.square,
+                                              lockAspectRatio: true),
+                                          iosUiSettings: IOSUiSettings(
+                                              minimumAspectRatio: 1.0,
+                                              aspectRatioLockEnabled: true,
+                                              resetAspectRatioEnabled: false,
+                                              rotateButtonsHidden: true));
+                                      final url = await uploadImageToFirebase(croppedFile);
+                                      context.read<AuthenticationRepository>().updateProfilePicture(url);
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  Padding(padding: EdgeInsets.only(bottom: 10))
+                                ],
+                              );
+                            }),
+                        child: Image.network(context.read<AppBloc>().state.user.profilePicture,
+                            width: 75, fit: BoxFit.cover))),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(context.read<AppBloc>().state.user.name, style: TextStyle(fontSize: 24)),
+                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  Text(context.read<AppBloc>().state.user.email, style: TextStyle(fontSize: 16))
+                ],
+              )
+            ]),
             Container(
-              padding: EdgeInsets.only(right: 20),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: InkWell(
-                      onTap: () => showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                ListTile(
-                                  leading: new Icon(Icons.photo),
-                                  title: new Text('View Profile Picture'),
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                            content: Image.network(context.read<AppBloc>().state.user.profilePicture)));
-                                  },
-                                ),
-                                ListTile(
-                                  leading: new Icon(Icons.add_a_photo),
-                                  title: new Text('Upload new profile picture'),
-                                  onTap: () async {
-                                    final picker = ImagePicker();
-                                    final PickedFile pickedFile = await picker.getImage(source: ImageSource.gallery);
-                                    setState(() {
-                                      _imageFile = File(pickedFile.path);
-                                    });
-                                    print(_imageFile.path);
-                                    File croppedFile = await ImageCropper.cropImage(
-                                        compressQuality: 50,
-                                        sourcePath: _imageFile.path,
-                                        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
-                                        androidUiSettings: AndroidUiSettings(
-                                            toolbarTitle: 'Crop Image',
-                                            toolbarColor: Colors.deepOrange,
-                                            toolbarWidgetColor: Colors.white,
-                                            initAspectRatio: CropAspectRatioPreset.square,
-                                            lockAspectRatio: true),
-                                        iosUiSettings: IOSUiSettings(
-                                            minimumAspectRatio: 1.0,
-                                            aspectRatioLockEnabled: true,
-                                            resetAspectRatioEnabled: false,
-                                            rotateButtonsHidden: true));
-                                    final url = await uploadImageToFirebase(croppedFile);
-                                    context.read<AuthenticationRepository>().updateProfilePicture(url);
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                                Padding(padding: EdgeInsets.only(bottom: 10))
-                              ],
-                            );
-                          }),
-                      child: Image.network(context.read<AppBloc>().state.user.profilePicture,
-                          width: 75, fit: BoxFit.cover))),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(context.read<AppBloc>().state.user.name, style: TextStyle(fontSize: 24)),
-                Padding(padding: EdgeInsets.only(bottom: 10)),
-                Text(context.read<AppBloc>().state.user.email, style: TextStyle(fontSize: 16))
-              ],
-            )
-          ]))
+                padding: EdgeInsets.only(top: 20),
+                child: InkWell(
+                    onTap: isLinkedToZoom
+                        ? null
+                        : () => launch(
+                            'https://zoom.us/oauth/authorize?response_type=code&client_id=5NM6HEpT4CWNO0zQ9s0fg&redirect_uri=http://localhost:5001/timelinus-2021/asia-east2/zoomAuth&state={"client":"mobile", "id": "${context.read<AppBloc>().state.user.id}"}',
+                            // forceWebView: true,
+                            forceSafariVC: true),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Linked to Zoom Account', style: TextStyle(color: Colors.black, fontSize: 16)),
+                        Text(isLinkedToZoom ? 'Yes' : 'No',
+                            style: TextStyle(color: appTheme.primaryColor, fontSize: 16, fontWeight: FontWeight.w700))
+                      ],
+                    ))),
+            Container(
+                padding: EdgeInsets.only(top: 20),
+                child: InkWell(
+                    onTap: isLinkedToGoogle ? null : () => AuthenticationRepository.linkAccountWithGoogle(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Linked to Google Account', style: TextStyle(color: Colors.black, fontSize: 16)),
+                        Text(isLinkedToGoogle ? 'Yes' : 'No',
+                            style: TextStyle(color: appTheme.primaryColor, fontSize: 16, fontWeight: FontWeight.w700))
+                      ],
+                    )))
+          ])),
         ]));
   }
 }

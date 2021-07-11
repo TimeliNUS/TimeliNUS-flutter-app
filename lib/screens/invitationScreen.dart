@@ -81,7 +81,20 @@ enum CalendarSource { exist, import }
 
 class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
   final TextEditingController controller = new TextEditingController();
+  bool isLinked = false;
   CalendarSource selectedCalendarSource = CalendarSource.import;
+
+  @override
+  void initState() {
+    super.initState();
+    setIsLinked();
+  }
+
+  void setIsLinked() async {
+    String token = await AuthenticationRepository.checkLinkedToGoogle(context.read<AppBloc>().state.user.id);
+    setState(() => isLinked = (token != null));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -136,7 +149,8 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
                       side:
                           MaterialStateProperty.resolveWith((states) => BorderSide(color: appTheme.primaryColorLight))),
                   onPressed: () => context.read<InvitationBloc>().add(AcceptGoogle()),
-                  child: Text('Login to Google', style: TextStyle(color: appTheme.primaryColorLight)))
+                  child: Text(isLinked ? 'Use linked Google account' : 'Login to Google',
+                      style: TextStyle(color: appTheme.primaryColorLight)))
             ],
           ),
           Align(

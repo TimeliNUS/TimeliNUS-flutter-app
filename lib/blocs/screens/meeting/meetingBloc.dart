@@ -60,9 +60,6 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
           .map((meeting) => Meeting.fromEntity(meeting))
           .where(
               (x) => x.selectedTimeStart.day == DateTime.now().day && x.selectedTimeStart.month == DateTime.now().month)
-          // .where((x) =>
-          //     x.selectedTimeStart.add(Duration(hours: x.timeLength.toInt())).difference(DateTime.now()) >
-          //     Duration(minutes: 10))
           .toList();
       yield MeetingLoaded(meetings);
       return;
@@ -92,9 +89,19 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
     final updatedMeetings = state.meetings.map((project) {
       return project.id == event.updatedMeeting.id ? event.updatedMeeting : project;
     }).toList();
-    yield MeetingLoaded(updatedMeetings);
     print(event.updatedMeeting);
-    await meetingRepository.updateMeeting(event.updatedMeeting.toEntity());
+    List<Future<dynamic>> futures = [];
+    futures.add(meetingRepository.updateMeeting(event.updatedMeeting.toEntity()));
+    if (event.createZoomMeeting == true) {
+      futures.add(meetingRepository.createZoomMeeting(
+          event.id,
+          event.updatedMeeting.id,
+          event.updatedMeeting.timeLength,
+          event.updatedMeeting.title,
+          event.updatedMeeting.selectedTimeStart.toIso8601String()));
+    }
+    Future.wait(futures);
+    yield MeetingLoaded(updatedMeetings);
   }
 
   Stream<MeetingState> _mapDeleteMeetingtToState(DeleteMeeting event) async* {

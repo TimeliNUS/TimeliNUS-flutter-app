@@ -15,7 +15,7 @@ class TimeslotView extends StatefulWidget {
   TimeslotView(this.intervals, this.startDate, this.endDate,
       {this.callback,
       this.isDialog = true,
-      this.meetingLength = 1,
+      this.meetingLength = 120,
       this.isConfirmed = false,
       this.selectedDate,
       Key key})
@@ -66,7 +66,7 @@ class TimeslotViewState extends State<TimeslotView> {
                     : widget.startDate.hour.toDouble(),
                 endHour:
                     widget.endDate.minute != 0 ? (widget.endDate.hour.toDouble() + 1) : widget.endDate.hour.toDouble(),
-                timeInterval: Duration(hours: widget.meetingLength),
+                timeInterval: Duration(minutes: widget.meetingLength),
                 timeFormat: 'h:mm a',
                 timeIntervalHeight: 45,
                 // minimumAppointmentDuration: Duration(minutes: 30)

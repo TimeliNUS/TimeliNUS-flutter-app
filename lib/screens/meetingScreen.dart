@@ -235,7 +235,7 @@ class _UpcomingMeetingsState extends State<UpcomingMeetings> {
                                                 ' - ' +
                                                 DateFormat.jm()
                                                     .format(meeting.selectedTimeStart
-                                                        .add(Duration(hours: meeting.timeLength.toInt())))
+                                                        .add(Duration(minutes: meeting.timeLength)))
                                                     .toLowerCase())
                                             : (' Within ' +
                                                 (DateFormat.jm().format(meeting.startDate)).toLowerCase() +

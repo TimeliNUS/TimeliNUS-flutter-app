@@ -56,7 +56,7 @@ class ViewMeetingPopupState extends State<ViewMeetingPopup> {
                             //     child:
                             InvitationDetail(
                               widget.meeting,
-                              authorName,
+                              authorName ?? 'No author found',
                               isAccepted: true,
                             ),
                             Padding(padding: EdgeInsets.only(bottom: 5)),

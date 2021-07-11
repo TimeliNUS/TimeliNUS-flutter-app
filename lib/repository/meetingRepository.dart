@@ -156,7 +156,6 @@ class MeetingRepository {
 
   Future<void> syncGoogleCalendar(
       String meetingId, String accessToken, String timeMin, String timeMax, String userId) async {
-    print('accessToken ' + accessToken);
     final resp = await http.post(
       Uri.parse(AppConstants.findGoogleCommonUrl),
       headers: <String, String>{
@@ -167,6 +166,25 @@ class MeetingRepository {
     );
     print('response ');
     print(resp.body);
+    return;
+  }
+
+  Future<void> createZoomMeeting(String user, String meetingId, int timeLength, String topic, String startTime) async {
+    print('zoom details: ' + user);
+    print('zoom details: ' + meetingId);
+    final response = await http.post(
+      Uri.parse(
+        AppConstants.createZoomUrl,
+      ),
+      body: jsonEncode(<String, String>{
+        "user": user,
+        "topic": topic,
+        "startTime": startTime,
+        "timeLength": timeLength.toString(),
+        "id": meetingId
+      }),
+    );
+    print(response.body);
     return;
   }
 

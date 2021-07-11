@@ -1,12 +1,16 @@
 import 'dart:async';
-
+import 'dart:convert';
+import "package:http/http.dart" as http;
 import 'package:TimeliNUS/models/userModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as FirebaseAuth;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis_auth/googleapis_auth.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:meta/meta.dart';
+import 'package:url_launcher/url_launcher.dart';
 // Thrown if during the sign up process if a failure occurs.
 
 class AuthenticationFailture implements Exception {
@@ -56,6 +60,11 @@ class AuthenticationRepository {
   );
   User _currentUser;
 
+  static ClientId id =
+      ClientId("114066663509-q3koofrq4dsvve435l786tuke74q4pof.apps.googleusercontent.com", "lVKx-s1uUAP_JmY-qsQ6p1Bv");
+  static final scopes = ['email', 'https://www.googleapis.com/auth/calendar'];
+  static final storage = new FlutterSecureStorage();
+
   /// Stream of [User] which will emit the current user when
   /// the authentication state changes.
   ///
@@ -102,24 +111,71 @@ class AuthenticationRepository {
   /// Throws a [logInWithGoogle] if an exception occurs.
   Future<void> logInWithGoogle() async {
     try {
-      final storage = new FlutterSecureStorage();
-      print('scopes : ' + _googleSignIn.scopes.toString());
-      final googleUser = await _googleSignIn.signIn();
-      final googleAuth = await googleUser.authentication;
-      final credential = FirebaseAuth.GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
-      );
-      print('writing access: ' + credential.accessToken);
-      await storage.write(key: 'accessToken', value: credential.accessToken);
-      FirebaseAuth.UserCredential cred = await _firebaseAuth.signInWithCredential(credential);
-      await (FirebaseFirestore.instance
-          .collection('user')
-          .doc(cred.user.uid)
-          .set({'name': cred.user.displayName, 'email': cred.user.email, 'project': [], 'todo': [], 'meeting': []}));
+      clientViaUserConsent(id, scopes, prompt).then((AuthClient client) async {
+        await closeWebView();
+        print('writing tokens...');
+        await storage.write(key: 'refreshToken', value: client.credentials.refreshToken);
+        await storage.write(key: 'accessToken', value: client.credentials.accessToken.data);
+        await storage.write(key: 'expiryDate', value: client.credentials.accessToken.expiry.toIso8601String());
+        final credential = FirebaseAuth.GoogleAuthProvider.credential(
+          accessToken: client.credentials.accessToken.data,
+          idToken: client.credentials.idToken,
+        );
+        FirebaseAuth.UserCredential cred = await _firebaseAuth.signInWithCredential(credential);
+        client.close();
+        if (cred.additionalUserInfo.isNewUser) {
+          await (FirebaseFirestore.instance.collection('user').doc(cred.user.uid).set({
+            'name': cred.user.displayName,
+            'email': cred.user.email,
+            'project': [],
+            'todo': [],
+            'meeting': [],
+            'googleRefreshToken': client.credentials.refreshToken
+          }));
+        } else {
+          await (FirebaseFirestore.instance
+              .collection('user')
+              .doc(cred.user.uid)
+              .update({'googleRefreshToken': client.credentials.refreshToken}));
+        }
+      });
     } on FirebaseAuth.FirebaseAuthException catch (err) {
       throw AuthenticationFailture(err.code);
     }
+  }
+
+  static void linkAccountWithGoogle() async {
+    try {
+      final storage = new FlutterSecureStorage();
+
+      clientViaUserConsent(id, scopes, prompt).then((AuthClient client) async {
+        await closeWebView();
+        print('writing tokens...');
+        await storage.write(key: 'refreshToken', value: client.credentials.refreshToken);
+        await storage.write(key: 'accessToken', value: client.credentials.accessToken.data);
+        await storage.write(key: 'expiryDate', value: client.credentials.accessToken.expiry.toIso8601String());
+        final credential = FirebaseAuth.GoogleAuthProvider.credential(
+          accessToken: client.credentials.accessToken.data,
+          idToken: client.credentials.idToken,
+        );
+        FirebaseAuth.UserCredential cred =
+            await FirebaseAuth.FirebaseAuth.instance.currentUser.linkWithCredential(credential);
+        client.close();
+        await (FirebaseFirestore.instance
+            .collection('user')
+            .doc(cred.user.uid)
+            .update({'googleRefreshToken': client.credentials.refreshToken}));
+      });
+    } on FirebaseAuth.FirebaseAuthException catch (err) {
+      throw AuthenticationFailture(err.code);
+    }
+  }
+
+  static void prompt(String url) async {
+    print("Please go to the following URL and grant access:");
+    print("  => $url");
+    print("");
+    await launch(url, forceWebView: true, forceSafariVC: true);
   }
 
   /// Signs in with the provided [email] and [password].
@@ -145,7 +201,9 @@ class AuthenticationRepository {
   /// Throws a [LogOutFailure] if an exception occurs.
   Future<void> logOut() async {
     try {
-      await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut(), _googleSignIn.disconnect()]);
+      await storage.deleteAll();
+      await _firebaseAuth.signOut();
+      // await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut(), _googleSignIn.disconnect()]);
     } on Exception {
       throw LogOutFailure();
     }
@@ -178,22 +236,41 @@ class AuthenticationRepository {
     });
   }
 
-  Future<void> refreshToken() async {
-    print("Token Refresh");
-    final storage = new FlutterSecureStorage();
-    final GoogleSignInAccount googleSignInAccount = await _googleSignIn.signInSilently();
-    final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
-    print('refreshToken: ' + googleSignInAuthentication.serverAuthCode);
-    print('accessToken: ' + googleSignInAuthentication.accessToken);
-
-    final FirebaseAuth.AuthCredential credential = FirebaseAuth.GoogleAuthProvider.credential(
-      accessToken: googleSignInAuthentication.accessToken,
-      idToken: googleSignInAuthentication.idToken,
+  Future<String> refreshTokenAPI(String token) async {
+    final response = await http.post(
+      Uri.parse("https://oauth2.googleapis.com/token"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        "grant_type": 'refresh_token',
+        "refresh_token": token,
+        'client_secret': 'lVKx-s1uUAP_JmY-qsQ6p1Bv',
+        'client_id': '114066663509-q3koofrq4dsvve435l786tuke74q4pof.apps.googleusercontent.com'
+      }),
     );
-    FirebaseAuth.UserCredential cred = await _firebaseAuth.signInWithCredential(credential);
-    await storage.write(key: 'accessToken', value: googleSignInAuthentication.accessToken);
-    // return googleSignInAuthentication.accessToken; // New refreshed token
+    return jsonDecode(response.body)['access_token'];
+  }
+
+  static Future<String> checkLinkedToGoogle(String id) async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('user').doc(id).get();
+    Map<String, Object> data = snapshot.data();
+    return ((data['googleRefreshToken'] != null ? data['googleRefreshToken'] as String : null));
+  }
+
+  Future<void> refreshToken(String refreshToken) async {
+    print("Token Refresh : " + refreshToken);
+    String token = await refreshTokenAPI(refreshToken);
+    await storage.write(key: 'accessToken', value: token);
+    print('token: ' + token);
     return;
+  }
+
+  static Future<String> checkLinkedToZoom(String id) async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('accounts').doc(id).get();
+    Map<String, Object> data = snapshot.data();
+    print('isLinked to Zoom ? : ' + (data['zoomRefreshToken'] != null).toString());
+    return ((data['zoomRefreshToken'] != null ? data['zoomRefreshToken'] as String : null));
   }
 }
 

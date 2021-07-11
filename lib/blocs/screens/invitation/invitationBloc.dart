@@ -61,10 +61,19 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
       Meeting temp = state.meeting;
       yield InvitationLoading();
       final storage = new FlutterSecureStorage();
-      await AuthenticationRepository().refreshToken();
+      String refreshToken = await AuthenticationRepository.checkLinkedToGoogle(app.state.user.id);
+      if (refreshToken != null) {
+        String expiryDate = await storage.read(key: 'expiryDate');
+        if (DateTime.parse(expiryDate).isBefore(DateTime.now())) {
+          await AuthenticationRepository().refreshToken(refreshToken);
+        } else {
+          print('no need to refresh accessToken');
+        }
+      } else {
+        await AuthenticationRepository.linkAccountWithGoogle();
+      }
       // final IdTokenResult idTokenResult = await FirebaseAuth.instance.currentUser.getIdTokenResult();
       String accessToken = await storage.read(key: 'accessToken');
-      print(accessToken);
       await meetingRepository.syncGoogleCalendar(
           temp.id,
           // idTokenResult.token,

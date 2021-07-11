@@ -10,14 +10,11 @@ class InvitationDetail extends StatelessWidget {
   final Meeting meeting;
   final String authorName;
   final bool isAccepted;
-  const InvitationDetail(this.meeting, this.authorName,
-      {this.isAccepted = false, Key key})
-      : super(key: key);
+  const InvitationDetail(this.meeting, this.authorName, {this.isAccepted = false, Key key}) : super(key: key);
 
-  Future<String> getAuthorName() async {
-    return AuthenticationRepository.findUsersByRef([meeting.author])
-        .then((x) => x[0].name);
-  }
+  // Future<String> getAuthorName() async {
+  //   return AuthenticationRepository.findUsersByRef([meeting.author]).then((x) => x[0].name);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +23,7 @@ class InvitationDetail extends StatelessWidget {
             borderRadius: BorderRadius.all(
               Radius.circular(20),
             ),
-            boxShadow: [
-              BoxShadow(
-                  color: appTheme.primaryColor,
-                  spreadRadius: 0.5,
-                  blurRadius: 0.5)
-            ],
+            boxShadow: [BoxShadow(color: appTheme.primaryColor, spreadRadius: 0.5, blurRadius: 0.5)],
             color: Colors.white),
         child: Padding(
             padding: EdgeInsets.all(20),
@@ -50,25 +42,18 @@ class InvitationDetail extends StatelessWidget {
                 Text('Meeting created by: ' + authorName),
                 customPadding(),
                 isAccepted
-                    ? (Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                            Text('Confirmed Users: ' +
-                                meeting.confirmed
-                                    .map((x) => x.name)
-                                    .join(', ')),
-                            customPadding(),
-                            Text('Invited Users (Not confirmed): ' +
-                                meeting.invited.map((x) => x.name).join(', ')),
-                            customPadding()
-                          ]))
+                    ? (Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Confirmed Users: ' + meeting.confirmed.map((x) => x.name).join(', ')),
+                        customPadding(),
+                        Text('Invited Users (Not confirmed): ' + meeting.invited.map((x) => x.name).join(', ')),
+                        customPadding()
+                      ]))
                     : Container(),
                 Text('Meeting is within:'),
                 customPadding(),
                 Row(
                   children: [
-                    Icon(Icons.calendar_today_outlined,
-                        size: 18, color: appTheme.primaryColorLight),
+                    Icon(Icons.calendar_today_outlined, size: 18, color: appTheme.primaryColorLight),
                     Text(' ' +
                         DateFormat('MMM dd, yyyy').format(meeting.startDate) +
                         ' - ' +
@@ -78,8 +63,7 @@ class InvitationDetail extends StatelessWidget {
                 Padding(padding: EdgeInsets.only(bottom: 7.5)),
                 Row(
                   children: [
-                    Icon(Icons.av_timer_rounded,
-                        size: 18, color: appTheme.primaryColorLight),
+                    Icon(Icons.av_timer_rounded, size: 18, color: appTheme.primaryColorLight),
                     Text(' ' +
                         DateFormat('kk:mm').format(meeting.startDate) +
                         ' - ' +
@@ -89,8 +73,7 @@ class InvitationDetail extends StatelessWidget {
                 Padding(padding: EdgeInsets.only(bottom: 7.5)),
                 Row(
                   children: [
-                    Icon(Icons.location_pin,
-                        size: 18, color: appTheme.primaryColorLight),
+                    Icon(Icons.location_pin, size: 18, color: appTheme.primaryColorLight),
                     Text(' ' + meeting.meetingVenue.toString().split('.')[1]),
                   ],
                 )

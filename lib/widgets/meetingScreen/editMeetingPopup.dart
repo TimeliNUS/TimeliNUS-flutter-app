@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/meeting/meetingBloc.dart';
 import 'package:TimeliNUS/models/models.dart';
+import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/widgets/meetingScreen/timeslotView.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:TimeliNUS/utils/dateTimeExtension.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EditMeetingPopup extends StatefulWidget {
   final Meeting meetingToEdit;
@@ -28,13 +30,17 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
   List<User> pics = [];
   Project selectedProject;
   DateTime selectedTime;
+  bool isNeeded = false;
   TextEditingController textController = new TextEditingController();
+  bool isLinkedToZoom = false;
 
   @override
   void initState() {
     super.initState();
     textController = new TextEditingController(text: widget.meetingToEdit.title);
     meetingVenue = widget.meetingToEdit.meetingVenue;
+    AuthenticationRepository.checkLinkedToZoom(context.read<AppBloc>().state.user.id)
+        .then((val) => isLinkedToZoom = (val != null));
   }
 
   @override
@@ -92,6 +98,7 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                           PopupDropdown(
                                               initialProject: widget.meetingToEdit.project,
                                               dropdownLabel: 'Module Project',
+                                              isDisabled: true,
                                               callback: (val) => {setState(() => selectedProject = val)}),
                                           customPadding(),
                                           PersonInChargeChips(pics, "Person in Charge", project: selectedProject,
@@ -119,6 +126,7 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                                   (val) => setState(() => startDateValue = val),
                                                   false,
                                                   isNotMini: false,
+                                                  isDisabled: true,
                                                   initialTime: widget.meetingToEdit.startDate,
                                                 )),
                                               ]),
@@ -135,6 +143,7 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                                 (val) => setState(() => endDateValue = val),
                                                 false,
                                                 isNotMini: false,
+                                                isDisabled: true,
                                                 initialTime: widget.meetingToEdit.endDate,
                                               )),
                                             ],
@@ -149,22 +158,24 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                               Radio<MeetingVenue>(
                                                 value: MeetingVenue.Zoom,
                                                 groupValue: meetingVenue,
-                                                onChanged: (MeetingVenue value) {
-                                                  setState(() {
-                                                    meetingVenue = value;
-                                                  });
-                                                },
+                                                onChanged: null,
+                                                // (MeetingVenue value) {
+                                                //   setState(() {
+                                                //     meetingVenue = value;
+                                                //   });
+                                                // },
                                               ),
                                               Padding(padding: EdgeInsets.only(right: 30)),
                                               Text('Face to Face'),
                                               Radio<MeetingVenue>(
                                                 value: MeetingVenue.FaceToFace,
                                                 groupValue: meetingVenue,
-                                                onChanged: (MeetingVenue value) {
-                                                  setState(() {
-                                                    meetingVenue = value;
-                                                  });
-                                                },
+                                                onChanged: null,
+                                                // onChanged: (MeetingVenue value) {
+                                                //   setState(() {
+                                                //     meetingVenue = value;
+                                                //   });
+                                                // },
                                               ),
                                             ],
                                           ),
@@ -172,7 +183,19 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                           Text('Selected datetime: \n' +
                                               (selectedTime != null
                                                   ? DateFormat.yMMMd().add_jm().format(selectedTime)
-                                                  : 'None'))
+                                                  : 'None')),
+                                          widget.meetingToEdit.invited.isEmpty
+                                              ? Row(children: [
+                                                  Text('Create Zoom Meeting automatically: '),
+                                                  Checkbox(
+                                                    value: isNeeded,
+                                                    onChanged: (boolean) {
+                                                      setState(() => isNeeded = boolean);
+                                                      print('isLinked : ' + isLinkedToZoom.toString());
+                                                    },
+                                                  )
+                                                ])
+                                              : Container()
                                         ],
                                       ))))),
                       Container(
@@ -183,27 +206,45 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
-                                    child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 10),
-                                        child: Text("Done",
-                                            style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
-                                    onPressed: () {
-                                      widget.meetingBloc.add(UpdateMeeting(
-                                          widget.meetingToEdit.copyWith(
-                                              title: textController.text,
-                                              groupmates: pics,
-                                              meetingVenue: meetingVenue,
-                                              project: selectedProject,
-                                              startDate: startDateValue,
-                                              endDate: endDateValue,
-                                              isConfirmed: true,
-                                              selectedTimeStart: selectedTime),
-                                          userId));
-                                      Navigator.pop(context);
-                                    })
+                                (isLinkedToZoom || !isNeeded)
+                                    ? ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
+                                        child: Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 10),
+                                            child: Text("Done",
+                                                style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
+                                        onPressed: () {
+                                          widget.meetingBloc.add(UpdateMeeting(
+                                              widget.meetingToEdit.copyWith(
+                                                  title: textController.text,
+                                                  groupmates: pics,
+                                                  meetingVenue: meetingVenue,
+                                                  project: selectedProject,
+                                                  startDate: startDateValue,
+                                                  endDate: endDateValue,
+                                                  isConfirmed: true,
+                                                  selectedTimeStart: selectedTime),
+                                              userId,
+                                              createZoomMeeting: isNeeded));
+                                          Navigator.pop(context);
+                                        })
+                                    : ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
+                                        onPressed: () {
+                                          launch(
+                                              'https://zoom.us/oauth/authorize?response_type=code&client_id=5NM6HEpT4CWNO0zQ9s0fg&redirect_uri=http://localhost:5001/timelinus-2021/asia-east2/zoomAuth&state={"client":"mobile", "id": "${context.read<AppBloc>().state.user.id}"}',
+                                              // forceWebView: true,
+                                              forceSafariVC: true);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 10),
+                                            child: Text("Link your Zoom Account",
+                                                style: appTheme.textTheme.bodyText2.apply(color: Colors.white))))
                               ],
                             )),
                       )

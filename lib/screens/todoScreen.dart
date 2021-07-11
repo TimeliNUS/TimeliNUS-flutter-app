@@ -45,7 +45,6 @@ class _TodoScreenState extends State<TodoScreen> {
                         TopBar(widget.projectTitle ?? "My Todos",
                             subtitle: widget.projectTitle != null ? "Project Todos " : null,
                             // subtitle: "Example Project",
-                            onPressedCallback: () => context.read<AppBloc>().add(AppLogoutRequested()),
                             rightWidget: CircularProgress()),
                         Expanded(
                           child: CustomCard(),

@@ -13,6 +13,8 @@ class AppConstants {
   static const String DEV_FINDGOOGLECOMMON = "http://localhost:5001/timelinus-2021/asia-east2/findcommon";
   static const String DEV_FINDCOMMON = 'http://localhost:5001/timelinus-2021/asia-east2/findNusModsCommon';
   static const String PROD_FINDCOMMON = 'https://asia-east2-timelinus-2021.cloudfunctions.net/findNusModsCommon';
+  static const String DEV_CREATEZOOM = 'http://localhost:5001/timelinus-2021/asia-east2/createZoomMeeting';
+  static const String PROD_CREATEZOOM = 'https://asia-east2-timelinus-2021.cloudfunctions.net/createZoomMeeting';
 
   static bool isSimulator = false;
 
@@ -36,4 +38,5 @@ class AppConstants {
   static String findCommonUrl = (isSimulator) ? DEV_FINDCOMMON : PROD_FINDCOMMON;
 
   static String findGoogleCommonUrl = (isSimulator) ? DEV_FINDGOOGLECOMMON : DEV_FINDGOOGLECOMMON;
+  static String createZoomUrl = (isSimulator) ? DEV_CREATEZOOM : PROD_CREATEZOOM;
 }

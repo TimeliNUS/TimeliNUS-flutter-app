@@ -29,14 +29,6 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await AppConstants.init();
 
-  var id =
-      ClientId("114066663509-j11htpbtn3u1p7dulr22bpjldopg3d11.apps.googleusercontent.com", "Zk7QGcCR6Ym_PxztseumHQfM");
-  var scopes = ['https://www.googleapis.com/auth/calendar'];
-
-  clientViaUserConsent(id, scopes, prompt).then((AuthClient client) {
-    client.close();
-  });
-
   final authenticationRepository = AuthenticationRepository();
   final projectRepository = ProjectRepository();
   await authenticationRepository.user.first;
@@ -45,12 +37,6 @@ Future<void> main() async {
   });
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(App(authenticationRepository: authenticationRepository, projectRepository: projectRepository));
-}
-
-void prompt(String url) {
-  print("Please go to the following URL and grant access:");
-  print("  => $url");
-  print("");
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

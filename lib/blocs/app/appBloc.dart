@@ -48,8 +48,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       if (dynamicLink != null) {
         final Uri deepLink = dynamicLink.link;
         if (deepLink != null) {
-          // ignore: unawaited_futures
-          this.add(AppOnInvitation());
+          print(dynamicLink.link.query);
+          this.add(AppOnProfile());
         }
       }
     }, onError: (OnLinkErrorException e) async {
@@ -64,7 +64,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         if (deepLink != null) {
           // ignore: unawaited_futures
-          this.add(AppOnInvitation());
+          this.add(AppOnProfile());
         }
       }
     } catch (err) {
