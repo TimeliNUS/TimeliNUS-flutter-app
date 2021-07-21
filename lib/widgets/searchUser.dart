@@ -62,8 +62,7 @@ class _SearchUserState extends State<SearchUser> {
                   leading: new Icon(Icons.search),
                   title: new TextField(
                     controller: controller,
-                    decoration: new InputDecoration(
-                        hintText: 'Search', border: InputBorder.none),
+                    decoration: new InputDecoration(hintText: 'Search', border: InputBorder.none),
                     onChanged: onSearchTextChanged,
                   ),
                   trailing: new IconButton(
@@ -87,9 +86,7 @@ class _SearchUserState extends State<SearchUser> {
                     Navigator.pop(context);
                   },
                   child: Card(
-                    child: new ListTile(
-                        title: new Text(_searchResult[i].name),
-                        subtitle: Text(_userDetails[i].email)),
+                    child: new ListTile(title: new Text(_searchResult[i].name), subtitle: Text(_userDetails[i].email)),
                     margin: const EdgeInsets.all(0.0),
                   ));
             },
@@ -107,7 +104,7 @@ class _SearchUserState extends State<SearchUser> {
     }
 
     _userDetails.forEach((userDetail) {
-      if (userDetail.name.contains(text)) _searchResult.add(userDetail);
+      if (userDetail.name.toLowerCase().contains(text.toLowerCase())) _searchResult.add(userDetail);
     });
 
     setState(() {});

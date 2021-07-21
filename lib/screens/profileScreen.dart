@@ -28,8 +28,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         appTheme.primaryColorLight,
         Scaffold(
             backgroundColor: appTheme.primaryColorLight,
-            body: Column(
-              mainAxisSize: MainAxisSize.max,
+            body: ListView(
+              // mainAxisSize: MainAxisSize.max,
               children: [
                 TopBar('Settings',
                     onPressedCallback: () => context.read<AppBloc>().add(AppOnDashboard()),
@@ -157,7 +157,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                 children: [
                   Text(context.read<AppBloc>().state.user.name, style: TextStyle(fontSize: 24)),
                   Padding(padding: EdgeInsets.only(bottom: 10)),
-                  Text(context.read<AppBloc>().state.user.email, style: TextStyle(fontSize: 16))
+                  Text(context.read<AppBloc>().state.user.email, style: TextStyle(fontSize: 14))
                 ],
               )
             ]),
@@ -166,10 +166,11 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                 child: InkWell(
                     onTap: isLinkedToZoom
                         ? null
-                        : () => launch(
-                            'https://zoom.us/oauth/authorize?response_type=code&client_id=5NM6HEpT4CWNO0zQ9s0fg&redirect_uri=http://localhost:5001/timelinus-2021/asia-east2/zoomAuth&state={"client":"mobile", "id": "${context.read<AppBloc>().state.user.id}"}',
-                            // forceWebView: true,
-                            forceSafariVC: true),
+                        : () {
+                            final url = Uri.encodeFull(
+                                'https://zoom.us/oauth/authorize?response_type=code&client_id=5NM6HEpT4CWNO0zQ9s0fg&redirect_uri=http://localhost:5001/timelinus-2021/asia-east2/zoomAuth&state={"client":"mobile", "id": "${context.read<AppBloc>().state.user.id}"}');
+                            launch(url, forceSafariVC: true);
+                          },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

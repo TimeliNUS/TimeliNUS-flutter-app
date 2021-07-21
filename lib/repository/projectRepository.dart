@@ -47,14 +47,17 @@ class ProjectRepository {
   //     'todo': [...refs]
   //   });
   // }
-  Future<ProjectEntity> loadProjectById(String id) async {
+  static Future<ProjectEntity> loadProjectById(String id) async {
     DocumentSnapshot documentSnapshot = await ref.doc(id).get();
     Map<String, Object> tempData = documentSnapshot.data();
     List<TodoEntity> todoEntities = await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
     List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
     List<User> users = await AuthenticationRepository.findUsersByRef(tempData['groupmates']);
+    List<User> invited = await AuthenticationRepository.findUsersByRef(tempData['invitations']);
+    List<User> confirmed = await AuthenticationRepository.findUsersByRef(tempData['confirmedInvitations']);
     // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
-    ProjectEntity documentSnapshotTask = ProjectEntity.fromJson(tempData, todos, users, id, documentSnapshot.reference);
+    ProjectEntity documentSnapshotTask =
+        ProjectEntity.fromJson(tempData, todos, users, invited, confirmed, id, documentSnapshot.reference);
     return documentSnapshotTask;
   }
 
@@ -68,8 +71,11 @@ class ProjectRepository {
       List<TodoEntity> todoEntities = await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
       List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
       List<User> users = await AuthenticationRepository.findUsersByRef(tempData['groupmates']);
+      List<User> invited = await AuthenticationRepository.findUsersByRef(tempData['invitations']);
+      List<User> confirmed = await AuthenticationRepository.findUsersByRef(tempData['confirmedInvitations']);
       // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
-      ProjectEntity documentSnapshotTask = ProjectEntity.fromJson(temp.data(), todos, users, temp.id, temp.reference);
+      ProjectEntity documentSnapshotTask =
+          ProjectEntity.fromJson(temp.data(), todos, users, invited, confirmed, temp.id, temp.reference);
       projects.add(documentSnapshotTask);
     }
     return projects;
@@ -84,13 +90,33 @@ class ProjectRepository {
       List<TodoEntity> todoEntities = await TodoRepository.loadTodosFromReferenceList(tempData['todos']);
       List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
       List<User> users = await AuthenticationRepository.findUsersByRef(tempData['groupmates']);
+      List<User> invited = await AuthenticationRepository.findUsersByRef(tempData['invitations']);
+      List<User> confirmed = await AuthenticationRepository.findUsersByRef(tempData['confirmedInvitations']);
+
       // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
       print(users);
-      ProjectEntity documentSnapshotTask = ProjectEntity.fromJson(temp.data(), todos, users, temp.id, temp.reference);
+      ProjectEntity documentSnapshotTask =
+          ProjectEntity.fromJson(temp.data(), todos, users, invited, confirmed, temp.id, temp.reference);
       projects.add(documentSnapshotTask);
     }
     // print('invitations: ' + projects.length.toString());
     return projects;
+  }
+
+  static Future<void> acceptProjectInvitation(String projectId, String userId) async {
+    DocumentReference personRef = person.doc(userId);
+    await ref.doc(projectId).update({
+      "confirmedInvitations": FieldValue.arrayUnion([personRef]),
+      "invitations": FieldValue.arrayRemove([personRef])
+    });
+  }
+
+  static Future<void> declineProjectInvitation(String projectId, String userId) async {
+    DocumentReference personRef = person.doc(userId);
+    await ref.doc(projectId).update({
+      "groupmates": FieldValue.arrayRemove([personRef]),
+      "invitations": FieldValue.arrayRemove([personRef])
+    });
   }
 
   Future<void> updateProject(ProjectEntity project) {

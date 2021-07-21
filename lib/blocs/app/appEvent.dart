@@ -33,7 +33,8 @@ class AppOnMeeting extends AppEvent {
 
 class AppOnInvitation extends AppEvent {
   final String invitationId;
-  const AppOnInvitation({this.invitationId});
+  final bool isMeeting;
+  const AppOnInvitation({this.invitationId, this.isMeeting = true});
 }
 
 class AppUserChanged extends AppEvent {

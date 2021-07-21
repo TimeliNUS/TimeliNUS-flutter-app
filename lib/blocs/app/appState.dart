@@ -12,7 +12,8 @@ class AppState extends Equatable {
 
   AppState.onTodo(User user, {String projectId, String projectTitle})
       : this(status: AppStatus.onTodo, user: user, data: {'projectId': projectId, 'projectTitle': projectTitle});
-  AppState.onInvitation(User user, String id) : this(status: AppStatus.onInvitation, user: user, data: id);
+  AppState.onInvitation(User user, String id, {bool isMeeting})
+      : this(status: AppStatus.onInvitation, user: user, data: {'id': id, 'isMeeting': isMeeting});
   AppState.onProject(User user) : this(status: AppStatus.onProject, user: user);
   AppState.onMeeting(User user, {String projectId, String projectTitle})
       : this(status: AppStatus.onMeeting, user: user, data: {'projectId': projectId, 'projectTitle': projectTitle});

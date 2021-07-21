@@ -30,6 +30,12 @@ class TimeslotViewState extends State<TimeslotView> {
   @override
   void initState() {
     super.initState();
+    widget.intervals.add(TimeRegion(
+      startTime: new DateTime(widget.startDate.year, widget.startDate.month, widget.startDate.day, widget.endDate.hour,
+          widget.endDate.minute),
+      endTime: new DateTime(widget.startDate.year, widget.startDate.month, widget.startDate.day, 23, 59),
+      recurrenceRule: 'FREQ=DAILY;INTERVAL=1',
+    ));
     print(widget.isConfirmed);
   }
 
@@ -64,8 +70,8 @@ class TimeslotViewState extends State<TimeslotView> {
                 startHour: widget.startDate.minute != 0
                     ? (widget.startDate.hour.toDouble())
                     : widget.startDate.hour.toDouble(),
-                endHour:
-                    widget.endDate.minute != 0 ? (widget.endDate.hour.toDouble() + 1) : widget.endDate.hour.toDouble(),
+                // endHour:
+                //     widget.endDate.minute != 0 ? (widget.endDate.hour.toDouble() + 1) : widget.endDate.hour.toDouble(),
                 timeInterval: Duration(minutes: widget.meetingLength),
                 timeFormat: 'h:mm a',
                 timeIntervalHeight: 45,

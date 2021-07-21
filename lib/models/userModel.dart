@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 
 class User extends Equatable {
   /// {@macro user}
-  const User({@required this.id, this.email, this.name, this.ref, this.profilePicture});
+  const User({@required this.id, this.calendar, this.email, this.name, this.ref, this.profilePicture});
 
   /// The current user's email address.
   final String email;
@@ -18,6 +18,8 @@ class User extends Equatable {
   final DocumentReference ref;
 
   final String profilePicture;
+
+  final String calendar;
 
   /// Empty user which represents an unauthenticated user.
   static const empty = User(id: '');
@@ -37,6 +39,7 @@ class User extends Equatable {
         name: json['name'],
         email: json['email'],
         ref: ref,
+        calendar: json['calendar'],
         profilePicture: json['photoURL'] ?? 'https://via.placeholder.com/500x500');
   }
 
@@ -47,6 +50,10 @@ class User extends Equatable {
       'name': name,
       // 'email': email,
     };
+  }
+
+  User updateNewCalendar(String url) {
+    return new User(id: id, name: name, email: email, ref: ref, calendar: url, profilePicture: profilePicture);
   }
 
   @override

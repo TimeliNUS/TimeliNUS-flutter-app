@@ -2,10 +2,11 @@ part of 'invitationBloc.dart';
 
 abstract class InvitationState extends Equatable {
   final Meeting meeting;
-  const InvitationState(this.meeting);
+  final Project project;
+  const InvitationState(this.meeting, {this.project});
 
   @override
-  List<Object> get props => [meeting];
+  List<Object> get props => [meeting, project];
 }
 
 class InvitationInitial extends InvitationState {
@@ -21,6 +22,17 @@ class InvitationLoaded extends InvitationState {
 
   @override
   List<Object> get props => [meeting];
+}
+
+class ProjectInvitationLoaded extends InvitationState {
+  final Project project;
+  ProjectInvitationLoaded(this.project) : super(null, project: project);
+
+  @override
+  String toString() => 'ProjectInvitationLoaded { project: $project }';
+
+  @override
+  List<Object> get props => [project];
 }
 
 class InvitationNotLoaded extends InvitationState {

@@ -1,8 +1,10 @@
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/app/appEvent.dart';
+import 'package:TimeliNUS/blocs/screens/invitation/invitationBloc.dart';
 import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/models/project.dart';
 import 'package:TimeliNUS/models/todo.dart';
+import 'package:TimeliNUS/repository/meetingRepository.dart';
 import 'package:TimeliNUS/repository/projectRepository.dart';
 import 'package:TimeliNUS/utils/transitionBuilder.dart';
 import 'package:TimeliNUS/widgets/bottomNavigationBar.dart';
@@ -76,10 +78,12 @@ class _ProjectScreenState extends State<ProjectScreen> with SingleTickerProvider
                                 // await Future.delayed(Duration(milliseconds: 1000));
                                 await context.read<ProjectBloc>().stream.firstWhere((state) => state is ProjectLoaded);
                               },
-                              child: ListView(
-                                  children: (state.projects.map((project) => ProjectCard(
-                                          project, project.todos.where((todo) => todo.complete == false).toList())))
-                                      .toList())))
+                              child: ListView(children: [
+                                ProjectInvitations(),
+                                Divider(color: Colors.white, indent: 30, endIndent: 30, height: 40, thickness: 1),
+                                ...(state.projects.map((project) => ProjectCard(
+                                    project, project.todos.where((todo) => todo.complete == false).toList()))).toList()
+                              ])))
                       : Container()),
                   // ElevatedButton(
                   //     onPressed: () =>
@@ -235,6 +239,83 @@ class ProjectCardDetail extends StatelessWidget {
                                   ))
                         ],
                       )))
+            ])));
+  }
+}
+
+class ProjectInvitations extends StatefulWidget {
+  ProjectInvitations({Key key}) : super(key: key);
+
+  @override
+  _ProjectInvitationsState createState() => _ProjectInvitationsState();
+}
+
+class _ProjectInvitationsState extends State<ProjectInvitations> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        // color: ThemeColor.lightOrange,
+        padding: EdgeInsets.only(left: 30, right: 30),
+        child: SingleChildScrollView(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch,
+                // mainAxisSize: MainAxisSize.min,
+                // mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+              Text((context.read<ProjectBloc>().state.invitations.length == 0 ? "No " : "") + "Invitations",
+                  textAlign: TextAlign.left, style: TextStyle(fontSize: 20, color: Colors.white)),
+              // Expanded(child: ListView()),
+              ...context
+                  .read<ProjectBloc>()
+                  .state
+                  .invitations
+                  .map((invitation) => Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: IntrinsicHeight(
+                          child: Row(mainAxisSize: MainAxisSize.max, children: [
+                        Expanded(
+                            child: GestureDetector(
+                                onTap: () => context
+                                    .read<AppBloc>()
+                                    .add(AppOnInvitation(invitationId: invitation.id, isMeeting: false)),
+                                child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        bottomLeft: Radius.circular(20),
+                                      ),
+                                      color: Colors.white,
+                                    ),
+                                    // color: Colors.white,
+                                    child: Padding(
+                                        padding: EdgeInsets.all(25),
+                                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                          Text(invitation.title + '\ncreated by ' + invitation.groupmates[0].name),
+                                          Padding(
+                                            padding: EdgeInsets.only(bottom: 5),
+                                          ),
+                                        ]))))),
+                        GestureDetector(
+                            onTap: () {
+                              ProjectRepository.acceptProjectInvitation(
+                                  invitation.id, context.read<AppBloc>().state.user.id);
+                              BlocProvider.of<ProjectBloc>(context)
+                                  .add(LoadProjects(context.read<AppBloc>().state.user.id));
+                            },
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(20),
+                                    bottomRight: Radius.circular(20),
+                                  ),
+                                  color: appTheme.primaryColor,
+                                ),
+                                child: Padding(
+                                    padding: EdgeInsets.all(15),
+                                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                      Text('Accept', textAlign: TextAlign.center, style: TextStyle(color: Colors.white))
+                                    ]))))
+                      ]))))
+                  .toList()
             ])));
   }
 }

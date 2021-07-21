@@ -11,12 +11,15 @@ class ProjectEntity extends Equatable {
   final int noOfMeetings;
   final List<Todo> todos;
   final List<User> groupmates;
+  final List<User> invited;
+  final List<User> confirmed;
   final DocumentReference ref;
 
   ProjectEntity(this.title, this.moduleCode, this.id, this.progress, this.deadline, this.groupmates, this.noOfMeetings,
-      this.todos, this.ref);
+      this.todos, this.invited, this.confirmed, this.ref);
 
-  static ProjectEntity fromJson(Map<String, Object> json, List<Todo> todos, List<User> users,
+  static ProjectEntity fromJson(
+      Map<String, Object> json, List<Todo> todos, List<User> users, List<User> invited, List<User> confirmed,
       [String id, DocumentReference ref]) {
     return ProjectEntity(
         json['title'],
@@ -27,6 +30,8 @@ class ProjectEntity extends Equatable {
         users,
         json['meetings'] != null ? (json['meetings'] as List).length : 0,
         todos,
+        invited,
+        confirmed,
         ref);
   }
 

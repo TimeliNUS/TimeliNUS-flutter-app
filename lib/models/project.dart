@@ -14,8 +14,8 @@ class Project extends Equatable {
   final List<User> groupmates;
   final int noOfMeetings;
   final List<Todo> todos;
-  // final List<User> confirmed;
-  // final List<User> invited;
+  final List<User> invited;
+  final List<User> confirmed;
   final DocumentReference ref;
 
   const Project(this.title,
@@ -26,8 +26,8 @@ class Project extends Equatable {
       this.groupmates = const [],
       this.noOfMeetings = 0,
       this.todos = const [],
-      // this.confirmed = const [],
-      // this.invited = const [],
+      this.invited = const [],
+      this.confirmed = const [],
       this.ref});
 
   static Project fromEntity(ProjectEntity entity) {
@@ -41,15 +41,15 @@ class Project extends Equatable {
       noOfMeetings: entity.noOfMeetings,
       todos: entity.todos,
       ref: entity.ref,
-      // confirmed: entity.confirmed,
-      // invited: entity.invited
+      invited: entity.invited ?? [],
+      confirmed: entity.confirmed ?? [],
     );
   }
 
   ProjectEntity toEntity() {
     return ProjectEntity(
       title, moduleCode, id, progress, deadline != null ? Timestamp.fromDate(deadline) : null,
-      groupmates, noOfMeetings, todos, ref,
+      groupmates, noOfMeetings, todos, invited, confirmed, ref,
       // confirmed, invited
     );
   }
@@ -66,19 +66,17 @@ class Project extends Equatable {
       DocumentReference ref,
       List<User> confirmed,
       List<User> invited}) {
-    return Project(
-      title ?? this.title,
-      moduleCode: moduleCode ?? this.moduleCode,
-      id: id ?? this.id,
-      progress: progress ?? this.progress,
-      deadline: deadline ?? this.deadline,
-      groupmates: groupmates ?? this.groupmates,
-      noOfMeetings: noOfMeetings ?? this.noOfMeetings,
-      todos: todos ?? this.todos,
-      ref: ref ?? this.ref,
-      // confirmed: confirmed ?? this.confirmed,
-      // invited: invited ?? this.invited
-    );
+    return Project(title ?? this.title,
+        moduleCode: moduleCode ?? this.moduleCode,
+        id: id ?? this.id,
+        progress: progress ?? this.progress,
+        deadline: deadline ?? this.deadline,
+        groupmates: groupmates ?? this.groupmates,
+        noOfMeetings: noOfMeetings ?? this.noOfMeetings,
+        todos: todos ?? this.todos,
+        ref: ref ?? this.ref,
+        confirmed: confirmed ?? this.confirmed,
+        invited: invited ?? this.invited);
   }
 
   @override

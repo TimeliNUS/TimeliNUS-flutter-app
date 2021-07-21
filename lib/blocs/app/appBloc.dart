@@ -97,7 +97,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     } else if (event is AppOnMeeting) {
       yield (AppState.onMeeting(state.user, projectId: event.projectId, projectTitle: event.projectTitle));
     } else if (event is AppOnInvitation) {
-      yield (AppState.onInvitation(state.user, event.invitationId));
+      yield (AppState.onInvitation(state.user, event.invitationId, isMeeting: event.isMeeting));
     } else if (event is AppOnDashboard) {
       yield (AppState.onDashboard(state.user));
     }
@@ -112,7 +112,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       final token = await FirebaseMessaging.instance.getToken();
       _authenticationRepository.saveTokenToDatabase(token, event.user.id);
     }
-    yield event.user.isNotEmpty ? AppState.authenticated(event.user) : AppState.unauthenticated();
+    if (state.user.calendar != event.user.calendar) {
+      AuthenticationRepository.importNewCalendar(event.user.calendar, event.user.id);
+    }
+    yield event.user.isNotEmpty
+        ? (state.status == AppStatus.onMeeting ? AppState.onMeeting(event.user) : AppState.authenticated(event.user))
+        : AppState.unauthenticated();
   }
 
   @override

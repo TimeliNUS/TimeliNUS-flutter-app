@@ -286,7 +286,8 @@ class DashboardMeetingItem extends StatelessWidget {
                         : ' In ' + timeago.format(meeting.selectedTimeStart, allowFromNow: true, locale: 'en_short'))),
                 Padding(padding: EdgeInsets.only(right: 10)),
                 Icon(Icons.location_pin, size: 20, color: appTheme.primaryColor),
-                Text(' ' + meeting.meetingVenue.toString().split('.')[1]),
+                Text(' ' + meeting.meetingVenue),
+                // .toString().split('.')[1]),
               ]),
               diff.abs() < meeting.timeLength
                   ? ElevatedButton(

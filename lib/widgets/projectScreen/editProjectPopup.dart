@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/models/models.dart';
+import 'package:TimeliNUS/utils/alertDialog.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
@@ -97,13 +99,17 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                         child: Text("Done",
                                             style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
                                     onPressed: () {
-                                      widget.projectBloc.add(UpdateProject(
-                                          widget.projectToEdit.copyWith(
-                                              title: textController.text,
-                                              deadline: deadlineValue,
-                                              groupmates: groupmates),
-                                          context.read<AppBloc>().getCurrentUser().id));
-                                      Navigator.pop(context);
+                                      if (textController.text != '') {
+                                        widget.projectBloc.add(UpdateProject(
+                                            widget.projectToEdit.copyWith(
+                                                title: textController.text,
+                                                deadline: deadlineValue,
+                                                groupmates: groupmates),
+                                            context.read<AppBloc>().getCurrentUser().id));
+                                        Navigator.pop(context);
+                                      } else {
+                                        customAlertDialog(context);
+                                      }
                                     })
                               ],
                             )),

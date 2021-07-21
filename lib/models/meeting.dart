@@ -3,23 +3,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-
-enum MeetingVenue { Zoom, FaceToFace }
-MeetingVenue convertMeetingVenue(input) {
-  return MeetingVenue.values.firstWhere((e) {
-    return (e.toString().split('.')[1] == input);
-  });
-}
-
-// class Intervals {
-//   final DateTime start;
-//   final DateTime end;
-//   const Intervals(this.start, this.end);
-
-//   static fromJson(Map<String, Object> json) {
-//     return new Intervals(json['start'], json['end']);
-//   }
+// enum MeetingVenue { Online, Offline }
+// MeetingVenue convertMeetingVenue(input) {
+//   return MeetingVenue.values.firstWhere((e) {
+//     return (e.toString().split('.')[1] == input);
+//   }, orElse: () => MeetingVenue.Offline);
 // }
+
+class Intervals {
+  final DateTime start;
+  final DateTime end;
+  const Intervals(this.start, this.end);
+
+  static fromJson(Map<String, Object> json) {
+    return new Intervals(json['start'], json['end']);
+  }
+
+  Map<String, Timestamp> toJson() {
+    return {'start': Timestamp.fromDate(start), 'end': Timestamp.fromDate(end)};
+  }
+
+  @override
+  String toString() {
+    return '{start: ' + start.toIso8601String() + ' ,end: ' + end.toString() + ' }';
+  }
+}
 
 @immutable
 class Meeting extends Equatable {
@@ -32,12 +40,14 @@ class Meeting extends Equatable {
   final List<User> groupmates;
   final List<User> confirmed;
   final List<User> invited;
-  final MeetingVenue meetingVenue;
+  final String meetingVenue;
   final Project project;
   final DocumentReference ref;
   final List<TimeRegion> timeslots;
   final DateTime selectedTimeStart;
   final bool isConfirmed;
+  final String meetingLink;
+  final bool isOnlineVenue;
 
   const Meeting(this.title, this.groupmates, this.meetingVenue, this.project,
       {this.id,
@@ -50,7 +60,9 @@ class Meeting extends Equatable {
       this.ref,
       this.timeslots = const [],
       this.selectedTimeStart,
-      this.isConfirmed});
+      this.isConfirmed,
+      this.meetingLink,
+      this.isOnlineVenue});
   @override
   List<Object> get props => [title, groupmates, timeLength, startDate];
 
@@ -65,27 +77,30 @@ class Meeting extends Equatable {
         timeLength: entity.timeLength,
         timeslots: entity.timeslots ?? [],
         selectedTimeStart: entity.selectedDate != null ? entity.selectedDate.toDate() : null,
-        isConfirmed: entity.isConfirmed ?? false);
+        isConfirmed: entity.isConfirmed ?? false,
+        meetingLink: entity.meetingLink ?? null,
+        isOnlineVenue: entity.isOnlineVenue);
   }
 
   MeetingEntity toEntity() {
     return MeetingEntity(
-      title,
-      id,
-      timeLength,
-      startDate != null ? Timestamp.fromDate(startDate.toUtc()) : null,
-      endDate != null ? Timestamp.fromDate(endDate.toUtc()) : null,
-      groupmates[0].ref,
-      groupmates,
-      invited,
-      confirmed,
-      meetingVenue,
-      ref,
-      project,
-      timeslots ?? [],
-      selectedTimeStart != null ? Timestamp.fromDate(selectedTimeStart.toUtc()) : null,
-      isConfirmed ?? false,
-    );
+        title,
+        id,
+        timeLength,
+        startDate != null ? Timestamp.fromDate(startDate.toUtc()) : null,
+        endDate != null ? Timestamp.fromDate(endDate.toUtc()) : null,
+        groupmates[0].ref,
+        groupmates,
+        invited,
+        confirmed,
+        meetingVenue,
+        ref,
+        project,
+        timeslots ?? [],
+        selectedTimeStart != null ? Timestamp.fromDate(selectedTimeStart.toUtc()) : null,
+        isConfirmed ?? false,
+        meetingLink,
+        isOnlineVenue);
   }
 
   Meeting copyWith(
@@ -98,12 +113,13 @@ class Meeting extends Equatable {
       List<User> groupmates,
       List<User> invited,
       List<User> confirmed,
-      MeetingVenue meetingVenue,
+      String meetingVenue,
       Project project,
       DocumentReference ref,
       List<TimeRegion> timeslots,
       DateTime selectedTimeStart,
-      bool isConfirmed}) {
+      bool isConfirmed,
+      bool isOnlineVenue}) {
     return Meeting(
         title ?? this.title, groupmates ?? this.groupmates, meetingVenue ?? this.meetingVenue, project ?? this.project,
         id: id ?? this.id,
@@ -116,7 +132,8 @@ class Meeting extends Equatable {
         ref: ref ?? this.ref,
         timeslots: timeslots ?? this.timeslots,
         isConfirmed: isConfirmed ?? this.isConfirmed,
-        selectedTimeStart: selectedTimeStart ?? this.selectedTimeStart);
+        selectedTimeStart: selectedTimeStart ?? this.selectedTimeStart,
+        isOnlineVenue: isOnlineVenue ?? this.isOnlineVenue);
   }
 
   // @override

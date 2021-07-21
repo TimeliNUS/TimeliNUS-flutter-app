@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/todo/todo.dart';
 import 'package:TimeliNUS/models/models.dart';
+import 'package:TimeliNUS/utils/alertDialog.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
@@ -89,30 +90,42 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                         child: Text("Add & Next",
                                             style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
                                     onPressed: () {
-                                      widget.todosBloc.add(AddTodo(
-                                          Todo(textController.text,
-                                              note: noteController.text,
-                                              pic: pics,
-                                              deadline: deadlineValue,
-                                              project: selectedProject,
-                                              complete: false),
-                                          userId));
-                                      Navigator.pop(context);
+                                      if (textController.text != '' &&
+                                          (selectedProject != null &&
+                                              selectedProject.title != 'Please select a project!')) {
+                                        widget.todosBloc.add(AddTodo(
+                                            Todo(textController.text,
+                                                note: noteController.text,
+                                                pic: pics,
+                                                deadline: deadlineValue,
+                                                project: selectedProject,
+                                                complete: false),
+                                            userId));
+                                        Navigator.pop(context);
+                                      } else {
+                                        customAlertDialog(context);
+                                      }
                                     }),
                                 OutlinedButton(
                                     child: Padding(
                                         padding: EdgeInsets.symmetric(horizontal: 10),
                                         child: Text("Add & Done", style: appTheme.textTheme.bodyText2)),
                                     onPressed: () {
-                                      widget.todosBloc.add(AddTodo(
-                                          Todo(textController.text,
-                                              note: noteController.text,
-                                              deadline: deadlineValue,
-                                              pic: pics,
-                                              project: selectedProject,
-                                              complete: true),
-                                          userId));
-                                      Navigator.pop(context);
+                                      if (textController.text != '' &&
+                                          (selectedProject != null &&
+                                              selectedProject.title != 'Please select a project!')) {
+                                        widget.todosBloc.add(AddTodo(
+                                            Todo(textController.text,
+                                                note: noteController.text,
+                                                deadline: deadlineValue,
+                                                pic: pics,
+                                                project: selectedProject,
+                                                complete: true),
+                                            userId));
+                                        Navigator.pop(context);
+                                      } else {
+                                        customAlertDialog(context);
+                                      }
                                     })
                               ],
                             )),

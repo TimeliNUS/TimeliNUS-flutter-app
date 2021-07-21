@@ -4,6 +4,8 @@ import 'package:TimeliNUS/blocs/app/appBloc.dart';
 import 'package:TimeliNUS/blocs/screens/meeting/meetingBloc.dart';
 import 'package:TimeliNUS/blocs/screens/project/projectBloc.dart';
 import 'package:TimeliNUS/models/models.dart';
+import 'package:TimeliNUS/utils/alertDialog.dart';
+import 'package:TimeliNUS/widgets/meetingScreen/meetingVenueSelect.dart';
 import 'package:TimeliNUS/widgets/overlayPopup.dart';
 import 'package:TimeliNUS/widgets/style.dart';
 import 'package:TimeliNUS/widgets/topBar.dart';
@@ -21,8 +23,9 @@ class NewMeetingPopup extends StatefulWidget {
 
 class _NewMeetingPopupState extends State<NewMeetingPopup> {
   DateTime startDateValue = DateTime.now().stripTime();
-  DateTime endDateValue;
-  MeetingVenue meetingVenue = MeetingVenue.Zoom;
+  DateTime endDateValue = DateTime.now().stripTime();
+  String meetingVenue = "";
+  bool isOnlineVenue = false;
   List<User> pics = [];
   Project selectedProject;
   final TextEditingController textController = new TextEditingController();
@@ -86,11 +89,13 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                                       'From:',
                                                     )),
                                                 Expanded(
-                                                    child: DeadlineInput(
-                                                  (val) => setState(() => startDateValue = val),
-                                                  false,
-                                                  isNotMini: false,
-                                                )),
+                                                    child: Padding(
+                                                        padding: EdgeInsets.only(right: 2),
+                                                        child: DeadlineInput(
+                                                          (val) => setState(() => startDateValue = val),
+                                                          false,
+                                                          isNotMini: false,
+                                                        ))),
                                               ]),
                                           Row(
                                             children: [
@@ -101,42 +106,21 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                                     'to:',
                                                   )),
                                               Expanded(
-                                                  child: DeadlineInput(
-                                                (val) => setState(() => endDateValue = val),
-                                                false,
-                                                isNotMini: false,
-                                              )),
+                                                  child: Padding(
+                                                      padding: EdgeInsets.only(right: 2),
+                                                      child: DeadlineInput(
+                                                        (val) => setState(() => endDateValue = val),
+                                                        false,
+                                                        isNotMini: false,
+                                                      ))),
                                             ],
                                           ),
                                           customPadding(),
                                           Text(
                                             'Meeting Venue*',
                                           ),
-                                          Row(
-                                            children: [
-                                              Text('Zoom'),
-                                              Radio<MeetingVenue>(
-                                                value: MeetingVenue.Zoom,
-                                                groupValue: meetingVenue,
-                                                onChanged: (MeetingVenue value) {
-                                                  setState(() {
-                                                    meetingVenue = value;
-                                                  });
-                                                },
-                                              ),
-                                              Padding(padding: EdgeInsets.only(right: 30)),
-                                              Text('Face to Face'),
-                                              Radio<MeetingVenue>(
-                                                value: MeetingVenue.FaceToFace,
-                                                groupValue: meetingVenue,
-                                                onChanged: (MeetingVenue value) {
-                                                  setState(() {
-                                                    meetingVenue = value;
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          )
+                                          MeetingVenueSelect((val) => setState(() => meetingVenue = val),
+                                              (boolean) => setState(() => isOnlineVenue = boolean), meetingVenue),
                                         ],
                                       ))))),
                       Container(
@@ -155,13 +139,31 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                         child: Text("Done",
                                             style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
                                     onPressed: () {
-                                      widget.projectBloc
-                                        ..add(AddMeeting(
-                                            Meeting(textController.text, pics, meetingVenue, selectedProject,
-                                                startDate: startDateValue, endDate: endDateValue, isConfirmed: false),
-                                            userId))
-                                        ..add(LoadMeetings(context.read<AppBloc>().state.user.id));
-                                      Navigator.pop(context);
+                                      if (textController.text != '' &&
+                                          (selectedProject != null &&
+                                              selectedProject.title != 'Please select a project!') &&
+                                          endDateValue.hour >= startDateValue.hour &&
+                                          endDateValue.isAfter(startDateValue) &&
+                                          endDateValue != null &&
+                                          (isOnlineVenue || meetingVenue != '')) {
+                                        widget.projectBloc
+                                          ..add(AddMeeting(
+                                              Meeting(textController.text, pics, meetingVenue, selectedProject,
+                                                  startDate: startDateValue,
+                                                  endDate: endDateValue,
+                                                  isConfirmed: false,
+                                                  isOnlineVenue: isOnlineVenue),
+                                              userId))
+                                          ..add(LoadMeetings(context.read<AppBloc>().state.user.id));
+                                        Navigator.pop(context);
+                                      } else {
+                                        customAlertDialog(context,
+                                            message: endDateValue.isAfter(startDateValue)
+                                                ? (endDateValue.hour >= startDateValue.hour
+                                                    ? null
+                                                    : 'End hour must be after start hour')
+                                                : 'End date must be after start date');
+                                      }
                                     })
                               ],
                             )),

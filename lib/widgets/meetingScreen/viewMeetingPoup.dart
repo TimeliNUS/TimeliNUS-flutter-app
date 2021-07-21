@@ -66,6 +66,7 @@ class ViewMeetingPopupState extends State<ViewMeetingPopup> {
                               widget.meeting.startDate,
                               widget.meeting.endDate,
                               isDialog: false,
+                              meetingLength: widget.meeting.timeLength,
                               isConfirmed: widget.meeting.isConfirmed,
                               selectedDate: widget.meeting.selectedTimeStart,
                             ))

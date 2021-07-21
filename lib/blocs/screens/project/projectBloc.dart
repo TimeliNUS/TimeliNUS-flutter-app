@@ -46,6 +46,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       final List<Project> invitations = invitationEntities.map((project) => Project.fromEntity(project)).toList();
       yield ProjectLoaded(projects, invitations);
     } catch (err) {
+      print(err);
       yield ProjectNotLoaded();
     }
   }

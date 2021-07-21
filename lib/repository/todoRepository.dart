@@ -87,9 +87,11 @@ class TodoRepository {
       final DocumentSnapshot temp = await documentReference.get();
       // print(documentReference);
       final Map<String, Object> data = temp.data();
-      final List<User> users = await AuthenticationRepository.findUsersByRef(data['pic']);
-      TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, documentReference);
-      tasks.add(documentSnapshotTask);
+      if (data != null) {
+        final List<User> users = await AuthenticationRepository.findUsersByRef(data['pic']);
+        TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, documentReference);
+        tasks.add(documentSnapshotTask);
+      }
     }
     return tasks;
   }

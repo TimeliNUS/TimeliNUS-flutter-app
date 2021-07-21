@@ -139,7 +139,8 @@ class _MeetingInvitatiosnState extends State<MeetingInvitations> {
                                           Row(
                                             children: [
                                               Icon(Icons.location_pin, size: 20, color: appTheme.primaryColor),
-                                              Text(invitation.meetingVenue.toString().split('.')[1])
+                                              Text(invitation.meetingVenue)
+                                              // .toString().split('.')[1])
                                             ],
                                           )
                                         ])))),
@@ -249,12 +250,12 @@ class _UpcomingMeetingsState extends State<UpcomingMeetings> {
                                     Row(
                                       children: [
                                         Icon(Icons.location_pin, size: 20, color: appTheme.primaryColor),
-                                        Text(' ' +
-                                            meeting.meetingVenue
-                                                .toString()
-                                                .split('.')[1]
-                                                .replaceAllMapped(RegExp('([A-Z])'), (Match m) => ' ${m[0]}')
-                                                .trim())
+                                        Text(' ' + meeting.meetingVenue
+                                            // .toString()
+                                            // .split('.')[1]
+                                            // .replaceAllMapped(RegExp('([A-Z])'), (Match m) => ' ${m[0]}')
+                                            // .trim()
+                                            )
                                       ],
                                     )
                                   ]))

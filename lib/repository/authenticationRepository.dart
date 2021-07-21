@@ -236,6 +236,12 @@ class AuthenticationRepository {
     });
   }
 
+  static Future<void> importNewCalendar(String url, String userId) async {
+    await FirebaseFirestore.instance.collection('user').doc(userId).update({
+      'calendar': url,
+    });
+  }
+
   Future<String> refreshTokenAPI(String token) async {
     final response = await http.post(
       Uri.parse("https://oauth2.googleapis.com/token"),
@@ -267,10 +273,10 @@ class AuthenticationRepository {
   }
 
   static Future<String> checkLinkedToZoom(String id) async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('accounts').doc(id).get();
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('user').doc(id).get();
     Map<String, Object> data = snapshot.data();
-    print('isLinked to Zoom ? : ' + (data['zoomRefreshToken'] != null).toString());
-    return ((data['zoomRefreshToken'] != null ? data['zoomRefreshToken'] as String : null));
+    // print('isLinked to Zoom ? : ' + (data['zoomRefreshToken'] != null).toString());
+    return (((data != null && data['zoomRefreshToken'] != null) ? data['zoomRefreshToken'] as String : null));
   }
 }
 

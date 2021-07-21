@@ -12,13 +12,15 @@ class MeetingEntity extends Equatable {
   final List<User> groupmates;
   final List<User> invited;
   final List<User> confirmed;
-  final MeetingVenue meetingVenue;
+  final String meetingVenue;
   final Project project;
   final String id;
   final DocumentReference ref;
   final List<TimeRegion> timeslots;
   final Timestamp selectedDate;
   final bool isConfirmed;
+  final String meetingLink;
+  final bool isOnlineVenue;
 
   MeetingEntity(
       this.title,
@@ -35,7 +37,9 @@ class MeetingEntity extends Equatable {
       this.project,
       this.timeslots,
       this.selectedDate,
-      this.isConfirmed);
+      this.isConfirmed,
+      this.meetingLink,
+      this.isOnlineVenue);
 
   static MeetingEntity fromJson(Map<String, Object> json, List<User> invited, List<User> confirmed,
       [String id, DocumentReference ref]) {
@@ -56,9 +60,9 @@ class MeetingEntity extends Equatable {
         [],
         invited,
         confirmed,
-        convertMeetingVenue(json['meetingVenue']),
+        json['meetingVenue'],
         ref,
-        json['project'] != null ? Project.fromEntity(ProjectEntity.fromJson(json['project'], [], [])) : null,
+        json['project'] != null ? Project.fromEntity(ProjectEntity.fromJson(json['project'], [], [], [], [])) : null,
         json['timeslot'] != null
             ? (json['timeslot'] as List)
                 .map((timeslot) => TimeRegion(
@@ -68,7 +72,9 @@ class MeetingEntity extends Equatable {
                 .toList()
             : null,
         json['selectedDate'],
-        json['isConfirmed'] ?? false);
+        json['isConfirmed'] ?? false,
+        json['meetingLink'],
+        json['isOnlineVenue'] as bool);
   }
 
   Map<String, Object> toJson() {
@@ -76,7 +82,8 @@ class MeetingEntity extends Equatable {
       'id': id,
       'title': title,
       'timeLength': timeLength,
-      'meetingVenue': meetingVenue.toString().split('.')[1],
+      'meetingVenue': meetingVenue,
+      // .toString().split('.')[1],
       'groupmates': groupmates.map((x) => x.ref).toList(),
       'author': groupmates[0].ref,
       'project': project != null
@@ -88,7 +95,8 @@ class MeetingEntity extends Equatable {
       "startDate": startDate,
       "endDate": endDate,
       "selectedDate": selectedDate,
-      "isConfirmed": isConfirmed
+      "isConfirmed": isConfirmed,
+      "isOnlineVenue": isOnlineVenue,
       // "interval" ??
     };
   }
@@ -99,5 +107,6 @@ class MeetingEntity extends Equatable {
   }
 
   @override
-  List<Object> get props => [title, project, meetingVenue, timeLength, ref, id, groupmates, selectedDate, isConfirmed];
+  List<Object> get props =>
+      [title, project, meetingVenue, timeLength, ref, id, groupmates, selectedDate, isConfirmed, isOnlineVenue];
 }

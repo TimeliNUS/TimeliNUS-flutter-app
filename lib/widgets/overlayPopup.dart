@@ -63,7 +63,7 @@ class PopupDropdown extends StatefulWidget {
 }
 
 class PopupDropdownState extends State<PopupDropdown> {
-  List<Project> projects = [new Project('None selected')];
+  List<Project> projects = [new Project('Please select a project!')];
   Project selectedProject;
 
   @override
@@ -74,17 +74,20 @@ class PopupDropdownState extends State<PopupDropdown> {
 
   void loadProjects(String id, Project initial) async {
     final returnedProjects = await context.read<ProjectRepository>().loadProjects(id).then((x) => x.map((e) {
-          // print(e);
           return Project.fromEntity(e);
         }).toList());
 
     setState(() {
-      // print('returned : ');
-      // print(returnedProjects);
+      print(returnedProjects);
       projects.addAll(returnedProjects);
       // print(initial);
       if (initial != null) {
-        selectedProject = projects.firstWhere((x) => x.id == initial.id);
+        try {
+          selectedProject = projects.firstWhere((x) => x.id == initial.id);
+        } catch (e) {
+          projects[0] = new Project('Deleted project');
+          selectedProject = projects[0];
+        }
       } else {
         selectedProject = projects[0];
       }
@@ -146,7 +149,7 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 
   void loadProjects(String id) async {
     final List<User> returnedProject =
-        await context.read<ProjectRepository>().loadProjectById(id).then((x) => Project.fromEntity(x).groupmates);
+        await ProjectRepository.loadProjectById(id).then((x) => Project.fromEntity(x).groupmates);
     if (mounted) {
       setState(() {
         usersAvailableToChoose = returnedProject;
@@ -181,9 +184,12 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
                   selected: e.value,
                   onPressed: () {
                     setState(() => chipInputState = chipInputState..update(e.key, (value) => !e.value));
+                    List<User> tempUser = [];
+                    chipInputState.forEach((key, value) => value ? tempUser.add(key) : null);
+                    widget.callback(tempUser);
                   },
-                  label:
-                      Text(e.key.name, style: TextStyle(color: e.value ? Colors.white : appTheme.primaryColorLight))))
+                  label: Text(e.key.name ?? '',
+                      style: TextStyle(color: e.value ? Colors.white : appTheme.primaryColorLight))))
               .toList()),
           ActionChip(
             label: Icon(Icons.add, color: appTheme.primaryColorLight),
@@ -195,7 +201,7 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
                     page: SearchUser((val) {
                   setState(() => chipInputState.putIfAbsent(val, () => true));
                   List<User> tempUser = [];
-                  chipInputState.forEach((key, value) => tempUser.add(key));
+                  chipInputState.forEach((key, value) => value ? tempUser.add(key) : null);
                   widget.callback(tempUser);
                 }, groupmates: usersAvailableToChoose))),
           )

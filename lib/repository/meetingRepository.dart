@@ -6,6 +6,7 @@ import 'package:TimeliNUS/utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:TimeliNUS/utils/dateTimeExtension.dart';
 
 class MeetingRepository {
   static CollectionReference ref = FirebaseFirestore.instance.collection('meeting');
@@ -70,7 +71,7 @@ class MeetingRepository {
     return ref.doc(meeting.id).update(meeting.toJson());
   }
 
-  Future<void> acceptInvitation(Meeting meeting, String id, String url, String user) async {
+  Future<void> importNusMods(Meeting meeting, String id, String url, String user) async {
     await http.post(
       Uri.parse(AppConstants.findCommonUrl),
       headers: <String, String>{
@@ -151,7 +152,21 @@ class MeetingRepository {
           MeetingEntity.fromJson(temp.data(), invitedUsers, confirmedUsers, temp.id, temp.reference);
       meetings.add(documentSnapshotTask);
     }
-    return meetings;
+    return meetings
+        .where((x) => x.selectedDate == null || x.selectedDate.toDate().isAfter(DateTime.now().stripTime()))
+        .toList()
+          ..sort((x, y) {
+            if (x.selectedDate != null && y.selectedDate != null) {
+              return x.selectedDate.toDate().compareTo(y.selectedDate.toDate());
+            } else {
+              if (x.selectedDate != null && y.selectedDate == null) {
+                return -1;
+              } else {
+                return 1;
+              }
+            }
+            // return x.startDate.toDate().isBefore(y.startDate.toDate()) ? -1 : 1;
+          });
   }
 
   Future<void> syncGoogleCalendar(
@@ -166,6 +181,16 @@ class MeetingRepository {
     );
     print('response ');
     print(resp.body);
+    return;
+  }
+
+  Future<void> addExtraTimeslotsAndAccept(String meetingId, String userId, List<Map<String, Object>> json) async {
+    print('userId : ' + userId);
+    ref.doc(meetingId).update({
+      'timeslot': FieldValue.arrayUnion(json),
+      'invitations': FieldValue.arrayRemove([person.doc(userId)]),
+      'confirmedInvitations': FieldValue.arrayUnion([person.doc(userId)])
+    });
     return;
   }
 
