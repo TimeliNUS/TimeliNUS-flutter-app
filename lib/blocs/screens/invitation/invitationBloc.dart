@@ -65,6 +65,10 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
   }
 
   Stream<InvitationState> _mapAcceptInvitationToState(AcceptInvitation event) async* {
+    if (event.isAccepted == false) {
+      await meetingRepository.declineMeetingInvitation(state.meeting.id, event.userId);
+      return;
+    }
     final storage = new FlutterSecureStorage();
     print('hi');
     List<Future> promises = [];

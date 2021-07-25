@@ -24,7 +24,7 @@ void main() {
       'deadline': null
     };
   });
-  test('Convert JSON to meetingEntityy', () {
+  test('Convert JSON to projectEntity', () {
     final project = ProjectEntity.fromJson(
         json, [], [], [], [], 'id', FirebaseFirestore.instance.collection('project').doc('testId'));
     Project actualMeeting = Project('title',

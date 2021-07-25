@@ -245,34 +245,45 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
           ]),
           Align(
               alignment: Alignment.bottomCenter,
-              child: ElevatedButton(
+              child: Row(children: [
+                ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateColor.resolveWith((states) => appTheme.primaryColorLight)),
+                    child: Text('Confirm'),
+                    onPressed: () {
+                      if (isUsingNUSMods &&
+                          selectedCalendarSource == CalendarSource.exist &&
+                          defaultController.text == '') {
+                        customAlertDialog(context,
+                            message:
+                                "Currently you do not have any existing calendar related to NUSMods for importing!");
+                      } else {
+                        context.read<InvitationBloc>().add(AcceptInvitation(
+                            isUsingNUSMods
+                                ? ((selectedCalendarSource == CalendarSource.import)
+                                    ? (controller.text)
+                                    : defaultController.text)
+                                : '',
+                            context.read<AppBloc>().state.user.id,
+                            intervals,
+                            useGoogle: isUsingGoogle));
+
+                        if (isImporting)
+                          context.read<AppBloc>().add(AppUserChanged(
+                              context.read<AppBloc>().state.user.updateNewCalendar(defaultController.text)));
+                        // context.read<AppBloc>().add(AppOnMeeting());
+
+                      }
+                    }),
+                ElevatedButton(
+                  onPressed: () {
+                    context.read<InvitationBloc>().add(AcceptInvitation(null, null, null, isAccepted: false));
+                  },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateColor.resolveWith((states) => appTheme.primaryColorLight)),
-                  child: Text('Confirm'),
-                  onPressed: () {
-                    if (isUsingNUSMods &&
-                        selectedCalendarSource == CalendarSource.exist &&
-                        defaultController.text == '') {
-                      customAlertDialog(context,
-                          message: "Currently you do not have any existing calendar related to NUSMods for importing!");
-                    } else {
-                      context.read<InvitationBloc>().add(AcceptInvitation(
-                          isUsingNUSMods
-                              ? ((selectedCalendarSource == CalendarSource.import)
-                                  ? (controller.text)
-                                  : defaultController.text)
-                              : '',
-                          context.read<AppBloc>().state.user.id,
-                          intervals,
-                          useGoogle: isUsingGoogle));
-
-                      if (isImporting)
-                        context.read<AppBloc>().add(AppUserChanged(
-                            context.read<AppBloc>().state.user.updateNewCalendar(defaultController.text)));
-                      // context.read<AppBloc>().add(AppOnMeeting());
-
-                    }
-                  }))
+                  child: Text('Decline'),
+                )
+              ]))
         ]));
   }
 }

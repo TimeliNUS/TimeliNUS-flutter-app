@@ -30,13 +30,14 @@ class LoadProjectInvitation extends InvitationEvent {
 }
 
 class AcceptInvitation extends InvitationEvent {
+  final bool isAccepted;
   final String url;
   final String userId;
   final bool useGoogle;
   // final Meeting meeting;
   final List<Intervals> intervals;
 
-  AcceptInvitation(this.url, this.userId, this.intervals, {this.useGoogle = false}) : super();
+  AcceptInvitation(this.url, this.userId, this.intervals, {this.useGoogle = false, this.isAccepted = true}) : super();
 
   @override
   String toString() => 'AcceptInvitation';

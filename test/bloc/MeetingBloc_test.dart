@@ -139,7 +139,7 @@ void main() {
         ],
       );
       blocTest(
-        'Today Todos',
+        'Today Meeting',
         build: () => meetingBloc,
         act: (bloc) => bloc..add(TodayMeeting('userId')),
         expect: () => [

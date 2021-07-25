@@ -232,4 +232,12 @@ class MeetingRepository {
     print('id: ' + meeting.id);
     return ref.doc(meeting.id).delete();
   }
+
+  Future<void> declineMeetingInvitation(String meetingId, String userId) async {
+    DocumentReference personRef = person.doc(userId);
+    await ref.doc(meetingId).update({
+      "groupmates": FieldValue.arrayRemove([personRef]),
+      "invitations": FieldValue.arrayRemove([personRef])
+    });
+  }
 }
