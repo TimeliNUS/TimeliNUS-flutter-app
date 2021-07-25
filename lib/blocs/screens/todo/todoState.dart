@@ -18,6 +18,7 @@ class TodoLoading extends TodoState {
   TodoLoading({this.isNull = false}) : super((isNull ? null : []), 0.0);
   @override
   String toString() => 'TodoLoading';
+  List<Object> get props => [];
 }
 
 class TodoLoaded extends TodoState {
@@ -27,7 +28,7 @@ class TodoLoaded extends TodoState {
   TodoLoaded(this.progress, this.todos) : super(todos, progress);
 
   @override
-  String toString() => 'TodosLoaded { progress: $progress }';
+  String toString() => 'TodosLoaded { progress: $progress, todos: $todos }';
 
   @override
   List<Object> get props => [todos, progress];

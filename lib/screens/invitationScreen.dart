@@ -39,7 +39,7 @@ class _InvitationState extends State<Invitation> {
 
   void findAuthorName(Meeting meeting) async {
     if (meeting != null) {
-      String tempName = await AuthenticationRepository.findUsersByRef([meeting.author]).then((x) => x[0].name);
+      String tempName = await AuthenticationRepository().findUsersByRef([meeting.author]).then((x) => x[0].name);
       setState(() => authorName = tempName);
     }
   }
@@ -138,7 +138,7 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
   }
 
   void setIsLinked() async {
-    String token = await AuthenticationRepository.checkLinkedToGoogle(context.read<AppBloc>().state.user.id);
+    String token = await AuthenticationRepository().checkLinkedToGoogle(context.read<AppBloc>().state.user.id);
     setState(() => isLinked = (token != null));
   }
 
@@ -223,7 +223,7 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
                       ? null
                       : () => isLinked
                           ? setState(() => isUsingGoogle = true)
-                          : AuthenticationRepository.linkAccountWithGoogle(),
+                          : AuthenticationRepository().linkAccountWithGoogle(),
                   child: Text(
                       isUsingGoogle
                           ? 'Using Linked Google account'
@@ -321,8 +321,8 @@ class _CalendarImportFieldState extends State<CalendarImportField> {
                   onTap: widget.isEnabled
                       ? () {
                           // if (widget.controller.text != '') {
-                          AuthenticationRepository.importNewCalendar(
-                              widget.controller.text, context.read<AppBloc>().state.user.id);
+                          AuthenticationRepository()
+                              .importNewCalendar(widget.controller.text, context.read<AppBloc>().state.user.id);
                           widget.callback();
                           // } else {
                           //   customAlertDialog(context, message: 'Link must not be empty!');

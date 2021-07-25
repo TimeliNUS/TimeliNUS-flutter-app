@@ -11,7 +11,12 @@ import 'package:flutter/foundation.dart';
 // import 'package:url_launcher/url_launcher.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
-  AppBloc({@required AuthenticationRepository authenticationRepository})
+  FirebaseMessaging _messaging;
+  FirebaseDynamicLinks _dynamicLinks;
+  AppBloc(
+      {@required AuthenticationRepository authenticationRepository,
+      FirebaseMessaging messaging,
+      FirebaseDynamicLinks dynamicLinks})
       : assert(authenticationRepository != null),
         _authenticationRepository = authenticationRepository,
         super(
@@ -19,13 +24,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               ? AppState.authenticated(authenticationRepository.currentUser)
               : AppState.unauthenticated(),
         ) {
-    _userSubscription = _authenticationRepository.user.listen(_onUserChanged);
+    // _userSubscription = _authenticationRepository.user.listen(_onUserChanged);
+    _messaging = messaging ?? FirebaseMessaging.instance;
+    _dynamicLinks = dynamicLinks ?? FirebaseDynamicLinks.instance;
     initDynamicLinks();
     prepareNotifications();
   }
 
   Future<void> prepareNotifications() async {
-    RemoteMessage initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage initialMessage = await _messaging.getInitialMessage();
 
     // If the message also contains a data property with a "type" of "chat",
     // navigate to a chat screen
@@ -44,7 +51,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   Future<void> initDynamicLinks() async {
-    FirebaseDynamicLinks.instance.onLink(onSuccess: (PendingDynamicLinkData dynamicLink) async {
+    _dynamicLinks.onLink(onSuccess: (PendingDynamicLinkData dynamicLink) async {
       if (dynamicLink != null) {
         final Uri deepLink = dynamicLink.link;
         if (deepLink != null) {
@@ -57,7 +64,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       print(e.message);
     });
 
-    final PendingDynamicLinkData data = await FirebaseDynamicLinks.instance.getInitialLink();
+    final PendingDynamicLinkData data = await _dynamicLinks.getInitialLink();
     try {
       if (data != null) {
         final Uri deepLink = data.link;
@@ -73,7 +80,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   final AuthenticationRepository _authenticationRepository;
-  StreamSubscription<User> _userSubscription;
+  // StreamSubscription<User> _userSubscription;
 
   User getCurrentUser() {
     return _authenticationRepository.currentUser;
@@ -109,11 +116,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   Stream<AppState> _mapUserChangedToState(AppUserChanged event, AppState state) async* {
     if (event.user.isNotEmpty) {
-      final token = await FirebaseMessaging.instance.getToken();
+      final token = await _messaging.getToken();
       _authenticationRepository.saveTokenToDatabase(token, event.user.id);
     }
     if (state.user.calendar != event.user.calendar) {
-      AuthenticationRepository.importNewCalendar(event.user.calendar, event.user.id);
+      AuthenticationRepository().importNewCalendar(event.user.calendar, event.user.id);
     }
     yield event.user.isNotEmpty
         ? (state.status == AppStatus.onMeeting ? AppState.onMeeting(event.user) : AppState.authenticated(event.user))
@@ -122,7 +129,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   @override
   Future<void> close() {
-    _userSubscription.cancel();
+    // _userSubscription.cancel();
     return super.close();
   }
 

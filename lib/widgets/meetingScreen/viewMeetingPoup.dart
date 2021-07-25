@@ -25,7 +25,7 @@ class ViewMeetingPopupState extends State<ViewMeetingPopup> {
   }
 
   void findAuthorName() async {
-    List<User> temp = await AuthenticationRepository.findUsersByRef([widget.meeting.author]);
+    List<User> temp = await AuthenticationRepository().findUsersByRef([widget.meeting.author]);
     setState(() => authorName = temp[0].name);
   }
 

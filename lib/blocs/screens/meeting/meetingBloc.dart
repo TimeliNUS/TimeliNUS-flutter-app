@@ -12,7 +12,10 @@ part 'meetingState.dart';
 
 class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
   final MeetingRepository meetingRepository;
-  MeetingBloc(this.meetingRepository) : super(MeetingInitial());
+  MeetingBloc(this.meetingRepository)
+      :
+        // : assert(meetingRepository != null),
+        super(MeetingInitial());
 
   @override
   Stream<MeetingState> mapEventToState(
@@ -42,6 +45,8 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
       }
       final meetingEntities = await meetingRepository.loadConfirmedMeetings(event.id);
       final invitationEntities = await meetingRepository.loadInvitation(event.id);
+      print(meetingEntities);
+      print(invitationEntities);
       final List<Meeting> meetings = meetingEntities.map((meeting) => Meeting.fromEntity(meeting)).toList();
       final List<Meeting> invitations = invitationEntities.map((invitation) => Meeting.fromEntity(invitation)).toList();
       yield MeetingLoaded(meetings, invitations: invitations);
@@ -89,6 +94,7 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
     final updatedMeetings = state.meetings.map((project) {
       return project.id == event.updatedMeeting.id ? event.updatedMeeting : project;
     }).toList();
+    print('hi');
     print(event.updatedMeeting);
     List<Future<dynamic>> futures = [];
     futures.add(meetingRepository.updateMeeting(event.updatedMeeting.toEntity()));

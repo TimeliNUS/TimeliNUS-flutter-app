@@ -9,33 +9,46 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:TimeliNUS/utils/dateTimeExtension.dart';
 
 class MeetingRepository {
-  static CollectionReference ref = FirebaseFirestore.instance.collection('meeting');
-  static CollectionReference person = FirebaseFirestore.instance.collection('user');
-  static CollectionReference project = FirebaseFirestore.instance.collection('project');
+  MeetingRepository._internal();
+  static final MeetingRepository _singleton = MeetingRepository._internal();
 
-  final FirebaseFirestore firestore;
+  CollectionReference ref;
+  CollectionReference person;
+  CollectionReference project;
+  FirebaseFirestore firestore;
 
-  const MeetingRepository({this.firestore});
+  factory MeetingRepository({FirebaseFirestore firestore}) {
+    if (firestore != null) {
+      _singleton.firestore = firestore;
+    } else {
+      _singleton.firestore = FirebaseFirestore.instance;
+    }
+    _singleton.ref = _singleton.firestore.collection('meeting');
+    _singleton.person = _singleton.firestore.collection('user');
+    _singleton.project = _singleton.firestore.collection('project');
+    return _singleton;
+  }
 
   Future<DocumentReference> addNewMeeting(MeetingEntity meeting, String id) async {
     Map<String, dynamic> tempJson = meeting.toJson();
     tempJson.addEntries([MapEntry("_createdAt", Timestamp.fromDate(DateTime.now()))]);
+    print(tempJson);
     final newMeetingref = await ref.add(tempJson);
     final List<Future> promises = [];
-    final updateTimeslot = http.post(
-      Uri.parse(AppConstants.updateMeetingUrl),
-      // 'https://asia-east2-timelinus-2021.cloudfunctions.net/updateMeetingTimeslotByDateTime'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        "startDate": meeting.startDate.toDate().toUtc().toIso8601String(),
-        "endDate": meeting.endDate.toDate().toUtc().toIso8601String(),
-        "id": newMeetingref.id
-      }),
-    );
+    // final updateTimeslot = http.post(
+    //   Uri.parse(AppConstants.updateMeetingUrl),
+    //   // 'https://asia-east2-timelinus-2021.cloudfunctions.net/updateMeetingTimeslotByDateTime'),
+    //   headers: <String, String>{
+    //     'Content-Type': 'application/json; charset=UTF-8',
+    //   },
+    //   body: jsonEncode(<String, String>{
+    //     "startDate": meeting.startDate.toDate().toUtc().toIso8601String(),
+    //     "endDate": meeting.endDate.toDate().toUtc().toIso8601String(),
+    //     "id": newMeetingref.id
+    //   }),
+    // );
 
-    promises.add(updateTimeslot);
+    // promises.add(updateTimeslot);
     promises.add(person.doc(id).update({
       'meeting': FieldValue.arrayUnion([newMeetingref])
     }));
@@ -88,7 +101,7 @@ class MeetingRepository {
     return;
   }
 
-  static Future<List<MeetingEntity>> loadMeetingsFromReferenceList(List<dynamic> refs) async {
+  Future<List<MeetingEntity>> loadMeetingsFromReferenceList(List<dynamic> refs) async {
     List<MeetingEntity> meetings = [];
     for (DocumentReference documentReference in refs) {
       final DocumentSnapshot temp = await documentReference.get();
@@ -127,10 +140,6 @@ class MeetingRepository {
     List<MeetingEntity> meetings = [];
     for (QueryDocumentSnapshot temp in list) {
       List<Future<dynamic>> promises = [];
-      print(((temp.data() as Map<String, Object>)['invitations'] as List<dynamic>)
-          .map((x) => x as DocumentReference)
-          .toList()
-          .runtimeType);
       List<DocumentReference> invitedUserRefs =
           ((temp.data() as Map<String, Object>)['invitations'] as List<dynamic>).isNotEmpty
               ? ((temp.data() as Map<String, Object>)['invitations'] as List<dynamic>)
@@ -145,8 +154,8 @@ class MeetingRepository {
               : [];
       List<User> invitedUsers;
       List<User> confirmedUsers;
-      promises.add(AuthenticationRepository.findUsersByRef(invitedUserRefs).then((x) => invitedUsers = x));
-      promises.add(AuthenticationRepository.findUsersByRef(acceptedUserRefs).then((x) => confirmedUsers = x));
+      promises.add(AuthenticationRepository().findUsersByRef(invitedUserRefs).then((x) => invitedUsers = x));
+      promises.add(AuthenticationRepository().findUsersByRef(acceptedUserRefs).then((x) => confirmedUsers = x));
       await Future.wait(promises);
       MeetingEntity documentSnapshotTask =
           MeetingEntity.fromJson(temp.data(), invitedUsers, confirmedUsers, temp.id, temp.reference);
@@ -217,6 +226,10 @@ class MeetingRepository {
     await person.doc(id).update({
       'meeting': FieldValue.arrayRemove([meeting.ref])
     });
+    await project.doc(meeting.project.id).update({
+      'meeting': FieldValue.arrayRemove([meeting.ref])
+    });
+    print('id: ' + meeting.id);
     return ref.doc(meeting.id).delete();
   }
 }

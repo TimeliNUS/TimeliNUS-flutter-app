@@ -296,8 +296,8 @@ class _ProjectInvitationsState extends State<ProjectInvitations> {
                                         ]))))),
                         GestureDetector(
                             onTap: () {
-                              ProjectRepository.acceptProjectInvitation(
-                                  invitation.id, context.read<AppBloc>().state.user.id);
+                              ProjectRepository()
+                                  .acceptProjectInvitation(invitation.id, context.read<AppBloc>().state.user.id);
                               BlocProvider.of<ProjectBloc>(context)
                                   .add(LoadProjects(context.read<AppBloc>().state.user.id));
                             },

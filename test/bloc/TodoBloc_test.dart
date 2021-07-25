@@ -7,13 +7,15 @@ import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:TimeliNUS/repository/todoRepository.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
+import '../integration/services/firebase/firebase_auth_test.dart';
+
 class MockTodoRepository extends Mock implements TodoRepository {}
 
-class MockTodosBloc extends MockBloc<TodoEvent, TodoState> implements TodoBloc {
-}
+class MockTodosBloc extends MockBloc<TodoEvent, TodoState> implements TodoBloc {}
 
 void main() {
   TodoRepository todoRepository;
@@ -24,20 +26,27 @@ void main() {
   //   registerFallbackValue<TodoState>(
   //       /* create a dummy instance of `TodoState` */);
   // });
-  Todo testTodo = Todo('first', id: '123');
-
-  setUp(() {
+  setupCloudFirestoreMocks();
+  Todo testTodo;
+  TodoEntity originalTodoEntity;
+  Todo originalTodo;
+  setUp(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
     todoRepository = MockTodoRepository();
-    // todoRepositoryWithItem = MockTodoRepository();
-
-    when(todoRepository.loadTodos(any)).thenAnswer((_) => Future.value([]));
-    // when(todoRepositoryWithItem.loadTodos(any)).thenAnswer((_) =>
-    //     Future.value([TodoEntity('test', '123', '', false, null, null)]));
-
+    DateTime currentDate = DateTime.now();
+    originalTodo = Todo('original',
+        id: '123', deadline: currentDate, ref: FirebaseFirestore.instance.collection('todo').doc('123'), pic: []);
+    originalTodoEntity = TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate), null, null,
+        FirebaseFirestore.instance.collection('todo').doc('123'));
+    testTodo = Todo('first',
+        id: '123',
+        deadline: currentDate.subtract(Duration(days: 1)),
+        ref: FirebaseFirestore.instance.collection('todo').doc('123'));
+    when(todoRepository.loadTodos(any)).thenAnswer((ans) => Future.value([originalTodoEntity]));
+    when(todoRepository.addNewTodo(any, any)).thenAnswer(
+        (ans) => Future.value(FirebaseFirestore.instance.collection('todo').doc(ans.positionalArguments[0].id)));
     todoBloc = TodoBloc(todoRepository: todoRepository);
-    // todoBlocWithItem = TodoBloc(todoRepository: todoRepositoryWithItem);
-    // todoBlocWithItem.add(LoadTodos('123');
-    // print(todoBlocWithItem.state);
   });
   // blocTest(
   //   'Reorder Todos',
@@ -72,7 +81,7 @@ void main() {
         act: (bloc) => bloc.add(LoadTodos('123')),
         expect: () => [
           TodoLoading(),
-          TodoLoaded(0, []),
+          TodoLoaded(0, [originalTodo]),
         ],
       );
       blocTest(
@@ -87,9 +96,7 @@ void main() {
       blocTest(
         'Delete Todos',
         build: () => todoBloc,
-        act: (bloc) => bloc
-          ..add(AddTodo(testTodo, 'userId'))
-          ..add(DeleteTodo(testTodo, 'userId')),
+        act: (bloc) => bloc..add(AddTodo(testTodo, 'userId'))..add(DeleteTodo(testTodo, 'userId')),
         expect: () => [
           TodoLoading(),
           TodoLoaded(0, [testTodo]),
@@ -100,14 +107,22 @@ void main() {
       blocTest(
         'Update Todos',
         build: () => todoBloc,
-        act: (bloc) => bloc
-          ..add(AddTodo(testTodo, 'userId'))
-          ..add(UpdateTodo(Todo('yes', id: '123'))),
+        act: (bloc) => bloc..add(AddTodo(testTodo, 'userId'))..add(UpdateTodo(Todo('yes', id: '123'))),
         expect: () => [
           TodoLoading(),
           TodoLoaded(0, [testTodo]),
           TodoLoading(),
           TodoLoaded(0, [Todo('yes', id: '123')]),
+        ],
+      );
+
+      blocTest(
+        'Today Todos',
+        build: () => todoBloc,
+        act: (bloc) => bloc..add(TodayTodo('userId')),
+        expect: () => [
+          TodoLoading(),
+          TodoLoaded(0, [originalTodo]),
         ],
       );
     });

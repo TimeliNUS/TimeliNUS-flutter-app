@@ -54,7 +54,7 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
   Stream<InvitationState> _mapLoadProjectInvitationToState(LoadProjectInvitation event) async* {
     try {
       yield InvitationLoading();
-      final projectEntity = await ProjectRepository.loadProjectById(event.id);
+      final projectEntity = await ProjectRepository().loadProjectById(event.id);
       print(projectEntity);
       final Project invitation = Project.fromEntity(projectEntity);
       yield ProjectInvitationLoaded(invitation);
@@ -66,6 +66,7 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
 
   Stream<InvitationState> _mapAcceptInvitationToState(AcceptInvitation event) async* {
     final storage = new FlutterSecureStorage();
+    print('hi');
     List<Future> promises = [];
     Meeting tempMeeting = state.meeting;
     try {
@@ -77,7 +78,7 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
         promises.add(meetingRepository.importNusMods(tempMeeting, tempMeeting.id, event.url, event.userId));
       }
       if (event.useGoogle) {
-        String refreshToken = await AuthenticationRepository.checkLinkedToGoogle(event.userId);
+        String refreshToken = await AuthenticationRepository().checkLinkedToGoogle(event.userId);
         String expiryDate = await storage.read(key: 'expiryDate');
         if (DateTime.parse(expiryDate).isBefore(DateTime.now())) {
           await AuthenticationRepository().refreshToken(refreshToken);
@@ -85,7 +86,6 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
           print('no need to refresh accessToken');
         }
         String accessToken = await storage.read(key: 'accessToken');
-        print('id: ' + tempMeeting.id);
         promises.add(meetingRepository.syncGoogleCalendar(
             tempMeeting.id,
             accessToken,
@@ -105,8 +105,8 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
   Stream<InvitationState> _mapAcceptProjectInvitationToState(AcceptProjectInvitation event) async* {
     try {
       (event.isAccepted)
-          ? await ProjectRepository.acceptProjectInvitation(state.project.id, event.userId)
-          : await ProjectRepository.declineProjectInvitation(state.project.id, event.userId);
+          ? await ProjectRepository().acceptProjectInvitation(state.project.id, event.userId)
+          : await ProjectRepository().declineProjectInvitation(state.project.id, event.userId);
       app.add(AppOnProject());
     } catch (err) {
       print(err);

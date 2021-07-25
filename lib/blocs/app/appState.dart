@@ -25,5 +25,5 @@ class AppState extends Equatable {
   dynamic data;
 
   @override
-  List<Object> get props => [status, user];
+  List<Object> get props => [status, user, data];
 }

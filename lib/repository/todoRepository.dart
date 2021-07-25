@@ -5,13 +5,24 @@ import 'package:TimeliNUS/repository/authenticationRepository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TodoRepository {
-  static CollectionReference ref = FirebaseFirestore.instance.collection('todo');
-  static CollectionReference person = FirebaseFirestore.instance.collection('user');
-  static CollectionReference project = FirebaseFirestore.instance.collection('project');
+  TodoRepository._internal();
+  static final TodoRepository _singleton = TodoRepository._internal();
+  factory TodoRepository({FirebaseFirestore firestore}) {
+    if (firestore != null) {
+      _singleton.firestore = firestore;
+    } else {
+      _singleton.firestore = FirebaseFirestore.instance;
+    }
+    _singleton.ref = _singleton.firestore.collection('todo');
+    _singleton.person = _singleton.firestore.collection('user');
+    _singleton.project = _singleton.firestore.collection('project');
+    return _singleton;
+  }
+  CollectionReference ref;
+  CollectionReference person;
+  CollectionReference project;
 
-  final FirebaseFirestore firestore;
-
-  const TodoRepository({this.firestore});
+  FirebaseFirestore firestore;
 
   Future<DocumentReference> addNewTodo(TodoEntity todo, String id) async {
     Map<String, dynamic> tempJson = todo.toJson();
@@ -59,7 +70,7 @@ class TodoRepository {
     List<TodoEntity> tasks = [];
     for (QueryDocumentSnapshot temp in documentSnapshot.docs.toList()) {
       final Map<String, Object> data = temp.data();
-      final List<User> users = await AuthenticationRepository.findUsersByRef(data['pic']);
+      final List<User> users = await AuthenticationRepository().findUsersByRef(data['pic']);
       TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, temp.reference);
       tasks.add(documentSnapshotTask);
     }
@@ -73,7 +84,7 @@ class TodoRepository {
     List<TodoEntity> tasks = [];
     for (QueryDocumentSnapshot temp in documentSnapshot.docs.toList()) {
       final Map<String, Object> data = temp.data();
-      final List<User> users = await AuthenticationRepository.findUsersByRef(data['pic']);
+      final List<User> users = await AuthenticationRepository().findUsersByRef(data['pic']);
       TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, temp.reference);
       tasks.add(documentSnapshotTask);
     }
@@ -81,14 +92,14 @@ class TodoRepository {
     return tasks;
   }
 
-  static Future<List<TodoEntity>> loadTodosFromReferenceList(List<dynamic> refs) async {
+  Future<List<TodoEntity>> loadTodosFromReferenceList(List<dynamic> refs) async {
     List<TodoEntity> tasks = [];
     for (DocumentReference documentReference in refs) {
       final DocumentSnapshot temp = await documentReference.get();
       // print(documentReference);
       final Map<String, Object> data = temp.data();
       if (data != null) {
-        final List<User> users = await AuthenticationRepository.findUsersByRef(data['pic']);
+        final List<User> users = await AuthenticationRepository().findUsersByRef(data['pic']);
         TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, documentReference);
         tasks.add(documentSnapshotTask);
       }

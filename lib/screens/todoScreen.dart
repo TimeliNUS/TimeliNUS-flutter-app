@@ -19,10 +19,10 @@ import 'package:provider/provider.dart';
 class TodoScreen extends StatefulWidget {
   final String projectId;
   final String projectTitle;
-  final TodoRepository _todoRepository = const TodoRepository();
+  final TodoRepository _todoRepository = TodoRepository();
   static Page page(String projectId, String projectTitle) =>
       MaterialPage(child: TodoScreen(projectId: projectId, projectTitle: projectTitle));
-  const TodoScreen({this.projectId, this.projectTitle, Key key}) : super(key: key);
+  TodoScreen({this.projectId, this.projectTitle, Key key}) : super(key: key);
   @override
   _TodoScreenState createState() => _TodoScreenState();
 }

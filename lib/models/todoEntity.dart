@@ -51,5 +51,5 @@ class TodoEntity extends Equatable {
   }
 
   @override
-  List<Object> get props => [task, id, note, complete, deadline, pic, project, ref];
+  List<Object> get props => [task, id, note, complete, deadline, pic, ref];
 }

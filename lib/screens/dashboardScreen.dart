@@ -90,8 +90,8 @@ class DashboardWelcomeBar extends StatelessWidget {
 }
 
 class DashboardProjects extends StatelessWidget {
-  const DashboardProjects({Key key}) : super(key: key);
-  final _projectRepository = const ProjectRepository();
+  DashboardProjects({Key key}) : super(key: key);
+  final _projectRepository = ProjectRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -220,8 +220,8 @@ class DashboardProjectCard extends StatelessWidget {
 }
 
 class DashboardMeetings extends StatelessWidget {
-  const DashboardMeetings({Key key}) : super(key: key);
-  final _meetingRepository = const MeetingRepository();
+  DashboardMeetings({Key key}) : super(key: key);
+  final _meetingRepository = MeetingRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -307,8 +307,8 @@ class DashboardMeetingItem extends StatelessWidget {
 }
 
 class DashboardTodos extends StatefulWidget {
-  const DashboardTodos({Key key}) : super(key: key);
-  final _todoRepository = const TodoRepository();
+  DashboardTodos({Key key}) : super(key: key);
+  final _todoRepository = TodoRepository();
   @override
   _DashboardTodosState createState() => _DashboardTodosState();
 }

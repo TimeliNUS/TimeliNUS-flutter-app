@@ -62,8 +62,7 @@ String generateRandomEmail({
 
 Future<void> emulatorClearAllUsers() async {
   await http.delete(
-    Uri.parse(
-        'http://$testEmulatorHost:$testEmulatorPort/emulator/v1/projects/$_testFirebaseProjectId/accounts'),
+    Uri.parse('http://$testEmulatorHost:$testEmulatorPort/emulator/v1/projects/$_testFirebaseProjectId/accounts'),
     headers: {
       'Authorization': 'Bearer owner',
     },
@@ -75,8 +74,7 @@ Future<EmulatorOobCode> emulatorOutOfBandCode(
   EmulatorOobCodeType type,
 ) async {
   final response = await http.get(
-    Uri.parse(
-        'http://$testEmulatorHost:$testEmulatorPort/emulator/v1/projects/$_testFirebaseProjectId/oobCodes'),
+    Uri.parse('http://$testEmulatorHost:$testEmulatorPort/emulator/v1/projects/$_testFirebaseProjectId/oobCodes'),
     headers: {
       'Authorization': 'Bearer owner',
     },
@@ -101,8 +99,7 @@ Future<EmulatorOobCode> emulatorOutOfBandCode(
   final responseBody = Map<String, dynamic>.from(jsonDecode(response.body));
   final oobCodes = List<Map<String, dynamic>>.from(responseBody['oobCodes']);
   final dynamic oobCode = oobCodes.reversed.firstWhere(
-    (oobCode) =>
-        oobCode['email'] == email && oobCode['requestType'] == requestType,
+    (oobCode) => oobCode['email'] == email && oobCode['requestType'] == requestType,
   );
 
   if (oobCode == null) {
@@ -120,8 +117,7 @@ Future<EmulatorOobCode> emulatorOutOfBandCode(
 Future<void> emulatorDisableUser(String uid) async {
   String body = jsonEncode({'disableUser': true, 'localId': uid});
   await http.post(
-    Uri.parse(
-        'http://$testEmulatorHost:$testEmulatorPort/identitytoolkit.googleapis.com/v1/accounts:update'),
+    Uri.parse('http://$testEmulatorHost:$testEmulatorPort/identitytoolkit.googleapis.com/v1/accounts:update'),
     headers: {
       'Authorization': 'Bearer owner',
       'Content-Type': 'application/json',
@@ -167,16 +163,28 @@ String createCryptoRandomString([int length = 32]) {
   return base64Url.encode(values).toLowerCase();
 }
 
+class MockAdditionalInfo extends Mock implements AdditionalUserInfo {
+  bool _isNewUser;
+  bool get isNewUser {
+    return _isNewUser;
+  }
+
+  MockAdditionalInfo(bool input) {
+    _isNewUser = input;
+  }
+}
+
 class MockFirebaseAuth extends Mock implements FirebaseAuth {
   final stateChangedStreamController = StreamController<User>();
   MockUser _mockUser;
   User _currentUser;
+  MockAdditionalInfo _mockAdditionalInfo;
 
-  MockFirebaseAuth({signedIn = false, MockUser mockUser})
-      : _mockUser = mockUser {
+  MockFirebaseAuth({signedIn = false, MockUser mockUser, bool isNewUser = false}) : _mockUser = mockUser {
     if (signedIn) {
       signInWithCredential(null);
     }
+    _mockAdditionalInfo = MockAdditionalInfo(isNewUser);
   }
 
   @override
@@ -216,8 +224,7 @@ class MockFirebaseAuth extends Mock implements FirebaseAuth {
   }
 
   @override
-  Future<ConfirmationResult> signInWithPhoneNumber(String phoneNumber,
-      [RecaptchaVerifier verifier]) async {
+  Future<ConfirmationResult> signInWithPhoneNumber(String phoneNumber, [RecaptchaVerifier verifier]) async {
     return MockConfirmationResult(onConfirm: () => _fakeSignIn());
   }
 
@@ -234,7 +241,7 @@ class MockFirebaseAuth extends Mock implements FirebaseAuth {
 
   Future<UserCredential> _fakeSignIn({bool isAnonymous = false}) {
     final userCredential =
-        MockUserCredential(isAnonymous: isAnonymous, mockUser: _mockUser);
+        MockUserCredential(isAnonymous: isAnonymous, mockUser: _mockUser, additionalUserInfo: _mockAdditionalInfo);
     _currentUser = userCredential.user;
     stateChangedStreamController.add(_currentUser);
     return Future.value(userCredential);
@@ -258,22 +265,27 @@ class MockConfirmationResult extends Mock implements ConfirmationResult {
 class MockUserCredential extends Mock implements UserCredential {
   final bool _isAnonymous;
   final MockUser _mockUser;
+  final AdditionalUserInfo _additionalUserInfo;
 
-  MockUserCredential({bool isAnonymous, MockUser mockUser})
+  MockUserCredential({bool isAnonymous, MockUser mockUser, AdditionalUserInfo additionalUserInfo})
       // Ensure no mocked credentials or mocked for Anonymous
       : assert(mockUser == null || mockUser.isAnonymous == isAnonymous),
         _isAnonymous = isAnonymous,
+        _additionalUserInfo = additionalUserInfo,
         _mockUser = mockUser;
 
   @override
   User get user => _mockUser ?? MockUser(isAnonymous: _isAnonymous);
+
+  @override
+  AdditionalUserInfo get additionalUserInfo => _additionalUserInfo;
 }
 
 class MockUser extends Mock with EquatableMixin implements User {
   final bool _isAnonymous;
   final String _uid;
   final String _email;
-  final String _displayName;
+  String _displayName;
   final String _phoneNumber;
   final String _photoURL;
   final String _refreshToken;
@@ -318,6 +330,18 @@ class MockUser extends Mock with EquatableMixin implements User {
   @override
   Future<String> getIdToken([bool forceRefresh = false]) async {
     return Future.value('fake_token');
+  }
+
+  @override
+  Future<void> updateDisplayName(String displayName) async {
+    await Future.delayed(Duration(milliseconds: 10), () => _displayName = displayName);
+    return;
+  }
+
+  @override
+  Future<UserCredential> linkWithCredential(AuthCredential credential) {
+    final userCredential = MockUserCredential(isAnonymous: isAnonymous, mockUser: this);
+    return Future.value(userCredential);
   }
 
   @override

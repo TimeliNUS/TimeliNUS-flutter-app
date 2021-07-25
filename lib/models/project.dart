@@ -80,5 +80,6 @@ class Project extends Equatable {
   }
 
   @override
-  List<Object> get props => [id, title, moduleCode, progress, deadline, groupmates, noOfMeetings, ref, todos];
+  List<Object> get props =>
+      [id, title, moduleCode, progress, deadline, groupmates, noOfMeetings, ref, todos, confirmed, invited];
 }

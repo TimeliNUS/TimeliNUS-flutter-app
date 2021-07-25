@@ -63,8 +63,9 @@ class _ProfileDetailsState extends State<ProfileDetails> {
   File _imageFile;
   @override
   Widget build(BuildContext context) {
-    bool isLinkedToGoogle = AuthenticationRepository.checkLinkedToGoogle(context.read<AppBloc>().state.user.id) != null;
-    bool isLinkedToZoom = AuthenticationRepository.checkLinkedToZoom(context.read<AppBloc>().state.user.id) != null;
+    bool isLinkedToGoogle =
+        AuthenticationRepository().checkLinkedToGoogle(context.read<AppBloc>().state.user.id) != null;
+    bool isLinkedToZoom = AuthenticationRepository().checkLinkedToZoom(context.read<AppBloc>().state.user.id) != null;
 
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 25),
@@ -182,7 +183,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
             Container(
                 padding: EdgeInsets.only(top: 20),
                 child: InkWell(
-                    onTap: isLinkedToGoogle ? null : () => AuthenticationRepository.linkAccountWithGoogle(),
+                    onTap: isLinkedToGoogle ? null : () => AuthenticationRepository().linkAccountWithGoogle(),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

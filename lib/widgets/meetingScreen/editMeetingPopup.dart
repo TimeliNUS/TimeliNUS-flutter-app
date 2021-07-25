@@ -41,7 +41,8 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
     super.initState();
     textController = new TextEditingController(text: widget.meetingToEdit.title);
     meetingVenue = widget.meetingToEdit.meetingVenue;
-    AuthenticationRepository.checkLinkedToZoom(context.read<AppBloc>().state.user.id)
+    AuthenticationRepository()
+        .checkLinkedToZoom(context.read<AppBloc>().state.user.id)
         .then((val) => isLinkedToZoom = (val != null));
   }
 

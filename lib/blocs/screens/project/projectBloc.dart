@@ -74,6 +74,6 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     final updatedProjects = state.projects.where((project) => project.id != event.project.id).toList();
     yield ProjectLoaded(updatedProjects, state.invitations);
     // }
-    await projectRepository.deleteTodo(event.project, event.userId);
+    await projectRepository.deleteProject(event.project, event.userId);
   }
 }

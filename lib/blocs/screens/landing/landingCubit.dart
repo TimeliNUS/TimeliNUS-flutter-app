@@ -7,7 +7,9 @@ import 'package:bloc/bloc.dart';
 import 'package:formz/formz.dart';
 
 class LandingCubit extends Cubit<LandingState> {
-  LandingCubit(this._authenticationRepository) : super(LandingState());
+  LandingCubit(this._authenticationRepository)
+      : assert(_authenticationRepository != null),
+        super(LandingState());
 
   final AuthenticationRepository _authenticationRepository;
 
