@@ -87,12 +87,22 @@ void main() {
         moduleCode: 'code',
         deadline: currentDate,
         ref: FirebaseFirestore.instance.collection('project').doc('id'),
-        groupmates: [],
+        groupmates: [User(id: 'userId', name: 'userName')],
         confirmed: [],
-        invited: [],
+        invited: [User(id: 'userId', name: 'userName')],
         noOfMeetings: 0);
-    originalProjectEntity = ProjectEntity('original', 'code', 'id', 1, Timestamp.fromDate(currentDate), [], 0, [], [],
-        [], FirebaseFirestore.instance.collection('project').doc('id'));
+    originalProjectEntity = ProjectEntity(
+        'original',
+        'code',
+        'id',
+        1,
+        Timestamp.fromDate(currentDate),
+        [User(id: 'userId', name: 'userName')],
+        0,
+        [],
+        [User(id: 'userId', name: 'userName')],
+        [],
+        FirebaseFirestore.instance.collection('project').doc('id'));
 
     when(() => invitationRepository.loadInvitation(any()))
         .thenAnswer((ans) => Future.value([originalInvitationEntity]));
@@ -106,10 +116,7 @@ void main() {
 
     // when(invitationRepository.addNewInvitation(any, any)).thenAnswer(
     //     (ans) => Future.value(FirebaseFirestore.instance.collection('invitation').doc(ans.positionalArguments[0].id)));
-    invitationBloc = InvitationBloc(
-      invitationRepository,
-      appBloc,
-    );
+    invitationBloc = InvitationBloc(invitationRepository, appBloc, projectRepository);
   });
   group('InvitationBloc', () {
     group('InvitationBloc Load', () {
@@ -122,15 +129,15 @@ void main() {
           InvitationLoaded(originalInvitation),
         ],
       );
-      // blocTest(
-      //   'Load Project Invitations',
-      //   build: () => invitationBloc,
-      //   act: (bloc) => bloc.add(LoadProjectInvitation('userId')),
-      //   expect: () => [
-      //     InvitationLoading(),
-      //     ProjectInvitationLoaded(originalProject),
-      //   ],
-      // );
+      blocTest(
+        'Load Project Invitations',
+        build: () => invitationBloc,
+        act: (bloc) => bloc.add(LoadProjectInvitation('userId')),
+        expect: () => [
+          InvitationLoading(),
+          ProjectInvitationLoaded(originalProject),
+        ],
+      );
       blocTest(
         'Accept Invitations',
         build: () => invitationBloc,
@@ -142,45 +149,17 @@ void main() {
           InvitationAccepted(),
         ],
       );
-      // blocTest(
-      //   'Delete Invitations',
-      //   build: () => invitationBloc,
-      //   act: (bloc) =>
-      //       bloc..add(AddInvitation(testInvitation, 'userId'))..add(DeleteInvitation(testInvitation, 'userId')),
-      //   expect: () => [
-      //     InvitationLoading(),
-      //     InvitationLoaded([testInvitation]),
-      //     InvitationLoading(),
-      //     InvitationLoaded([]),
-      //   ],
-      // );
-      // blocTest(
-      //   'Update Invitations',
-      //   build: () => invitationBloc,
-      //   act: (bloc) => bloc
-      //     ..add(AddInvitation(testInvitation, 'userId'))
-      //     ..add(UpdateInvitation(
-      //         testInvitation.copyWith(
-      //           title: "original",
-      //           ref: FirebaseFirestore.instance.collection('invitation').doc('id'),
-      //         ),
-      //         'userId')),
-      //   expect: () => [
-      //     InvitationLoading(),
-      //     InvitationLoaded([testInvitation]),
-      //     InvitationLoading(),
-      //     InvitationLoaded([originalInvitation.copyWith(id: 'testId')]),
-      //   ],
-      // );
-      // blocTest(
-      //   'Today Todos',
-      //   build: () => invitationBloc,
-      //   act: (bloc) => bloc..add(TodayInvitation('userId')),
-      //   expect: () => [
-      //     InvitationLoading(),
-      //     InvitationLoaded([originalInvitation]),
-      //   ],
-      // );
+
+      blocTest(
+        'Accept Project Invitations',
+        build: () => invitationBloc,
+        act: (bloc) => bloc..add(LoadProjectInvitation('id'))..add(AcceptProjectInvitation('userId', true)),
+        expect: () => [
+          InvitationLoading(),
+          ProjectInvitationLoaded(originalProject),
+          InvitationAccepted(),
+        ],
+      );
     });
   });
 }

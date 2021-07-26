@@ -18,12 +18,14 @@ part 'invitationState.dart';
 class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
   final AppBloc app;
   final MeetingRepository meetingRepository;
-  InvitationBloc(this.meetingRepository, this.app) : super(InvitationInitial());
+  ProjectRepository projectRepository;
+  InvitationBloc(this.meetingRepository, this.app, [this.projectRepository]) : super(InvitationInitial());
 
   @override
   Stream<InvitationState> mapEventToState(
     InvitationEvent event,
   ) async* {
+    projectRepository = projectRepository ?? ProjectRepository();
     if (event is LoadInvitation) {
       yield* _mapLoadInvitationToState(event);
     } else if (event is AcceptInvitation) {
@@ -54,7 +56,7 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
   Stream<InvitationState> _mapLoadProjectInvitationToState(LoadProjectInvitation event) async* {
     try {
       yield InvitationLoading();
-      final projectEntity = await ProjectRepository().loadProjectById(event.id);
+      final projectEntity = await projectRepository.loadProjectById(event.id);
       print(projectEntity);
       final Project invitation = Project.fromEntity(projectEntity);
       yield ProjectInvitationLoaded(invitation);
@@ -109,8 +111,9 @@ class InvitationBloc extends Bloc<InvitationEvent, InvitationState> {
   Stream<InvitationState> _mapAcceptProjectInvitationToState(AcceptProjectInvitation event) async* {
     try {
       (event.isAccepted)
-          ? await ProjectRepository().acceptProjectInvitation(state.project.id, event.userId)
-          : await ProjectRepository().declineProjectInvitation(state.project.id, event.userId);
+          ? await projectRepository.acceptProjectInvitation(state.project.id, event.userId)
+          : await projectRepository.declineProjectInvitation(state.project.id, event.userId);
+      yield InvitationAccepted();
       app.add(AppOnProject());
     } catch (err) {
       print(err);

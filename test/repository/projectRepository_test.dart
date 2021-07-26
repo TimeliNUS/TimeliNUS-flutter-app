@@ -75,35 +75,6 @@ void main() {
     final projectEntities = await projectRepository.loadProjectInvitations(userRef.id);
     expect(snapshot.docs.length, projectEntities.length);
   });
-  // test('load project todos', () async {
-  //   DocumentReference ref = await instance.collection('user').add(user.toJson());
-  //   instance.collection('todo').add(TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate),
-  //           new Project('projectName', id: 'projectId'), [new User(ref: ref, id: ref.id)], null)
-  //       .toJson());
-  //   // print(ref.id);
-  //   // print(instance.dump());
-  //   final snapshot = await instance.collection('todo').get();
-  //   final todoEntities = await projectRepository.loadProjectTodos('projectId');
-  //   expect(snapshot.docs.length, todoEntities.length);
-  // });
-  // test('load todos ref list', () async {
-  //   DocumentReference ref = await instance.collection('user').add(user.toJson());
-  //   DocumentReference todoRef = await instance.collection('todo').add(TodoEntity(
-  //           'original',
-  //           '123',
-  //           '',
-  //           false,
-  //           Timestamp.fromDate(currentDate),
-  //           new Project('projectName', id: 'projectId'),
-  //           [new User(ref: ref, id: ref.id)],
-  //           null)
-  //       .toJson());
-  //   // print(ref.id);
-  //   // print(instance.dump());
-  //   final snapshot = await instance.collection('todo').get();
-  //   final todoEntities = await projectRepository.loadTodosFromReferenceList([todoRef]);
-  //   expect(snapshot.docs.length, todoEntities.length);
-  // });
 
   test('update project', () async {
     DocumentReference ref = await instance.collection('user').add(user.toJson());

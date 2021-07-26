@@ -81,17 +81,6 @@ void main() {
     expect(snapshot.docs.length, todoEntities.length);
   });
 
-  test('load project todos', () async {
-    DocumentReference ref = await instance.collection('user').add(user.toJson());
-    instance.collection('todo').add(TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate),
-            new Project('projectName', id: 'projectId'), [new User(ref: ref, id: ref.id)], null)
-        .toJson());
-    // print(ref.id);
-    // print(instance.dump());
-    final snapshot = await instance.collection('todo').get();
-    final todoEntities = await todoRepository.loadProjectTodos('projectId');
-    expect(snapshot.docs.length, todoEntities.length);
-  });
   test('load todos ref list', () async {
     DocumentReference ref = await instance.collection('user').add(user.toJson());
     DocumentReference todoRef = await instance.collection('todo').add(TodoEntity(
