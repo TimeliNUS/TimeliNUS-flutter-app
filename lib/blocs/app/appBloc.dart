@@ -130,7 +130,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   @override
   Future<void> close() {
-    _userSubscription.cancel();
+    // _userSubscription.cancel();
     return super.close();
   }
 
