@@ -24,7 +24,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
               ? AppState.authenticated(authenticationRepository.currentUser)
               : AppState.unauthenticated(),
         ) {
-    // _userSubscription = _authenticationRepository.user.listen(_onUserChanged);
+    _userSubscription = _authenticationRepository.user.listen(_onUserChanged);
     _messaging = messaging ?? FirebaseMessaging.instance;
     _dynamicLinks = dynamicLinks ?? FirebaseDynamicLinks.instance;
     initDynamicLinks();
@@ -87,7 +87,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     return _authenticationRepository.currentUser;
   }
 
-  // void _onUserChanged(User user) => add(AppUserChanged(user));
+  void _onUserChanged(User user) => add(AppUserChanged(user));
 
   @override
   Stream<AppState> mapEventToState(AppEvent event) async* {
@@ -130,7 +130,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   @override
   Future<void> close() {
-    // _userSubscription.cancel();
+    _userSubscription.cancel();
     return super.close();
   }
 

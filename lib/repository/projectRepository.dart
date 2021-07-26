@@ -75,12 +75,13 @@ class ProjectRepository {
 
   Future<List<ProjectEntity>> loadProjects(String id) async {
     DocumentReference personRef = person.doc(id);
-    final querySnapshot = await ref.where('groupmates', arrayContains: personRef).get();
+    final querySnapshot = await ref.where('confirmedInvitations', arrayContains: personRef).get();
     List<ProjectEntity> projects = [];
     for (QueryDocumentSnapshot temp in querySnapshot.docs.toList()) {
       Map<String, Object> tempData = temp.data();
       print(tempData);
-      List<TodoEntity> todoEntities = await TodoRepository().loadTodosFromReferenceList(tempData['todos']);
+      List<TodoEntity> todoEntities =
+          tempData['todos'] != null ? await TodoRepository().loadTodosFromReferenceList(tempData['todos']) : [];
       List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
       List<User> users = await AuthenticationRepository().findUsersByRef(tempData['groupmates']);
       List<User> invited = await AuthenticationRepository().findUsersByRef(tempData['invitations']);
@@ -99,7 +100,8 @@ class ProjectRepository {
     List<ProjectEntity> projects = [];
     for (QueryDocumentSnapshot temp in querySnapshot.docs.toList()) {
       Map<String, Object> tempData = temp.data();
-      List<TodoEntity> todoEntities = await TodoRepository().loadTodosFromReferenceList(tempData['todos']);
+      List<TodoEntity> todoEntities =
+          tempData['todos'] != null ? await TodoRepository().loadTodosFromReferenceList(tempData['todos']) : [];
       List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
       List<User> users = await AuthenticationRepository().findUsersByRef(tempData['groupmates']);
       List<User> invited = await AuthenticationRepository().findUsersByRef(tempData['invitations']);

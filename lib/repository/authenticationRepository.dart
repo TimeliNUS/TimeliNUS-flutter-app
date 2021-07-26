@@ -239,6 +239,7 @@ class AuthenticationRepository {
     List<User> users = [];
     for (DocumentReference documentReference in refs) {
       final DocumentSnapshot temp = await documentReference.get();
+      if (temp.data() == null) continue;
       User documentSnapshotTask = User.fromJson(temp.data(), temp.id, ref: temp.reference);
       users.add(documentSnapshotTask);
     }

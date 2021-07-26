@@ -169,7 +169,7 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                         ? null
                         : () {
                             final url = Uri.encodeFull(
-                                'https://zoom.us/oauth/authorize?response_type=code&client_id=5NM6HEpT4CWNO0zQ9s0fg&redirect_uri=http://localhost:5001/timelinus-2021/asia-east2/zoomAuth&state={"client":"mobile", "id": "${context.read<AppBloc>().state.user.id}"}');
+                                'zoom.us/oauth/authorize?response_type=code&client_id=5NM6HEpT4CWNO0zQ9s0fg&redirect_uri=http://localhost:5001/timelinus-2021/asia-east2/zoomAuth&state={"client":"mobile", "id": "${context.read<AppBloc>().state.user.id}"}');
                             launch(url, forceSafariVC: true);
                           },
                     child: Row(

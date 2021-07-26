@@ -49,9 +49,9 @@ class MeetingRepository {
     // );
 
     // promises.add(updateTimeslot);
-    promises.add(person.doc(id).update({
-      'meeting': FieldValue.arrayUnion([newMeetingref])
-    }));
+    // promises.add(person.doc(id).update({
+    //   'meeting': FieldValue.arrayUnion([newMeetingref])
+    // }));
 
     promises.add(project.doc(meeting.project.id).update({
       'meetings': FieldValue.arrayUnion([newMeetingref])
