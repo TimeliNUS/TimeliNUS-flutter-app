@@ -63,8 +63,10 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
       final meetingEntities = await meetingRepository.loadConfirmedMeetings(event.id);
       final List<Meeting> meetings = meetingEntities
           .map((meeting) => Meeting.fromEntity(meeting))
-          .where(
-              (x) => x.selectedTimeStart.day == DateTime.now().day && x.selectedTimeStart.month == DateTime.now().month)
+          .where((x) =>
+              x.selectedTimeStart != null &&
+              x.selectedTimeStart.day == DateTime.now().day &&
+              x.selectedTimeStart.month == DateTime.now().month)
           .toList();
       yield MeetingLoaded(meetings);
       return;
