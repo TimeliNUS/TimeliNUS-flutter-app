@@ -105,7 +105,7 @@ class AuthenticationRepository {
         password: password,
       );
       List<Future> promises = [];
-      promises.add(credential.user.updateDisplayName(name));
+      promises.add(credential.user.updateProfile(displayName: name));
       promises.add(_firebaseFirestore
           .collection('user')
           .doc(credential.user.uid)

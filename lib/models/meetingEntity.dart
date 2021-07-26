@@ -97,7 +97,10 @@ class MeetingEntity extends Equatable {
       "selectedDate": selectedDate,
       "isConfirmed": isConfirmed,
       "isOnlineVenue": isOnlineVenue,
-      "timeslot": timeslots ?? [],
+      "timeslot": timeslots.map((x) {
+            return {"start": Timestamp.fromDate(x.startTime), "end": Timestamp.fromDate(x.endTime)};
+          }).toList() ??
+          [],
       "invitations": invited != null ? invited.map((x) => x.ref).toList() : [],
       "confirmedInvitations": confirmed != null ? confirmed.map((x) => x.ref).toList() : [],
       // "interval" ??

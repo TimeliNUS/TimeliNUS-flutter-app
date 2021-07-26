@@ -152,6 +152,9 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                                   startDate: startDateValue,
                                                   endDate: endDateValue,
                                                   isConfirmed: false,
+                                                  invited: pics,
+                                                  confirmed: [],
+                                                  timeslots: [],
                                                   isOnlineVenue: isOnlineVenue),
                                               userId))
                                           ..add(LoadMeetings(context.read<AppBloc>().state.user.id));

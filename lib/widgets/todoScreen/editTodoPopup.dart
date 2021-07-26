@@ -45,94 +45,89 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
   Widget build(BuildContext context) {
     return BlocProvider<TodoBloc>(
         create: (context) => widget.todosBloc,
-        child: BlocBuilder<TodoBloc, TodoState>(
-          builder: (context, state) {
-            return ColoredSafeArea(
-                appTheme.primaryColorLight,
-                Scaffold(
-                    body: Container(
-                        color: appTheme.primaryColorLight,
-                        child: Column(children: [
-                          TopBar("Todo Details",
-                              onPressedCallback: () => Navigator.pop(context),
-                              rightWidget: IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.white),
-                                  onPressed: () {
-                                    widget.todosBloc.add(DeleteTodo(widget.todoToEdit, userId));
-                                    Navigator.pop(context);
-                                  })),
-                          Expanded(
-                              child: GestureDetector(
-                                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                                  child: Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                              topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0))),
-                                      child: Padding(
-                                          padding: EdgeInsets.only(left: 30, right: 30, top: 15),
-                                          child: ListView(
-                                            children: [
-                                              // TopBar(),
-                                              PopupInput(textController),
-                                              customPadding(),
-                                              PopupDropdown(
-                                                  dropdownLabel: 'Module Project',
-                                                  initialProject: widget.todoToEdit.project,
-                                                  callback: (val) => {setState(() => selectedProject = val)}),
-                                              customPadding(),
-                                              PersonInChargeChips(widget.todoToEdit.pic, "Person in Charge",
-                                                  project: selectedProject, callback: (val) {
-                                                setState(() => pics = val);
-                                              }),
-                                              customPadding(),
-                                              // constraints: BoxConstraints.expand(height: 200)),
-                                              DeadlineInput(
-                                                (val) => setState(() => deadlineValue = val),
-                                                true,
-                                                initialTime: widget.todoToEdit.deadline,
-                                              ),
-                                              customPadding(),
-                                              NotesInput(noteController),
-                                            ],
-                                          ))))),
-                          Container(
-                            color: Colors.white,
-                            alignment: Alignment.bottomCenter,
-                            child: Padding(
-                                padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    ElevatedButton(
-                                        style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
-                                        child: Padding(
-                                            padding: EdgeInsets.symmetric(horizontal: 10),
-                                            child: Text("Update",
-                                                style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
-                                        onPressed: () {
-                                          if (textController.text != '' &&
-                                              (selectedProject != null &&
-                                                  selectedProject.title != 'Please select a project!')) {
-                                            widget.todosBloc.add(UpdateTodo(Todo(textController.text,
-                                                id: widget.todoToEdit.id,
-                                                note: noteController.text,
-                                                project: selectedProject,
-                                                complete: widget.todoToEdit.complete,
-                                                pic: pics,
-                                                deadline: deadlineValue)));
-                                            Navigator.pop(context);
-                                          } else {
-                                            customAlertDialog(context);
-                                          }
-                                        })
-                                  ],
-                                )),
-                          )
-                        ]))));
-          },
-        ));
+        child: ColoredSafeArea(
+            appTheme.primaryColorLight,
+            Scaffold(
+                body: Container(
+                    color: appTheme.primaryColorLight,
+                    child: Column(children: [
+                      TopBar("Todo Details",
+                          onPressedCallback: () => Navigator.pop(context),
+                          rightWidget: IconButton(
+                              icon: Icon(Icons.delete, color: Colors.white),
+                              onPressed: () {
+                                widget.todosBloc.add(DeleteTodo(widget.todoToEdit, userId));
+                                Navigator.pop(context);
+                              })),
+                      Expanded(
+                          child: GestureDetector(
+                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0))),
+                                  child: Padding(
+                                      padding: EdgeInsets.only(left: 30, right: 30, top: 15),
+                                      child: ListView(
+                                        children: [
+                                          // TopBar(),
+                                          PopupInput(textController),
+                                          customPadding(),
+                                          PopupDropdown(
+                                              dropdownLabel: 'Module Project',
+                                              initialProject: widget.todoToEdit.project,
+                                              callback: (val) => {setState(() => selectedProject = val)}),
+                                          customPadding(),
+                                          PersonInChargeChips(widget.todoToEdit.pic, "Person in Charge",
+                                              project: selectedProject, callback: (val) {
+                                            setState(() => pics = val);
+                                          }),
+                                          customPadding(),
+                                          // constraints: BoxConstraints.expand(height: 200)),
+                                          DeadlineInput(
+                                            (val) => setState(() => deadlineValue = val),
+                                            true,
+                                            initialTime: widget.todoToEdit.deadline,
+                                          ),
+                                          customPadding(),
+                                          NotesInput(noteController),
+                                        ],
+                                      ))))),
+                      Container(
+                        color: Colors.white,
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor: MaterialStateProperty.all<Color>(appTheme.primaryColorLight)),
+                                    child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 10),
+                                        child: Text("Update",
+                                            style: appTheme.textTheme.bodyText2.apply(color: Colors.white))),
+                                    onPressed: () {
+                                      if (textController.text != '' &&
+                                          (selectedProject != null &&
+                                              selectedProject.title != 'Please select a project!')) {
+                                        widget.todosBloc.add(UpdateTodo(Todo(textController.text,
+                                            id: widget.todoToEdit.id,
+                                            note: noteController.text,
+                                            project: selectedProject,
+                                            complete: widget.todoToEdit.complete,
+                                            pic: pics,
+                                            deadline: deadlineValue)));
+                                        Navigator.pop(context);
+                                      } else {
+                                        customAlertDialog(context);
+                                      }
+                                    })
+                              ],
+                            )),
+                      )
+                    ])))));
   }
 }

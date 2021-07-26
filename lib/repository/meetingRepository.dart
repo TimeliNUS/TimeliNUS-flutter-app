@@ -131,12 +131,13 @@ class MeetingRepository {
 
   Future<List<MeetingEntity>> loadConfirmedMeetings(String id) async {
     DocumentReference documentReference = person.doc(id);
-    QuerySnapshot documentSnapshot = await ref.where('author', isEqualTo: documentReference).get();
+    // QuerySnapshot documentSnapshot = await ref.where('author', isEqualTo: documentReference).get();
     QuerySnapshot documentSnapshot2 = await ref
         .where('confirmedInvitations', arrayContains: documentReference)
-        .where('author', isNotEqualTo: documentReference)
+        // .where('author', isNotEqualTo: documentReference)
         .get();
-    final list = documentSnapshot.docs.toList()..addAll(documentSnapshot2.docs.toList());
+    final list = documentSnapshot2.docs.toList();
+    // ..addAll(documentSnapshot2.docs.toList());
     List<MeetingEntity> meetings = [];
     for (QueryDocumentSnapshot temp in list) {
       List<Future<dynamic>> promises = [];
@@ -234,6 +235,7 @@ class MeetingRepository {
   }
 
   Future<void> declineMeetingInvitation(String meetingId, String userId) async {
+    print('user id : ' + userId);
     DocumentReference personRef = person.doc(userId);
     await ref.doc(meetingId).update({
       "groupmates": FieldValue.arrayRemove([personRef]),

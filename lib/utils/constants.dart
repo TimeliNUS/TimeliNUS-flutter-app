@@ -35,8 +35,8 @@ class AppConstants {
 
   static String updateMeetingUrl = (isSimulator) ? DEV_UPDATEMEETING : PROD_UPDATEMEETING;
 
-  static String findCommonUrl = (isSimulator) ? DEV_FINDCOMMON : PROD_FINDCOMMON;
+  static String findCommonUrl = (!isSimulator) ? DEV_FINDCOMMON : PROD_FINDCOMMON;
 
   static String findGoogleCommonUrl = (isSimulator) ? DEV_FINDGOOGLECOMMON : DEV_FINDGOOGLECOMMON;
-  static String createZoomUrl = (isSimulator) ? DEV_CREATEZOOM : PROD_CREATEZOOM;
+  static String createZoomUrl = (!isSimulator) ? DEV_CREATEZOOM : PROD_CREATEZOOM;
 }

@@ -40,7 +40,7 @@ class _InvitationState extends State<Invitation> {
   void findAuthorName(Meeting meeting) async {
     if (meeting != null) {
       String tempName = await AuthenticationRepository().findUsersByRef([meeting.author]).then((x) => x[0].name);
-      setState(() => authorName = tempName);
+      if (mounted) setState(() => authorName = tempName);
     }
   }
 
@@ -245,7 +245,7 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
           ]),
           Align(
               alignment: Alignment.bottomCenter,
-              child: Row(children: [
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 ElevatedButton(
                     style: ButtonStyle(
                         backgroundColor: MaterialStateColor.resolveWith((states) => appTheme.primaryColorLight)),
@@ -277,7 +277,9 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
                     }),
                 ElevatedButton(
                   onPressed: () {
-                    context.read<InvitationBloc>().add(AcceptInvitation(null, null, null, isAccepted: false));
+                    context
+                        .read<InvitationBloc>()
+                        .add(AcceptInvitation(null, context.read<AppBloc>().state.user.id, null, isAccepted: false));
                   },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateColor.resolveWith((states) => appTheme.primaryColorLight)),

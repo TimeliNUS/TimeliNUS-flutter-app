@@ -45,8 +45,6 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
       }
       final meetingEntities = await meetingRepository.loadConfirmedMeetings(event.id);
       final invitationEntities = await meetingRepository.loadInvitation(event.id);
-      print(meetingEntities);
-      print(invitationEntities);
       final List<Meeting> meetings = meetingEntities.map((meeting) => Meeting.fromEntity(meeting)).toList();
       final List<Meeting> invitations = invitationEntities.map((invitation) => Meeting.fromEntity(invitation)).toList();
       yield MeetingLoaded(meetings, invitations: invitations);
@@ -78,13 +76,13 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
 
   Stream<MeetingState> _mapAddMeetingToState(AddMeeting event) async* {
     try {
-      List<Meeting> currentMeetings = state.meetings;
+      List<Meeting> currentInvitations = state.invitations;
       yield MeetingLoading();
       DocumentReference newMeetingRef = await meetingRepository.addNewMeeting(event.meeting.toEntity(), event.id);
-      final updatedProjects = currentMeetings
+      final updatedInvitations = currentInvitations
         ..add(
             event.meeting.copyWith(author: event.meeting.groupmates[0].ref, ref: newMeetingRef, id: newMeetingRef.id));
-      yield MeetingLoaded(updatedProjects);
+      yield MeetingLoaded(state.meetings, invitations: updatedInvitations);
     } catch (err) {
       print(err);
       yield MeetingNotLoaded();
@@ -96,7 +94,6 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
     final updatedMeetings = state.meetings.map((project) {
       return project.id == event.updatedMeeting.id ? event.updatedMeeting : project;
     }).toList();
-    print('hi');
     print(event.updatedMeeting);
     List<Future<dynamic>> futures = [];
     futures.add(meetingRepository.updateMeeting(event.updatedMeeting.toEntity()));
