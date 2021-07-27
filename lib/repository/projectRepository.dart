@@ -10,27 +10,27 @@ class ProjectRepository {
 
   CollectionReference ref;
   CollectionReference person;
-  FirebaseFirestore firestore;
+  FirebaseFirestore _firestore;
 
   factory ProjectRepository({FirebaseFirestore firestore}) {
     if (firestore != null) {
-      _singleton.firestore = firestore;
+      _singleton._firestore = firestore;
     } else {
-      _singleton.firestore = FirebaseFirestore.instance;
+      _singleton._firestore = FirebaseFirestore.instance;
     }
-    _singleton.ref = _singleton.firestore.collection('project');
-    _singleton.person = _singleton.firestore.collection('user');
+    _singleton.ref = _singleton._firestore.collection('project');
+    _singleton.person = _singleton._firestore.collection('user');
     return _singleton;
   }
 
-  Future<DocumentReference> addNewProject(ProjectEntity todo, String id) async {
-    Map<String, dynamic> tempJson = todo.toJson();
+  Future<DocumentReference> addNewProject(ProjectEntity project, String id) async {
+    Map<String, dynamic> tempJson = project.toJson();
     tempJson.addEntries([
       MapEntry("_createdAt", Timestamp.fromDate(DateTime.now())),
       MapEntry("todos", []),
       MapEntry("meetings", []),
       MapEntry("confirmedInvitations", [person.doc(id)]),
-      MapEntry("invitations", todo.groupmates.where((y) => y.id != id).map((x) => x.ref).toList()),
+      MapEntry("invitations", project.groupmates.where((y) => y.id != id).map((x) => x.ref).toList()),
     ]);
     final newTodoRef = await ref.add(tempJson);
     bool userTodosExist = await person.doc(id).get().then((DocumentSnapshot snapshot) => snapshot.exists);

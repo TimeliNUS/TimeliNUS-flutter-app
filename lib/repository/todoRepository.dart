@@ -9,20 +9,20 @@ class TodoRepository {
   static final TodoRepository _singleton = TodoRepository._internal();
   factory TodoRepository({FirebaseFirestore firestore}) {
     if (firestore != null) {
-      _singleton.firestore = firestore;
+      _singleton._firestore = firestore;
     } else {
-      _singleton.firestore = FirebaseFirestore.instance;
+      _singleton._firestore = FirebaseFirestore.instance;
     }
-    _singleton.ref = _singleton.firestore.collection('todo');
-    _singleton.person = _singleton.firestore.collection('user');
-    _singleton.project = _singleton.firestore.collection('project');
+    _singleton.ref = _singleton._firestore.collection('todo');
+    _singleton.person = _singleton._firestore.collection('user');
+    _singleton.project = _singleton._firestore.collection('project');
     return _singleton;
   }
   CollectionReference ref;
   CollectionReference person;
   CollectionReference project;
 
-  FirebaseFirestore firestore;
+  FirebaseFirestore _firestore;
 
   Future<DocumentReference> addNewTodo(TodoEntity todo, String id) async {
     Map<String, dynamic> tempJson = todo.toJson();

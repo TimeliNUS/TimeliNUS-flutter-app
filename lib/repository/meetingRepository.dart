@@ -15,17 +15,17 @@ class MeetingRepository {
   CollectionReference ref;
   CollectionReference person;
   CollectionReference project;
-  FirebaseFirestore firestore;
+  FirebaseFirestore _firestore;
 
   factory MeetingRepository({FirebaseFirestore firestore}) {
     if (firestore != null) {
-      _singleton.firestore = firestore;
+      _singleton._firestore = firestore;
     } else {
-      _singleton.firestore = FirebaseFirestore.instance;
+      _singleton._firestore = FirebaseFirestore.instance;
     }
-    _singleton.ref = _singleton.firestore.collection('meeting');
-    _singleton.person = _singleton.firestore.collection('user');
-    _singleton.project = _singleton.firestore.collection('project');
+    _singleton.ref = _singleton._firestore.collection('meeting');
+    _singleton.person = _singleton._firestore.collection('user');
+    _singleton.project = _singleton._firestore.collection('project');
     return _singleton;
   }
 
