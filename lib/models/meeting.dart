@@ -89,7 +89,7 @@ class Meeting extends Equatable {
         timeLength,
         startDate != null ? Timestamp.fromDate(startDate.toUtc()) : null,
         endDate != null ? Timestamp.fromDate(endDate.toUtc()) : null,
-        groupmates[0].ref,
+        author ?? groupmates[0].ref,
         groupmates,
         invited,
         confirmed,
@@ -118,6 +118,7 @@ class Meeting extends Equatable {
       DocumentReference ref,
       List<TimeRegion> timeslots,
       DateTime selectedTimeStart,
+      String meetingLink,
       bool isConfirmed,
       bool isOnlineVenue}) {
     return Meeting(
@@ -133,11 +134,12 @@ class Meeting extends Equatable {
         timeslots: timeslots ?? this.timeslots,
         isConfirmed: isConfirmed ?? this.isConfirmed,
         selectedTimeStart: selectedTimeStart ?? this.selectedTimeStart,
-        isOnlineVenue: isOnlineVenue ?? this.isOnlineVenue);
+        isOnlineVenue: isOnlineVenue ?? this.isOnlineVenue,
+        meetingLink: meetingLink ?? this.meetingLink);
   }
 
   // @override
   // String toString() {
-  //   // return '[Meeting: ' + id != null ? id : "" + "]";
+  // return '[Meeting: ' + id != null ? id : "" + groupmates.toString() + "]";
   // }
 }

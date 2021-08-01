@@ -85,7 +85,7 @@ class MeetingEntity extends Equatable {
       'meetingVenue': meetingVenue,
       // .toString().split('.')[1],
       'groupmates': groupmates.map((x) => x.ref).toList(),
-      'author': groupmates[0].ref,
+      'author': author ?? groupmates[0].ref,
       'project': project != null
           ? {
               'id': project.id,
@@ -103,6 +103,7 @@ class MeetingEntity extends Equatable {
           [],
       "invitations": invited != null ? invited.map((x) => x.ref).toList() : [],
       "confirmedInvitations": confirmed != null ? confirmed.map((x) => x.ref).toList() : [],
+      "meetingLink": meetingLink,
       // "interval" ??
     };
   }

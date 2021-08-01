@@ -125,26 +125,6 @@ class InvitationDetail extends StatelessWidget {
                       ],
                     ),
                     Padding(padding: EdgeInsets.only(bottom: 7.5)),
-                    !(meeting.isOnlineVenue)
-                        ? Divider(color: appTheme.primaryColor, thickness: 0.5, height: 20)
-                        : Container(),
-                    !(meeting.isOnlineVenue)
-                        ? InkWell(
-                            onTap: () => launch(Uri.encodeFull("https://aces.nus.edu.sg/fbs/HomeServlet")),
-                            child: Text("Click here to go to NUS facility booking service",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  // color: Colors.blue
-                                )))
-                        : Container(),
-                    meeting.meetingLink != null
-                        ? Container(
-                            padding: EdgeInsets.only(top: 10),
-                            child: InkWell(
-                                onTap: () => launch(meeting.meetingLink),
-                                child: Text('Link: ' + meeting.meetingLink.substring(0, 37) + '...',
-                                    softWrap: true, style: TextStyle(fontWeight: FontWeight.bold))))
-                        : Container()
                   ],
                 )));
   }
