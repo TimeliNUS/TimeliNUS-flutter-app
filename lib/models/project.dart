@@ -16,6 +16,7 @@ class Project extends Equatable {
   final List<Todo> todos;
   final List<User> invited;
   final List<User> confirmed;
+  final bool includeTime;
   final DocumentReference ref;
 
   const Project(this.title,
@@ -28,6 +29,7 @@ class Project extends Equatable {
       this.todos = const [],
       this.invited = const [],
       this.confirmed = const [],
+      this.includeTime,
       this.ref});
 
   static Project fromEntity(ProjectEntity entity) {
@@ -42,6 +44,7 @@ class Project extends Equatable {
       todos: entity.todos,
       ref: entity.ref,
       invited: entity.invited ?? [],
+      includeTime: entity.includeTime,
       confirmed: entity.confirmed ?? [],
     );
   }
@@ -49,7 +52,7 @@ class Project extends Equatable {
   ProjectEntity toEntity() {
     return ProjectEntity(
       title, moduleCode, id, progress, deadline != null ? Timestamp.fromDate(deadline) : null,
-      groupmates, noOfMeetings, todos, invited, confirmed, ref,
+      groupmates, noOfMeetings, todos, invited, confirmed, includeTime, ref,
       // confirmed, invited
     );
   }
@@ -65,6 +68,7 @@ class Project extends Equatable {
       List<Todo> todos,
       DocumentReference ref,
       List<User> confirmed,
+      bool includeTime,
       List<User> invited}) {
     return Project(title ?? this.title,
         moduleCode: moduleCode ?? this.moduleCode,
@@ -76,10 +80,23 @@ class Project extends Equatable {
         todos: todos ?? this.todos,
         ref: ref ?? this.ref,
         confirmed: confirmed ?? this.confirmed,
+        includeTime: includeTime ?? this.includeTime,
         invited: invited ?? this.invited);
   }
 
   @override
-  List<Object> get props =>
-      [id, title, moduleCode, progress, deadline, groupmates, noOfMeetings, ref, todos, confirmed, invited];
+  List<Object> get props => [
+        id,
+        title,
+        moduleCode,
+        progress,
+        deadline,
+        groupmates,
+        noOfMeetings,
+        ref,
+        todos,
+        confirmed,
+        invited,
+        includeTime
+      ];
 }

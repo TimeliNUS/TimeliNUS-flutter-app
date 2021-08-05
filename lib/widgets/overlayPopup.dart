@@ -214,10 +214,13 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 class DeadlineInput extends StatefulWidget {
   final bool isOptional;
   final bool isNotMini;
+  final bool isWithTime;
   final bool isDisabled;
   final Function(DateTime date) callback;
-  DateTime initialTime;
-  DeadlineInput(this.callback, this.isOptional, {this.initialTime, this.isNotMini = true, this.isDisabled = false});
+  final Function(bool isIncludingTime) callbackForTime;
+  final DateTime initialTime;
+  DeadlineInput(this.callback, this.isOptional, this.isWithTime,
+      {this.initialTime, this.isNotMini = true, this.isDisabled = false, this.callbackForTime});
   @override
   State<DeadlineInput> createState() => _DeadlineInputState();
 }
@@ -229,7 +232,7 @@ class _DeadlineInputState extends State<DeadlineInput> {
   @override
   void initState() {
     super.initState();
-    isWithTime = (widget.initialTime != null ? widget.initialTime.hour != 0 : false) || !widget.isNotMini;
+    isWithTime = widget.isWithTime;
     chosenDateTime = widget.initialTime ?? (widget.isOptional ? null : now.stripTime());
   }
 
@@ -289,7 +292,9 @@ class _DeadlineInputState extends State<DeadlineInput> {
                         padding: new EdgeInsets.only(top: 10.0),
                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                           Text(chosenDateTime != null ? DateFormat.yMMMd().format(chosenDateTime) : "No deadline set",
-                              style: appTheme.textTheme.bodyText2.apply(color: Colors.black38)),
+                              style: appTheme.textTheme.bodyText2.copyWith(
+                                  color: widget.isDisabled ? Colors.black26 : appTheme.primaryColorLight,
+                                  fontWeight: FontWeight.w700)),
                           Padding(
                               padding: EdgeInsets.all(5),
                               child: Icon(Icons.calendar_today, size: 24, color: appTheme.accentColor))
@@ -309,7 +314,10 @@ class _DeadlineInputState extends State<DeadlineInput> {
                     Switch(
                       value: isWithTime,
                       activeColor: appTheme.accentColor,
-                      onChanged: (bool) => setState(() => isWithTime = !isWithTime),
+                      onChanged: (bool) {
+                        setState(() => isWithTime = !isWithTime);
+                        widget.callbackForTime(bool);
+                      },
                     ),
                   ])),
                   Container(
@@ -317,7 +325,10 @@ class _DeadlineInputState extends State<DeadlineInput> {
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
                         boxShadow: [
-                          BoxShadow(color: appTheme.primaryColorLight, spreadRadius: 1, blurRadius: 1),
+                          BoxShadow(
+                              color: (isWithTime && !widget.isDisabled) ? appTheme.primaryColorLight : Colors.black38,
+                              spreadRadius: 1,
+                              blurRadius: 1),
                         ],
                       ),
                       child: Padding(
@@ -326,6 +337,9 @@ class _DeadlineInputState extends State<DeadlineInput> {
                               (chosenDateTime != null ? chosenDateTime.hour.toString().padLeft(2, '0') : "00") +
                                   " : " +
                                   (chosenDateTime != null ? chosenDateTime.minute.toString().padLeft(2, '0') : "00"),
+                              style: TextStyle(
+                                  color:
+                                      (isWithTime && !widget.isDisabled) ? appTheme.primaryColorLight : Colors.black38),
                               textAlign: TextAlign.end)))
                 ])
               : Container(
@@ -335,7 +349,10 @@ class _DeadlineInputState extends State<DeadlineInput> {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                     boxShadow: [
-                      BoxShadow(color: appTheme.primaryColorLight, spreadRadius: 1, blurRadius: 1),
+                      BoxShadow(
+                          color: (!widget.isDisabled) ? appTheme.primaryColorLight : Colors.black38,
+                          spreadRadius: 1,
+                          blurRadius: 1),
                     ],
                   ),
                   child: Padding(
@@ -344,6 +361,7 @@ class _DeadlineInputState extends State<DeadlineInput> {
                           (chosenDateTime != null ? chosenDateTime.hour.toString().padLeft(2, '0') : "00") +
                               " : " +
                               (chosenDateTime != null ? chosenDateTime.minute.toString().padLeft(2, '0') : "00"),
+                          style: TextStyle(color: (!widget.isDisabled) ? appTheme.primaryColorLight : Colors.black38),
                           textAlign: TextAlign.center)))
         ]);
   }

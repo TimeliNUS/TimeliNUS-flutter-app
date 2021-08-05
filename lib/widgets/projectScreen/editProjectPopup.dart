@@ -22,6 +22,7 @@ class EditProjectPopup extends StatefulWidget {
 
 class _EditProjectPopupState extends State<EditProjectPopup> {
   DateTime deadlineValue;
+  bool includeTime;
   List<User> groupmates = [];
   TextEditingController textController = new TextEditingController();
   TextEditingController moduleCodeController = new TextEditingController();
@@ -30,6 +31,7 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
     super.initState();
     textController = new TextEditingController(text: widget.projectToEdit.title);
     moduleCodeController = new TextEditingController(text: widget.projectToEdit.moduleCode);
+    includeTime = widget.projectToEdit.includeTime;
   }
 
   @override
@@ -79,7 +81,9 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
-                                          DeadlineInput((val) => setState(() => deadlineValue = val), false,
+                                          DeadlineInput(
+                                              (val) => setState(() => deadlineValue = val), false, includeTime,
+                                              callbackForTime: (val) => setState(() => includeTime = val),
                                               initialTime: widget.projectToEdit.deadline),
                                         ],
                                       ))))),
@@ -104,6 +108,7 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                             widget.projectToEdit.copyWith(
                                                 title: textController.text,
                                                 deadline: deadlineValue,
+                                                includeTime: includeTime,
                                                 groupmates: groupmates),
                                             context.read<AppBloc>().getCurrentUser().id));
                                         Navigator.pop(context);

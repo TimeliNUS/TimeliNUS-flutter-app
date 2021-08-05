@@ -66,11 +66,12 @@ class TodoRepository {
 
   Future<List<TodoEntity>> loadTodos(String id) async {
     DocumentReference documentReference = person.doc(id);
-    QuerySnapshot documentSnapshot = await ref.where('pic', arrayContains: documentReference).get();
+    QuerySnapshot documentSnapshot = await ref.where('PIC', arrayContains: documentReference).get();
     List<TodoEntity> tasks = [];
+    print(documentSnapshot.docs.length);
     for (QueryDocumentSnapshot temp in documentSnapshot.docs.toList()) {
       final Map<String, Object> data = temp.data();
-      final List<User> users = await AuthenticationRepository().findUsersByRef(data['pic']);
+      final List<User> users = await AuthenticationRepository().findUsersByRef(data['PIC']);
       TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, temp.reference);
       tasks.add(documentSnapshotTask);
     }
@@ -84,7 +85,7 @@ class TodoRepository {
     List<TodoEntity> tasks = [];
     for (QueryDocumentSnapshot temp in documentSnapshot.docs.toList()) {
       final Map<String, Object> data = temp.data();
-      final List<User> users = await AuthenticationRepository().findUsersByRef(data['pic']);
+      final List<User> users = await AuthenticationRepository().findUsersByRef(data['PIC']);
       TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, temp.reference);
       tasks.add(documentSnapshotTask);
     }
@@ -99,7 +100,7 @@ class TodoRepository {
       // print(documentReference);
       final Map<String, Object> data = temp.data();
       if (data != null) {
-        final List<User> users = await AuthenticationRepository().findUsersByRef(data['pic']);
+        final List<User> users = await AuthenticationRepository().findUsersByRef(data['PIC']);
         TodoEntity documentSnapshotTask = TodoEntity.fromJson(temp.data(), users, temp.id, documentReference);
         tasks.add(documentSnapshotTask);
       }

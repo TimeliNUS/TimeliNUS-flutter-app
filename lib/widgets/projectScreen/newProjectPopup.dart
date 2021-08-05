@@ -21,6 +21,7 @@ class NewProjectPopup extends StatefulWidget {
 }
 
 class _NewProjectPopupState extends State<NewProjectPopup> {
+  bool includeTime = false;
   List<User> groupmates = [];
   DateTime deadlineValue = DateTime.now().stripTime();
   final TextEditingController textController = new TextEditingController();
@@ -70,7 +71,12 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
-                                          DeadlineInput((val) => setState(() => deadlineValue = val), false),
+                                          DeadlineInput(
+                                            (val) => setState(() => deadlineValue = val),
+                                            false,
+                                            includeTime,
+                                            callbackForTime: (val) => setState(() => includeTime = val),
+                                          ),
                                         ],
                                       ))))),
                       Container(

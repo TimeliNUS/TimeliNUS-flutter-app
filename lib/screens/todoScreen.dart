@@ -216,8 +216,8 @@ class _TodoItemState extends State<TodoItem> {
                             Padding(padding: EdgeInsets.only(right: 5)),
                             Text(
                                 widget.todo.deadline != null
-                                    ? (widget.todo.deadline.hour != 0
-                                        ? DateFormat('MMM dd, yyyy – kk:mm').format(widget.todo.deadline)
+                                    ? (widget.todo.includeTime
+                                        ? DateFormat('MMM dd, yyyy – HH:mm').format(widget.todo.deadline)
                                         : DateFormat('MMM dd, yyyy').format(widget.todo.deadline))
                                     : "No deadline set",
                                 style: TextStyle(color: appTheme.primaryColor))

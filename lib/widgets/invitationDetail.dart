@@ -111,9 +111,9 @@ class InvitationDetail extends StatelessWidget {
                       children: [
                         Icon(Icons.av_timer_rounded, size: 18, color: appTheme.primaryColorLight),
                         Text(' ' +
-                            DateFormat('kk:mm').format(meeting.startDate) +
+                            DateFormat('HH:mm').format(meeting.startDate) +
                             ' - ' +
-                            DateFormat('kk:mm').format(meeting.endDate)),
+                            DateFormat('HH:mm').format(meeting.endDate)),
                       ],
                     ),
                     Padding(padding: EdgeInsets.only(bottom: 7.5)),

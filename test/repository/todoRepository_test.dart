@@ -33,7 +33,7 @@ void main() {
   test('add new todo', () async {
     todoRepository.addNewTodo(
         TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate),
-            new Project('projectName', id: 'projectId'), [], null),
+            new Project('projectName', id: 'projectId'), [], false, null),
         'userId');
     final snapshot = await instance.collection('todo').get();
     expect(snapshot.docs.length, 1);
@@ -42,7 +42,7 @@ void main() {
   test('delete todo', () async {
     DocumentReference ref = await todoRepository.addNewTodo(
         TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate),
-            new Project('projectName', id: 'projectId'), [], null),
+            new Project('projectName', id: 'projectId'), [], false, null),
         'userId');
     // print(instance.dump());
     todoRepository.deleteTodo(
@@ -60,7 +60,7 @@ void main() {
   test('load todos', () async {
     DocumentReference ref = await instance.collection('user').add(user.toJson());
     instance.collection('todo').add(TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate),
-            new Project('projectName', id: 'projectId'), [new User(ref: ref, id: ref.id)], null)
+            new Project('projectName', id: 'projectId'), [new User(ref: ref, id: ref.id)], false, null)
         .toJson());
     // print(ref.id);
     // print(instance.dump());
@@ -72,7 +72,7 @@ void main() {
   test('load project todos', () async {
     DocumentReference ref = await instance.collection('user').add(user.toJson());
     instance.collection('todo').add(TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate),
-            new Project('projectName', id: 'projectId'), [new User(ref: ref, id: ref.id)], null)
+            new Project('projectName', id: 'projectId'), [new User(ref: ref, id: ref.id)], false, null)
         .toJson());
     // print(ref.id);
     // print(instance.dump());
@@ -91,6 +91,7 @@ void main() {
             Timestamp.fromDate(currentDate),
             new Project('projectName', id: 'projectId'),
             [new User(ref: ref, id: ref.id)],
+            false,
             null)
         .toJson());
     // print(ref.id);
@@ -106,7 +107,7 @@ void main() {
     DocumentReference newProjectRef = await instance.collection('project').add(newProject.toEntity().toJson());
 
     TodoEntity testEntity = TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate),
-        new Project('projectName', id: 'testId', ref: newProjectRef), [new User(ref: ref, id: ref.id)], null);
+        new Project('projectName', id: 'testId', ref: newProjectRef), [new User(ref: ref, id: ref.id)], false, null);
     DocumentReference todoRef = await instance.collection('todo').add(testEntity.toJson());
     TodoEntity updatedEntity =
         Todo.fromEntity(testEntity).copyWith(id: todoRef.id, title: 'updated', project: project).toEntity();

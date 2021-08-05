@@ -52,6 +52,7 @@ class ExtraTimeSlotPopupState extends State<ExtraTimeSlotPopup> {
                           child: DeadlineInput(
                         (val) => setState(() => start = val),
                         false,
+                        true,
                         isNotMini: false,
                       )),
                     ]),
@@ -67,6 +68,7 @@ class ExtraTimeSlotPopupState extends State<ExtraTimeSlotPopup> {
                             child: DeadlineInput(
                           (val) => setState(() => end = val),
                           false,
+                          true,
                           isNotMini: false,
                         )),
                       ],

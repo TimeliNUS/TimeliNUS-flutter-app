@@ -13,10 +13,11 @@ class ProjectEntity extends Equatable {
   final List<User> groupmates;
   final List<User> invited;
   final List<User> confirmed;
+  final bool includeTime;
   final DocumentReference ref;
 
   ProjectEntity(this.title, this.moduleCode, this.id, this.progress, this.deadline, this.groupmates, this.noOfMeetings,
-      this.todos, this.invited, this.confirmed, this.ref);
+      this.todos, this.invited, this.confirmed, this.includeTime, this.ref);
 
   static ProjectEntity fromJson(
       Map<String, Object> json, List<Todo> todos, List<User> users, List<User> invited, List<User> confirmed,
@@ -32,6 +33,7 @@ class ProjectEntity extends Equatable {
         todos,
         invited,
         confirmed,
+        json['includeTime'],
         ref);
   }
 
@@ -45,6 +47,7 @@ class ProjectEntity extends Equatable {
       //     meetings.map((meeting) => meeting.toEntity().toJson()).toList(),
       'groupmates': groupmates.map((x) => x.ref).toList(),
       // 'todos': todos,
+      'includeTime': includeTime ?? false,
       'deadline': deadline,
       // 'invitations': groupmates.sublist(1).map((x) => x.ref).toList(),
       // 'confirmedInvitations': [groupmates[0].ref],
@@ -57,5 +60,6 @@ class ProjectEntity extends Equatable {
   }
 
   @override
-  List<Object> get props => [title, progress, moduleCode, deadline, noOfMeetings, todos, ref, id, groupmates];
+  List<Object> get props =>
+      [title, progress, moduleCode, deadline, noOfMeetings, todos, ref, id, groupmates, includeTime];
 }

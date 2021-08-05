@@ -37,12 +37,13 @@ void main() {
     DateTime currentDate = DateTime.now();
     originalTodo = Todo('original',
         id: '123', deadline: currentDate, ref: FirebaseFirestore.instance.collection('todo').doc('123'), pic: []);
-    originalTodoEntity = TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate), null, null,
+    originalTodoEntity = TodoEntity('original', '123', '', false, Timestamp.fromDate(currentDate), null, null, false,
         FirebaseFirestore.instance.collection('todo').doc('123'));
     testTodo = Todo('first',
         id: '123',
         deadline: currentDate.subtract(Duration(days: 1)),
-        ref: FirebaseFirestore.instance.collection('todo').doc('123'));
+        ref: FirebaseFirestore.instance.collection('todo').doc('123'),
+        includeTime: false);
     when(todoRepository.loadTodos(any)).thenAnswer((ans) => Future.value([originalTodoEntity]));
     when(todoRepository.addNewTodo(any, any)).thenAnswer(
         (ans) => Future.value(FirebaseFirestore.instance.collection('todo').doc(ans.positionalArguments[0].id)));

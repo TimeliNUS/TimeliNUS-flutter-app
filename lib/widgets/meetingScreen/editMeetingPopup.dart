@@ -129,6 +129,7 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                                     child: DeadlineInput(
                                                   (val) => setState(() => startDateValue = val),
                                                   false,
+                                                  true,
                                                   isNotMini: false,
                                                   isDisabled: true,
                                                   initialTime: widget.meetingToEdit.startDate,
@@ -146,6 +147,7 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                                   child: DeadlineInput(
                                                 (val) => setState(() => endDateValue = val),
                                                 false,
+                                                true,
                                                 isNotMini: false,
                                                 isDisabled: true,
                                                 initialTime: widget.meetingToEdit.endDate,

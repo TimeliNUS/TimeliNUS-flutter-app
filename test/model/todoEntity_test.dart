@@ -34,7 +34,8 @@ void main() {
         id: 'id',
         complete: false,
         pic: [],
-        ref: FirebaseFirestore.instance.collection('todo').doc('testId'));
+        ref: FirebaseFirestore.instance.collection('todo').doc('testId'),
+        includeTime: false);
     expect(actualTodo, Todo.fromEntity(todo));
   });
 
@@ -47,6 +48,7 @@ void main() {
       null,
       new Project('projectName', id: 'projectId'),
       [],
+      false,
       FirebaseFirestore.instance.collection('user').doc('userId'),
     );
     expect(json, actualTodo.toJson());

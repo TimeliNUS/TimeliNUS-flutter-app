@@ -2,6 +2,7 @@ import 'package:TimeliNUS/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'package:TimeliNUS/utils/dateTimeExtension.dart';
 
 class MeetingEntity extends Equatable {
   final String title;
@@ -47,8 +48,12 @@ class MeetingEntity extends Equatable {
         json['title'] ?? '',
         id != null ? id : (json['id'] as String),
         json['timeLength'] != null ? int.parse(json['timeLength'].toString()) : 0,
-        json['startDate'],
-        json['endDate'],
+        Timestamp.fromDate((json['startDate'] as Timestamp).toDate().add(Duration(
+            hours: int.parse((json['startTime'] as String).substring(0, 2)),
+            minutes: int.parse((json['startTime'] as String).substring(3))))),
+        Timestamp.fromDate((json['endDate'] as Timestamp).toDate().add(Duration(
+            hours: int.parse((json['endTime'] as String).substring(0, 2)),
+            minutes: int.parse((json['endTime'] as String).substring(3))))),
         // groupmates != null ? groupmates[0] : null,
         json['author'],
         // User(
@@ -90,11 +95,15 @@ class MeetingEntity extends Equatable {
           ? {
               'id': project.id,
               'title': project.title,
+              'ref': project.ref,
             }
           : null,
-      "startDate": startDate,
-      "endDate": endDate,
-      "selectedDate": selectedDate,
+      "startDate": Timestamp.fromDate(startDate.toDate().stripTime()),
+      "endDate": Timestamp.fromDate(endDate.toDate().stripTime()),
+      "startTime": startDate.toDate().printTime(),
+      "endTime": endDate.toDate().printTime(),
+      "selectedStartDate": selectedDate,
+      "selectedEndDate": selectedDate != null ? selectedDate.toDate().add(Duration(minutes: timeLength)) : null,
       "isConfirmed": isConfirmed,
       "isOnlineVenue": isOnlineVenue,
       "timeslot": timeslots.map((x) {

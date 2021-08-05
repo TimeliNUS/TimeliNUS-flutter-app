@@ -179,8 +179,8 @@ class DashboardProjectCard extends StatelessWidget {
                   Icon(Icons.calendar_today_outlined, size: 15, color: Colors.grey),
                   Text(
                       ' ' +
-                          ((project.deadline.hour != 0)
-                              ? DateFormat('MMM dd, yyyy – kk:mm').format(project.deadline)
+                          ((project.includeTime)
+                              ? DateFormat('MMM dd, yyyy – HH:mm').format(project.deadline)
                               : DateFormat('MMM dd, yyyy').format(project.deadline)),
                       style: TextStyle(fontSize: 12, color: Colors.grey)),
                 ],

@@ -20,6 +20,7 @@ class NewTodoPopup extends StatefulWidget {
 
 class _NewTodoPopupState extends State<NewTodoPopup> {
   DateTime deadlineValue;
+  bool includeTime = false;
   final TextEditingController textController = new TextEditingController();
   final TextEditingController noteController = new TextEditingController();
   List<User> pics = [];
@@ -68,7 +69,8 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                           }),
                                           customPadding(),
                                           // constraints: BoxConstraints.expand(height: 200)),
-                                          DeadlineInput((val) => setState(() => deadlineValue = val), true,
+                                          DeadlineInput((val) => setState(() => deadlineValue = val), true, includeTime,
+                                              callbackForTime: (val) => setState(() => includeTime = val),
                                               initialTime: null),
                                           customPadding(),
                                           NotesInput(noteController),
@@ -99,6 +101,7 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                                 pic: pics,
                                                 deadline: deadlineValue,
                                                 project: selectedProject,
+                                                includeTime: includeTime,
                                                 complete: false),
                                             userId));
                                         Navigator.pop(context);
@@ -120,6 +123,7 @@ class _NewTodoPopupState extends State<NewTodoPopup> {
                                                 deadline: deadlineValue,
                                                 pic: pics,
                                                 project: selectedProject,
+                                                includeTime: includeTime,
                                                 complete: true),
                                             userId));
                                         Navigator.pop(context);

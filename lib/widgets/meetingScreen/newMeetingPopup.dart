@@ -32,6 +32,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
   List<User> pics = [];
   Project selectedProject;
   DateTime selectedTime;
+
   final TextEditingController textController = new TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -98,6 +99,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                                         child: DeadlineInput(
                                                           (val) => setState(() => startDateValue = val),
                                                           false,
+                                                          true,
                                                           isNotMini: false,
                                                         ))),
                                               ]),
@@ -115,6 +117,7 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                                       child: DeadlineInput(
                                                         (val) => setState(() => endDateValue = val),
                                                         false,
+                                                        true,
                                                         isNotMini: false,
                                                       ))),
                                             ],

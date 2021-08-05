@@ -24,6 +24,7 @@ class EditTodoPopup extends StatefulWidget {
 
 class _EditTodoPopupState extends State<EditTodoPopup> {
   DateTime deadlineValue;
+  bool includeTime;
   TextEditingController textController = new TextEditingController();
   TextEditingController noteController;
   List<User> pics;
@@ -37,6 +38,7 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
     textController = new TextEditingController(text: widget.todoToEdit.title);
     noteController = new TextEditingController(text: widget.todoToEdit.note);
     deadlineValue = widget.todoToEdit.deadline;
+    includeTime = widget.todoToEdit.includeTime;
     pics = widget.todoToEdit.pic ?? [];
     selectedProject = widget.todoToEdit.project;
   }
@@ -88,6 +90,8 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                           DeadlineInput(
                                             (val) => setState(() => deadlineValue = val),
                                             true,
+                                            includeTime,
+                                            callbackForTime: (val) => setState(() => includeTime = val),
                                             initialTime: widget.todoToEdit.deadline,
                                           ),
                                           customPadding(),
@@ -119,6 +123,7 @@ class _EditTodoPopupState extends State<EditTodoPopup> {
                                             project: selectedProject,
                                             complete: widget.todoToEdit.complete,
                                             pic: pics,
+                                            includeTime: includeTime,
                                             deadline: deadlineValue)));
                                         Navigator.pop(context);
                                       } else {

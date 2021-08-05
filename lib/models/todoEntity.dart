@@ -12,9 +12,11 @@ class TodoEntity extends Equatable {
   final Timestamp deadline;
   final Project project;
   final List<User> pic;
+  final bool includeTime;
   final DocumentReference ref;
 
-  TodoEntity(this.task, this.id, this.note, this.complete, this.deadline, this.project, this.pic, this.ref);
+  TodoEntity(
+      this.task, this.id, this.note, this.complete, this.deadline, this.project, this.pic, this.includeTime, this.ref);
 
   Map<String, Object> toJson() {
     return {
@@ -26,9 +28,11 @@ class TodoEntity extends Equatable {
           ? {
               'id': project.id,
               'title': project.title,
+              'ref': project.ref,
             }
           : null,
-      'pic': pic.map((x) => x.ref).toList(),
+      'PIC': pic.map((x) => x.ref).toList(),
+      'includeTime': includeTime,
       'deadline': deadline
     };
   }
@@ -47,9 +51,10 @@ class TodoEntity extends Equatable {
         json['deadline'] as Timestamp,
         json['project'] != null ? Project.fromEntity(ProjectEntity.fromJson(json['project'], [], [], [], [])) : null,
         users,
+        json['includeTime'] ?? false,
         ref);
   }
 
   @override
-  List<Object> get props => [task, id, note, complete, deadline, pic, ref];
+  List<Object> get props => [task, id, note, complete, deadline, pic, ref, includeTime];
 }
