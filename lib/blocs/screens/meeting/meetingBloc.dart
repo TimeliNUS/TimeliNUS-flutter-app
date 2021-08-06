@@ -44,6 +44,8 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
         return;
       }
       final meetingEntities = await meetingRepository.loadConfirmedMeetings(event.id);
+      print('hello');
+      print(meetingEntities);
       final invitationEntities = await meetingRepository.loadInvitation(event.id);
       final List<Meeting> meetings = meetingEntities.map((meeting) => Meeting.fromEntity(meeting)).toList();
       final List<Meeting> invitations = invitationEntities.map((invitation) => Meeting.fromEntity(invitation)).toList();
@@ -80,8 +82,7 @@ class MeetingBloc extends Bloc<MeetingEvent, MeetingState> {
       yield MeetingLoading();
       DocumentReference newMeetingRef = await meetingRepository.addNewMeeting(event.meeting.toEntity(), event.id);
       final updatedInvitations = currentInvitations
-        ..add(
-            event.meeting.copyWith(author: event.meeting.groupmates[0].ref, ref: newMeetingRef, id: newMeetingRef.id));
+        ..add(event.meeting.copyWith(author: event.meeting.confirmed[0].ref, ref: newMeetingRef, id: newMeetingRef.id));
       yield MeetingLoaded(state.meetings, invitations: updatedInvitations);
     } catch (err) {
       print(err);

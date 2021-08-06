@@ -22,8 +22,7 @@ class BottomBar extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       type: BottomNavigationBarType.fixed,
-      onTap: (int index) =>
-          BlocProvider.of<AppBloc>(context).add(buttonToState[index]),
+      onTap: (int index) => BlocProvider.of<AppBloc>(context).add(buttonToState[index]),
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),

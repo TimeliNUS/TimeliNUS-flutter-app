@@ -137,6 +137,7 @@ class MeetingRepository {
         // .where('author', isNotEqualTo: documentReference)
         .get();
     final list = documentSnapshot2.docs.toList();
+    print(list.map((x) => x.id).join(','));
     // ..addAll(documentSnapshot2.docs.toList());
     List<MeetingEntity> meetings = [];
     for (QueryDocumentSnapshot temp in list) {
@@ -153,6 +154,7 @@ class MeetingRepository {
                   .map((x) => x as DocumentReference)
                   .toList()
               : [];
+
       List<User> invitedUsers;
       List<User> confirmedUsers;
       promises.add(AuthenticationRepository().findUsersByRef(invitedUserRefs).then((x) => invitedUsers = x));
@@ -238,7 +240,6 @@ class MeetingRepository {
     print('user id : ' + userId);
     DocumentReference personRef = person.doc(userId);
     await ref.doc(meetingId).update({
-      "groupmates": FieldValue.arrayRemove([personRef]),
       "invitations": FieldValue.arrayRemove([personRef])
     });
   }

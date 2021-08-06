@@ -34,11 +34,11 @@ PODS:
   - firebase_core (1.4.0):
     - Firebase/CoreOnly (= 8.3.0)
     - Flutter
-  - firebase_dynamic_links (2.0.7):
+  - firebase_dynamic_links (2.0.6):
     - Firebase/DynamicLinks (= 8.3.0)
     - firebase_core
     - Flutter
-  - firebase_messaging (10.0.4):
+  - firebase_messaging (10.0.2):
     - Firebase/Messaging (= 8.3.0)
     - firebase_core
     - Flutter
@@ -214,8 +214,8 @@ SPEC CHECKSUMS:
   Firebase: 817b9171d0d51dccc458b94a5e8edff6b1dd323d
   firebase_auth: 5d48a6c2c9de6d8f7946269ef904136298c6aa12
   firebase_core: 72374607c8c6f5a0adc0559e5c5bf57deda975e3
-  firebase_dynamic_links: 63d25b8afb1257210012a703b2029b425f0b62c7
-  firebase_messaging: 55c5b8184efd330b9d1f1765b55c4ae57e015c5e
+  firebase_dynamic_links: d87c152d9161e9506687c3e9e4c9d69efa669b87
+  firebase_messaging: 4d851e2ac28b48ea7da4ed0b61bba30560ed0fba
   firebase_storage: 84d2a34e6d582e2772d41d88a5530584b94073dd
   FirebaseAuth: fd12c82de44e7ad3b821610c387b8251f03aa0f9
   FirebaseCore: a6dba751680d7033b9d3831e1cfc95ead0605118
@@ -227,7 +227,7 @@ SPEC CHECKSUMS:
   FirebaseStorage: ff380720c204593d98c3e5482e62ccfbb522f0c5
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
-  google_sign_in: 952c378b33dc5a0bf4bcb2d12afe9ac70b3239fb
+  google_sign_in: 6bd214b9c154f881422f5fe27b66aaa7bbd580cc
   GoogleDataTransport: 85fd18ff3019bb85d3f2c551d04c481dedf71fc9
   GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
   GoogleUtilities: eea970f4a389963963bffe8d8fabe43540678b9c

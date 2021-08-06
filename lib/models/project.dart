@@ -11,7 +11,6 @@ class Project extends Equatable {
   final String moduleCode;
   final double progress;
   final DateTime deadline;
-  final List<User> groupmates;
   final int noOfMeetings;
   final List<Todo> todos;
   final List<User> invited;
@@ -24,7 +23,6 @@ class Project extends Equatable {
       this.moduleCode,
       this.progress = 1,
       this.deadline,
-      this.groupmates = const [],
       this.noOfMeetings = 0,
       this.todos = const [],
       this.invited = const [],
@@ -39,7 +37,6 @@ class Project extends Equatable {
       id: entity.id,
       progress: entity.progress,
       deadline: entity.deadline != null ? entity.deadline.toDate() : null,
-      groupmates: entity.groupmates != null ? entity.groupmates : [],
       noOfMeetings: entity.noOfMeetings,
       todos: entity.todos,
       ref: entity.ref,
@@ -52,7 +49,7 @@ class Project extends Equatable {
   ProjectEntity toEntity() {
     return ProjectEntity(
       title, moduleCode, id, progress, deadline != null ? Timestamp.fromDate(deadline) : null,
-      groupmates, noOfMeetings, todos, invited, confirmed, includeTime, ref,
+      noOfMeetings, todos, invited, confirmed, includeTime, ref,
       // confirmed, invited
     );
   }
@@ -63,7 +60,6 @@ class Project extends Equatable {
       String id,
       double progress,
       DateTime deadline,
-      List<User> groupmates,
       int noOfMeetings,
       List<Todo> todos,
       DocumentReference ref,
@@ -75,7 +71,6 @@ class Project extends Equatable {
         id: id ?? this.id,
         progress: progress ?? this.progress,
         deadline: deadline ?? this.deadline,
-        groupmates: groupmates ?? this.groupmates,
         noOfMeetings: noOfMeetings ?? this.noOfMeetings,
         todos: todos ?? this.todos,
         ref: ref ?? this.ref,
@@ -85,18 +80,6 @@ class Project extends Equatable {
   }
 
   @override
-  List<Object> get props => [
-        id,
-        title,
-        moduleCode,
-        progress,
-        deadline,
-        groupmates,
-        noOfMeetings,
-        ref,
-        todos,
-        confirmed,
-        invited,
-        includeTime
-      ];
+  List<Object> get props =>
+      [id, title, moduleCode, progress, deadline, noOfMeetings, ref, todos, confirmed, invited, includeTime];
 }

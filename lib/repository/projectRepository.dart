@@ -30,7 +30,7 @@ class ProjectRepository {
       MapEntry("todos", []),
       MapEntry("meetings", []),
       MapEntry("confirmedInvitations", [person.doc(id)]),
-      MapEntry("invitations", project.groupmates.where((y) => y.id != id).map((x) => x.ref).toList()),
+      MapEntry("invitations", project.invited.map((x) => x.ref).toList()),
     ]);
     final newTodoRef = await ref.add(tempJson);
     bool userTodosExist = await person.doc(id).get().then((DocumentSnapshot snapshot) => snapshot.exists);
@@ -64,12 +64,11 @@ class ProjectRepository {
     Map<String, Object> tempData = documentSnapshot.data();
     List<TodoEntity> todoEntities = await TodoRepository().loadTodosFromReferenceList(tempData['todos']);
     List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
-    List<User> users = await AuthenticationRepository().findUsersByRef(tempData['groupmates']);
     List<User> invited = await AuthenticationRepository().findUsersByRef(tempData['invitations']);
     List<User> confirmed = await AuthenticationRepository().findUsersByRef(tempData['confirmedInvitations']);
     // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
     ProjectEntity documentSnapshotTask =
-        ProjectEntity.fromJson(tempData, todos, users, invited, confirmed, id, documentSnapshot.reference);
+        ProjectEntity.fromJson(tempData, todos, invited, confirmed, id, documentSnapshot.reference);
     return documentSnapshotTask;
   }
 
@@ -83,12 +82,12 @@ class ProjectRepository {
       List<TodoEntity> todoEntities =
           tempData['todos'] != null ? await TodoRepository().loadTodosFromReferenceList(tempData['todos']) : [];
       List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
-      List<User> users = await AuthenticationRepository().findUsersByRef(tempData['groupmates']);
+
       List<User> invited = await AuthenticationRepository().findUsersByRef(tempData['invitations']);
       List<User> confirmed = await AuthenticationRepository().findUsersByRef(tempData['confirmedInvitations']);
       // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
       ProjectEntity documentSnapshotTask =
-          ProjectEntity.fromJson(temp.data(), todos, users, invited, confirmed, temp.id, temp.reference);
+          ProjectEntity.fromJson(temp.data(), todos, invited, confirmed, temp.id, temp.reference);
       projects.add(documentSnapshotTask);
     }
     return projects;
@@ -103,14 +102,12 @@ class ProjectRepository {
       List<TodoEntity> todoEntities =
           tempData['todos'] != null ? await TodoRepository().loadTodosFromReferenceList(tempData['todos']) : [];
       List<Todo> todos = todoEntities.map((todoEntity) => Todo.fromEntity(todoEntity)).toList();
-      List<User> users = await AuthenticationRepository().findUsersByRef(tempData['groupmates']);
       List<User> invited = await AuthenticationRepository().findUsersByRef(tempData['invitations']);
       List<User> confirmed = await AuthenticationRepository().findUsersByRef(tempData['confirmedInvitations']);
 
       // List<MeetingEntity> meetings = await MeetingRepository.loadMeetingsFromReferenceList(tempData['meetings']);
-      print(users);
       ProjectEntity documentSnapshotTask =
-          ProjectEntity.fromJson(temp.data(), todos, users, invited, confirmed, temp.id, temp.reference);
+          ProjectEntity.fromJson(temp.data(), todos, invited, confirmed, temp.id, temp.reference);
       projects.add(documentSnapshotTask);
     }
     // print('invitations: ' + projects.length.toString());
@@ -128,7 +125,6 @@ class ProjectRepository {
   Future<void> declineProjectInvitation(String projectId, String userId) async {
     DocumentReference personRef = person.doc(userId);
     await ref.doc(projectId).update({
-      "groupmates": FieldValue.arrayRemove([personRef]),
       "invitations": FieldValue.arrayRemove([personRef])
     });
   }

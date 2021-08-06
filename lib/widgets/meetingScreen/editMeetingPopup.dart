@@ -203,7 +203,6 @@ class _EditMeetingPopupState extends State<EditMeetingPopup> {
                                             widget.meetingBloc.add(UpdateMeeting(
                                                 widget.meetingToEdit.copyWith(
                                                     title: textController.text,
-                                                    groupmates: pics,
                                                     meetingVenue: meetingVenue,
                                                     project: selectedProject,
                                                     startDate: startDateValue,

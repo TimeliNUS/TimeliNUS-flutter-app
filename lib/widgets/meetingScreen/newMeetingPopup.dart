@@ -205,12 +205,17 @@ class _NewMeetingPopupState extends State<NewMeetingPopup> {
                                           (selectedTime != null || !isDirectCreate)) {
                                         widget.projectBloc
                                           ..add(AddMeeting(
-                                              Meeting(textController.text, pics, meetingVenue, selectedProject,
+                                              Meeting(textController.text, meetingVenue, selectedProject,
                                                   startDate: startDateValue,
                                                   endDate: endDateValue,
                                                   isConfirmed: isDirectCreate,
-                                                  invited: isDirectCreate ? [] : pics,
-                                                  confirmed: isDirectCreate ? pics : [],
+                                                  invited: isDirectCreate
+                                                      ? []
+                                                      : pics
+                                                          .where((x) => x.id != context.read<AppBloc>().state.user.id)
+                                                          .toList(),
+                                                  confirmed:
+                                                      isDirectCreate ? pics : [context.read<AppBloc>().state.user],
                                                   timeslots: [],
                                                   selectedTimeStart: isDirectCreate ? selectedTime : null,
                                                   isOnlineVenue: isOnlineVenue),

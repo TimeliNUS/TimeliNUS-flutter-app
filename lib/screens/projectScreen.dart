@@ -127,7 +127,7 @@ class ProjectCard extends StatelessWidget {
                     children: [
                       Icon(Icons.calendar_today_outlined, size: 18, color: appTheme.primaryColorLight),
                       Text(' ' +
-                          ((project.includeTime)
+                          ((project.includeTime || !(project.includeTime == null))
                               ? DateFormat('MMM dd, yyyy – HH:mm').format(project.deadline)
                               : DateFormat('MMM dd, yyyy').format(project.deadline))),
                       Expanded(
@@ -135,17 +135,17 @@ class ProjectCard extends StatelessWidget {
                               alignment: Alignment.centerRight,
                               child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
-                                  children: project.groupmates
+                                  children: project.confirmed
                                       .map((groupmate) => CircleAvatar(
                                             backgroundImage: Image.network(groupmate.profilePicture).image,
                                             maxRadius: 12,
                                           ))
                                       .take(4)
                                       .toList()
-                                        ..add(project.groupmates.length > 4
+                                        ..add(project.confirmed.length > 4
                                             ? CircleAvatar(
                                                 maxRadius: 12,
-                                                child: Text('+' + (project.groupmates.length - 4).toString(),
+                                                child: Text('+' + (project.confirmed.length - 4).toString(),
                                                     style: TextStyle(fontSize: 10)))
                                             : CircleAvatar(
                                                 radius: 0,
@@ -289,7 +289,7 @@ class _ProjectInvitationsState extends State<ProjectInvitations> {
                                     child: Padding(
                                         padding: EdgeInsets.all(25),
                                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                          Text(invitation.title + '\ncreated by ' + invitation.groupmates[0].name),
+                                          Text(invitation.title + '\ncreated by ' + invitation.confirmed[0].name),
                                           Padding(
                                             padding: EdgeInsets.only(bottom: 5),
                                           ),

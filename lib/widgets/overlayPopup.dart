@@ -149,7 +149,7 @@ class _PersonInChargeChipsState extends State<PersonInChargeChips> {
 
   void loadProjects(String id) async {
     final List<User> returnedProject =
-        await ProjectRepository().loadProjectById(id).then((x) => Project.fromEntity(x).groupmates);
+        await ProjectRepository().loadProjectById(id).then((x) => Project.fromEntity(x).confirmed);
     if (mounted) {
       setState(() {
         usersAvailableToChoose = returnedProject;

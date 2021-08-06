@@ -115,7 +115,10 @@ class _NewProjectPopupState extends State<NewProjectPopup> {
                                               textController.text,
                                               moduleCode: moduleCodeController.text,
                                               deadline: deadlineValue,
-                                              groupmates: groupmates,
+                                              includeTime: includeTime,
+                                              invited: groupmates
+                                                  .where((x) => x.id != context.read<AppBloc>().getCurrentUser().id)
+                                                  .toList(),
                                             ),
                                             context.read<AppBloc>().getCurrentUser().id));
                                         Navigator.pop(context);

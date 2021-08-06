@@ -10,17 +10,15 @@ class ProjectEntity extends Equatable {
   final Timestamp deadline;
   final int noOfMeetings;
   final List<Todo> todos;
-  final List<User> groupmates;
   final List<User> invited;
   final List<User> confirmed;
   final bool includeTime;
   final DocumentReference ref;
 
-  ProjectEntity(this.title, this.moduleCode, this.id, this.progress, this.deadline, this.groupmates, this.noOfMeetings,
-      this.todos, this.invited, this.confirmed, this.includeTime, this.ref);
+  ProjectEntity(this.title, this.moduleCode, this.id, this.progress, this.deadline, this.noOfMeetings, this.todos,
+      this.invited, this.confirmed, this.includeTime, this.ref);
 
-  static ProjectEntity fromJson(
-      Map<String, Object> json, List<Todo> todos, List<User> users, List<User> invited, List<User> confirmed,
+  static ProjectEntity fromJson(Map<String, Object> json, List<Todo> todos, List<User> invited, List<User> confirmed,
       [String id, DocumentReference ref]) {
     return ProjectEntity(
         json['title'],
@@ -28,7 +26,6 @@ class ProjectEntity extends Equatable {
         id != null ? id : json['id'] as String,
         json['progress'] != null ? double.parse(json['progress'].toString()) : 0,
         json['deadline'] ?? null,
-        users,
         json['meetings'] != null ? (json['meetings'] as List).length : 0,
         todos,
         invited,
@@ -45,7 +42,6 @@ class ProjectEntity extends Equatable {
       'progress': progress,
       // 'meetings':
       //     meetings.map((meeting) => meeting.toEntity().toJson()).toList(),
-      'groupmates': groupmates.map((x) => x.ref).toList(),
       // 'todos': todos,
       'includeTime': includeTime ?? false,
       'deadline': deadline,
@@ -56,10 +52,9 @@ class ProjectEntity extends Equatable {
 
   @override
   String toString() {
-    return 'ProjectEntity{title: $title, moduleCode: $moduleCode, id: $id, progress: $progress, deadline: $deadline, ref: $ref, groupmates: $groupmates}';
+    return 'ProjectEntity{title: $title, moduleCode: $moduleCode, id: $id, progress: $progress, deadline: $deadline, ref: $ref}';
   }
 
   @override
-  List<Object> get props =>
-      [title, progress, moduleCode, deadline, noOfMeetings, todos, ref, id, groupmates, includeTime];
+  List<Object> get props => [title, progress, moduleCode, deadline, noOfMeetings, todos, ref, id, includeTime];
 }

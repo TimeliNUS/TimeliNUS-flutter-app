@@ -159,17 +159,17 @@ class DashboardProjectCard extends StatelessWidget {
               Padding(
                   padding: EdgeInsets.symmetric(vertical: 5),
                   child: Row(
-                      children: project.groupmates
+                      children: project.confirmed
                           .map((groupmate) => CircleAvatar(
                                 backgroundImage: Image.network(groupmate.profilePicture).image,
                                 maxRadius: 10,
                               ))
                           .take(4)
                           .toList()
-                            ..add(project.groupmates.length > 4
+                            ..add(project.confirmed.length > 4
                                 ? CircleAvatar(
                                     maxRadius: 10,
-                                    child: Text('+' + (project.groupmates.length - 4).toString(),
+                                    child: Text('+' + (project.confirmed.length - 4).toString(),
                                         style: TextStyle(fontSize: 10)))
                                 : CircleAvatar(
                                     radius: 0,

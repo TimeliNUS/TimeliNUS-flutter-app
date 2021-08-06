@@ -37,7 +37,6 @@ class Meeting extends Equatable {
   final DateTime endDate;
   final int timeLength;
   final DocumentReference author;
-  final List<User> groupmates;
   final List<User> confirmed;
   final List<User> invited;
   final String meetingVenue;
@@ -49,7 +48,7 @@ class Meeting extends Equatable {
   final String meetingLink;
   final bool isOnlineVenue;
 
-  const Meeting(this.title, this.groupmates, this.meetingVenue, this.project,
+  const Meeting(this.title, this.meetingVenue, this.project,
       {this.id,
       this.startDate,
       this.endDate,
@@ -63,14 +62,15 @@ class Meeting extends Equatable {
       this.isConfirmed,
       this.meetingLink,
       this.isOnlineVenue});
+
   @override
-  List<Object> get props => [title, groupmates, timeLength, startDate];
+  List<Object> get props => [title, timeLength, startDate];
 
   static Meeting fromEntity(MeetingEntity entity) {
-    return Meeting(entity.title, entity.groupmates ?? [], entity.meetingVenue, entity.project,
+    return Meeting(entity.title, entity.meetingVenue, entity.project,
         startDate: entity.startDate != null ? entity.startDate.toDate() : null,
         endDate: entity.endDate != null ? entity.endDate.toDate() : null,
-        author: entity.author ?? (entity.groupmates[0] != null ? entity.groupmates[0].ref : null),
+        author: entity.author ?? (entity.confirmed[0] != null ? entity.confirmed[0].ref : null),
         id: entity.id ?? null,
         confirmed: entity.confirmed ?? null,
         invited: entity.invited ?? null,
@@ -89,8 +89,7 @@ class Meeting extends Equatable {
         timeLength,
         startDate != null ? Timestamp.fromDate(startDate.toUtc()) : null,
         endDate != null ? Timestamp.fromDate(endDate.toUtc()) : null,
-        author ?? groupmates[0].ref,
-        groupmates,
+        author ?? confirmed[0].ref,
         invited,
         confirmed,
         meetingVenue,
@@ -121,8 +120,7 @@ class Meeting extends Equatable {
       String meetingLink,
       bool isConfirmed,
       bool isOnlineVenue}) {
-    return Meeting(
-        title ?? this.title, groupmates ?? this.groupmates, meetingVenue ?? this.meetingVenue, project ?? this.project,
+    return Meeting(title ?? this.title, meetingVenue ?? this.meetingVenue, project ?? this.project,
         id: id ?? this.id,
         author: author ?? this.author,
         startDate: startDate ?? this.startDate,

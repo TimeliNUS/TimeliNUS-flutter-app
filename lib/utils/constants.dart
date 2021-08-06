@@ -19,18 +19,18 @@ class AppConstants {
   static bool isSimulator = false;
 
   static Future<void> init() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Platform.isIOS) {
-      IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
-      isSimulator = !iosDeviceInfo.isPhysicalDevice;
-    } else {
-      AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
-      isSimulator = !androidDeviceInfo.isPhysicalDevice;
-    }
-    if (isSimulator) {
-      String host = defaultTargetPlatform == TargetPlatform.android ? '10.0.2.2:8080' : 'localhost:8080';
-      FirebaseFirestore.instance.settings = Settings(host: host, sslEnabled: false);
-    }
+    // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    // if (Platform.isIOS) {
+    //   IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
+    //   isSimulator = !iosDeviceInfo.isPhysicalDevice;
+    // } else {
+    //   AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
+    //   isSimulator = !androidDeviceInfo.isPhysicalDevice;
+    // }
+    // if (isSimulator) {
+    //   String host = defaultTargetPlatform == TargetPlatform.android ? '10.0.2.2:8080' : 'localhost:8080';
+    //   FirebaseFirestore.instance.settings = Settings(host: host, sslEnabled: false);
+    // }
   }
 
   static String updateMeetingUrl = (isSimulator) ? DEV_UPDATEMEETING : PROD_UPDATEMEETING;

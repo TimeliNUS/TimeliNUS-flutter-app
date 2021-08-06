@@ -75,7 +75,7 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                           PopupInput(moduleCodeController,
                                               inputLabel: 'Module Code', errorMsg: 'Please enter your module code!'),
                                           customPadding(),
-                                          PersonInChargeChips(widget.projectToEdit.groupmates, "Groupmates",
+                                          PersonInChargeChips(widget.projectToEdit.confirmed, "Groupmates",
                                               callback: (val) {
                                             setState(() => groupmates = val);
                                           }),
@@ -109,7 +109,7 @@ class _EditProjectPopupState extends State<EditProjectPopup> {
                                                 title: textController.text,
                                                 deadline: deadlineValue,
                                                 includeTime: includeTime,
-                                                groupmates: groupmates),
+                                                invited: groupmates),
                                             context.read<AppBloc>().getCurrentUser().id));
                                         Navigator.pop(context);
                                       } else {
