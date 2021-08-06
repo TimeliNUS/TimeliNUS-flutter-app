@@ -51,7 +51,7 @@ class TodoEntity extends Equatable {
         json['deadline'] as Timestamp,
         json['project'] != null
             ? Project.fromEntity(ProjectEntity.fromJson(
-                json['project'], [], [], [], (json['project'] as Map)['id'], (json['project'] as Map)[ref]))
+                json['project'], [], [], [], (json['project'] as Map)['id'], (json['project'] as Map)['ref']))
             : null,
         users,
         json['includeTime'] ?? false,
