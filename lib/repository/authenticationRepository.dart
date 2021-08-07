@@ -147,9 +147,10 @@ class AuthenticationRepository {
       );
       FirebaseAuth.UserCredential cred = await _firebaseAuth.signInWithCredential(credential);
       client.close();
+      // print('access token' + client.credentials.accessToken.data);
       if (cred.additionalUserInfo.isNewUser) {
         await (_firebaseFirestore.collection('user').doc(cred.user.uid).set({
-          'name': cred.user.displayName,
+          'name': cred.user.displayName ?? cred.user.email,
           'email': cred.user.email,
           'project': [],
           'todo': [],
