@@ -66,7 +66,7 @@ class MeetingEntity extends Equatable {
         ref,
         json['project'] != null
             ? Project.fromEntity(ProjectEntity.fromJson(
-                json['project'], [], [], [], (json['project'] as Map)['id'], (json['project'] as Map)['ref']))
+                json['project'], [], [], [], (json['project'] as Map)['id'], (json['project'] as Map)['reference']))
             : null,
         json['timeslot'] != null
             ? (json['timeslot'] as List)
@@ -94,7 +94,7 @@ class MeetingEntity extends Equatable {
           ? {
               'id': project.id,
               'title': project.title,
-              'ref': project.ref,
+              'reference': project.ref,
             }
           : null,
       "startDate": Timestamp.fromDate(startDate.toDate().stripTime()),

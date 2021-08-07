@@ -40,7 +40,8 @@ class User extends Equatable {
         email: json['email'],
         ref: ref,
         calendar: json['calendar'],
-        profilePicture: json['photoURL'] ?? 'https://via.placeholder.com/500x500');
+        profilePicture: json['photoURL'] ??
+            'https://firebasestorage.googleapis.com/v0/b/timelinus-2021.appspot.com/o/default_profile_pic.jpg?alt=media&token=093aee02-56ad-45b8-a937-ab337cf145f1');
   }
 
   Map<String, Object> toJson() {
