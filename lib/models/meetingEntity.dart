@@ -45,7 +45,7 @@ class MeetingEntity extends Equatable {
     return MeetingEntity(
         json['title'] ?? '',
         id != null ? id : (json['id'] as String),
-        json['timeLength'] != null ? int.parse(json['timeLength'].toString()) : 0,
+        json['timeLength'] != null ? (double.parse(json['timeLength'].toString()) * 60).floor() : 0,
         Timestamp.fromDate((json['startDate'] as Timestamp).toDate().add(Duration(
             hours: int.parse((json['startTime'] as String).substring(0, 2)),
             minutes: int.parse((json['startTime'] as String).substring(3))))),
@@ -86,7 +86,7 @@ class MeetingEntity extends Equatable {
     return {
       'id': id,
       'title': title,
-      'timeLength': timeLength,
+      'timeLength': timeLength / 60,
       'meetingVenue': meetingVenue,
       // .toString().split('.')[1],
       'author': author ?? confirmed[0].ref,
@@ -102,7 +102,9 @@ class MeetingEntity extends Equatable {
       "startTime": startDate.toDate().printTime(),
       "endTime": endDate.toDate().printTime(),
       "selectedStartDate": selectedDate,
-      "selectedEndDate": selectedDate != null ? selectedDate.toDate().add(Duration(minutes: timeLength)) : null,
+      "selectedEndDate": selectedDate != null
+          ? Timestamp.fromDate(selectedDate.toDate().add(Duration(minutes: timeLength)).toUtc())
+          : null,
       "isConfirmed": isConfirmed,
       "isOnlineVenue": isOnlineVenue,
       "timeslot": timeslots.map((x) {

@@ -46,11 +46,12 @@ class _MeetingScreenState extends State<MeetingScreen> {
               appTheme.primaryColorLight,
               Scaffold(
                   backgroundColor: appTheme.primaryColorLight,
-                  bottomNavigationBar: BottomBar(3),
+                  bottomNavigationBar: widget.projectId != null ? null : BottomBar(3),
                   body: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       TopBar(widget.projectId != null ? ('Project: ' + widget.projectTitle) : 'My Meetings',
+                          onPressedCallback: () => context.read<AppBloc>().add(AppOnProject()),
                           subtitle: "Invitations and Upcoming"),
                       Expanded(
                         child: CustomCard(

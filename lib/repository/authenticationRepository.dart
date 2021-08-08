@@ -155,8 +155,10 @@ class AuthenticationRepository {
           'project': [],
           'todo': [],
           'meeting': [],
-          'googleRefreshToken': client.credentials.refreshToken
+          'googleRefreshToken': client.credentials.refreshToken,
+          'photoURL': cred.user.photoURL
         }));
+        await cred.user.updateDisplayName(cred.user.email);
       } else {
         await (_firebaseFirestore
             .collection('user')

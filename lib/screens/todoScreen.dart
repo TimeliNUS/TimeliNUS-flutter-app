@@ -38,12 +38,13 @@ class _TodoScreenState extends State<TodoScreen> {
           return ColoredSafeArea(
               appTheme.primaryColorLight,
               Scaffold(
-                  bottomNavigationBar: BottomBar(2),
+                  bottomNavigationBar: widget.projectId != null ? null : BottomBar(2),
                   body: Container(
                       color: appTheme.primaryColorLight,
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         TopBar(widget.projectTitle ?? "My Todos",
                             subtitle: widget.projectTitle != null ? "Project Todos " : null,
+                            onPressedCallback: () => context.read<AppBloc>().add(AppOnProject()),
                             // subtitle: "Example Project",
                             rightWidget: CircularProgress()),
                         Expanded(

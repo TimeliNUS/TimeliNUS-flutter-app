@@ -211,8 +211,8 @@ class _ImportCalendarWidgetState extends State<ImportCalendarWidget> {
                 ])
               : Container(),
           customPadding(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Google Calendar: '),
               OutlinedButton(

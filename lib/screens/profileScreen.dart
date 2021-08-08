@@ -61,12 +61,69 @@ class ProfileDetails extends StatefulWidget {
 
 class _ProfileDetailsState extends State<ProfileDetails> {
   File _imageFile;
+
+  void _showModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: new Icon(Icons.photo),
+              title: new Text('View Profile Picture'),
+              onTap: () {
+                Navigator.pop(context);
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                        content: Image.network(context.read<AppBloc>().state.user.profilePicture ??
+                            'https://firebasestorage.googleapis.com/v0/b/timelinus-2021.appspot.com/o/default_profile_pic.jpg?alt=media&token=093aee02-56ad-45b8-a937-ab337cf145f1')));
+              },
+            ),
+            ListTile(
+              leading: new Icon(Icons.add_a_photo),
+              title: new Text('Upload new profile picture'),
+              onTap: () async {
+                final picker = ImagePicker();
+                final PickedFile pickedFile = await picker.getImage(source: ImageSource.gallery);
+                setState(() {
+                  _imageFile = File(pickedFile.path);
+                });
+                print(_imageFile.path);
+                File croppedFile = await ImageCropper.cropImage(
+                    compressQuality: 50,
+                    sourcePath: _imageFile.path,
+                    aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
+                    androidUiSettings: AndroidUiSettings(
+                        toolbarTitle: 'Crop Image',
+                        toolbarColor: Colors.deepOrange,
+                        toolbarWidgetColor: Colors.white,
+                        initAspectRatio: CropAspectRatioPreset.square,
+                        lockAspectRatio: true),
+                    iosUiSettings: IOSUiSettings(
+                        minimumAspectRatio: 1.0,
+                        aspectRatioLockEnabled: true,
+                        resetAspectRatioEnabled: false,
+                        rotateButtonsHidden: true));
+                final url = await uploadImageToFirebase(croppedFile);
+                context.read<AuthenticationRepository>().updateProfilePicture(url);
+                Navigator.pop(context);
+              },
+            ),
+            Padding(padding: EdgeInsets.only(bottom: 10))
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isLinkedToGoogle =
         AuthenticationRepository().checkLinkedToGoogle(context.read<AppBloc>().state.user.id) != null;
     bool isLinkedToZoom = AuthenticationRepository().checkLinkedToZoom(context.read<AppBloc>().state.user.id) != null;
-
+    String profilePic = context.read<AppBloc>().state.user.profilePicture;
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 25),
         child: Column(children: [
@@ -98,60 +155,8 @@ class _ProfileDetailsState extends State<ProfileDetails> {
                     borderRadius: BorderRadius.circular(12.0),
                     // borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
                     child: InkWell(
-                        onTap: () => showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  ListTile(
-                                    leading: new Icon(Icons.photo),
-                                    title: new Text('View Profile Picture'),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                              content:
-                                                  Image.network(context.read<AppBloc>().state.user.profilePicture)));
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: new Icon(Icons.add_a_photo),
-                                    title: new Text('Upload new profile picture'),
-                                    onTap: () async {
-                                      final picker = ImagePicker();
-                                      final PickedFile pickedFile = await picker.getImage(source: ImageSource.gallery);
-                                      setState(() {
-                                        _imageFile = File(pickedFile.path);
-                                      });
-                                      print(_imageFile.path);
-                                      File croppedFile = await ImageCropper.cropImage(
-                                          compressQuality: 50,
-                                          sourcePath: _imageFile.path,
-                                          aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
-                                          androidUiSettings: AndroidUiSettings(
-                                              toolbarTitle: 'Crop Image',
-                                              toolbarColor: Colors.deepOrange,
-                                              toolbarWidgetColor: Colors.white,
-                                              initAspectRatio: CropAspectRatioPreset.square,
-                                              lockAspectRatio: true),
-                                          iosUiSettings: IOSUiSettings(
-                                              minimumAspectRatio: 1.0,
-                                              aspectRatioLockEnabled: true,
-                                              resetAspectRatioEnabled: false,
-                                              rotateButtonsHidden: true));
-                                      final url = await uploadImageToFirebase(croppedFile);
-                                      context.read<AuthenticationRepository>().updateProfilePicture(url);
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  Padding(padding: EdgeInsets.only(bottom: 10))
-                                ],
-                              );
-                            }),
-                        child: Image.network(context.read<AppBloc>().state.user.profilePicture,
-                            width: 75, fit: BoxFit.cover))),
+                        onTap: () => _showModal(context),
+                        child: Image.network(profilePic, width: 75, fit: BoxFit.cover))),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
